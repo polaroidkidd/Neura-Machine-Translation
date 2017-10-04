@@ -16,6 +16,8 @@
 .idea/**/sqlDataSources.xml
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
+.idea/*
+PA_BA.iml
 
 # Gradle:
 .idea/**/gradle.xml
