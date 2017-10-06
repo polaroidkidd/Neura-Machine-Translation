@@ -1,0 +1,39 @@
+## Ports:
+hofernic:  
+8850 - 8854
+einardan  
+8855 - 8859
+
+##Allocate server resources
+srun --pty --ntasks=1 --cpus-per-task=2 --mem=4G --gres=gpu:1 bash
+
+Check if allocation was successful  
+nvidia-smi
+
+# Building the container from a file
+
+nvidia-docker build -f Dockerfile -t tag-name path/to/dockerfile
+
+# Run your docker image
+# (-d to detach & print container ID; -p to open port for ipython notebook 6006 & tensorboard 8888)
+
+nvidia-docker run -d --name container_name -p 8888:8888 -p 6006:6006 gcr.io/tensorflow/tensorflow:latest-gpu
+
+# Connect to your container
+
+nvidia-docker exec -it container_name bash
+
+# Stop or Start a container
+
+nvidia-docker start || stop
+
+
+# Launch tensorboard on your container
+
+tensorboard --logdir=path/to/log-directory
+
+# Port forwarding 
+
+ssh -L 8888:localhost:8888 -f -N user@yourserver
+
+This should be your output on localhost:8888
