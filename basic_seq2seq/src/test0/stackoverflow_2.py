@@ -1,3 +1,4 @@
+from itertools import islice
 from keras import Input, callbacks
 from keras.layers import TimeDistributed, Dropout
 from keras.models import Sequential
@@ -11,8 +12,13 @@ import numpy as np
 
 EMBEDDING_DIM = 100
 MAX_NUM_WORDS = 20000
-MAX_SEQ_LEN = 500
-BASE_DATA_DIR = "../data"
+MAX_SEQ_LEN = 250
+MAX_SENTENCES = 1000
+BASE_DATA_DIR = os.path.join("../..", "data")
+
+
+#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 
 def load(file):
     """
@@ -22,17 +28,50 @@ def load(file):
     """
     with(open(file, encoding='utf8')) as file:
         data = file.readlines()
-
+        #data = []
+        #for i in range(MAX_SENTENCES):
+        #    data.append(lines[i])
     print('Loaded', len(data), "lines of data.")
     return data
 
-
-def add_one_hot_dim(sequences, vocab_size):
-    x = (np.ones((sequences.shape[0], sequences.shape[1], vocab_size), dtype='int32'))
-    for idx, s in enumerate(sequences):
+def convert_last_dim_to_one_hot_enc(target, vocab_size):
+    """
+    :param target: shape: (number of samples, max sentence length)
+    :param vocab_size: size of the vocabulary
+    :return: transformed target with shape: (number of samples, max sentence length, number of words in vocab)
+    """
+    x = np.ones((target.shape[0], target.shape[1], vocab_size), dtype='int32')
+    for idx, s in enumerate(target):
         for token in s:
-            x[idx, :len(sequences)] = to_categorical(token, num_classes=vocab_size)
+            x[idx, :len(target)] = to_categorical(token, num_classes=vocab_size)
     return x
+
+
+def serve_sentence(data_x, data_y):
+    for i, _ in enumerate(data_x):
+        in_X = data_x[i]
+        out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
+        for token in data_y[i]:
+            out_Y[0, :len(data_y)] = to_categorical(token, num_classes=vocab_size)
+        yield in_X, out_Y
+
+
+def serve_batch(data_x, data_y, vocab_size, batch_size):
+    dataiter = serve_sentence(data_x, data_y)
+    V = vocab_size
+    S = MAX_SEQ_LEN
+    B = batch_size
+
+    while dataiter:
+        in_X = np.zeros((B, S), dtype=np.int32)
+        out_Y = np.zeros((B, S, V), dtype=np.int32)
+        next_batch = list(islice(dataiter, 0, batch_size))
+        if len(next_batch) < batch_size:
+            raise StopIteration
+        for d_i, (d_X, d_Y) in enumerate(next_batch):
+            in_X[d_i] = d_X
+            out_Y[d_i] = d_Y
+        yield in_X, out_Y
 
 
 def preprocess_data(input_data, target_data):
@@ -43,9 +82,10 @@ def preprocess_data(input_data, target_data):
 
     embeddings_index = load_embedding()
     embedding_matrix, num_words = prepare_embedding_matrix(word_index, embeddings_index)
-    target_data = add_one_hot_dim(padded_target_data, num_words)
 
-    return padded_input_data, target_data, embedding_matrix, num_words
+    #target_data = convert_last_dim_to_one_hot_enc(padded_target_data, num_words)
+
+    return padded_input_data, padded_target_data, embedding_matrix, num_words
 
 
 def tokenize(input_data, target_data):
@@ -102,7 +142,7 @@ data_de = load(german_train_file)
 input_data, target_data, embedding_matrix, num_words = preprocess_data(data_en, data_de)
 
 vocab_size = num_words
-batch_size = 33
+batch_size = 64
 rnn_size = 10
 p_dense_dropout = 0.8
 
@@ -143,4 +183,6 @@ print(target_data.shape)
 print(target_data[0])
 tbCallBack = callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0,
                                    write_graph=True, write_images=True)
-M.fit(input_data, target_data, callbacks=[tbCallBack])
+#M.fit(input_data, target_data, callbacks=[tbCallBack])
+
+M.fit_generator(serve_batch(input_data, target_data, vocab_size, batch_size), 3900, epochs=1, verbose=2, callbacks=[tbCallBack])
