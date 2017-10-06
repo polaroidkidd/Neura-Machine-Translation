@@ -29,7 +29,6 @@ def load(file):
 
 def add_one_hot_dim(sequences, vocab_size):
     x = (np.ones((sequences.shape[0], sequences.shape[1], vocab_size), dtype='int32'))
-
     for idx, s in enumerate(sequences):
         for token in s:
             x[idx, :len(sequences)] = to_categorical(token, num_classes=vocab_size)
@@ -63,7 +62,7 @@ def load_embedding():
     print('Indexing word vectors.')
 
     embeddings_index = {}
-    filename = os.path.join('C:/Users/Nicolas/Dropbox/PA_CODE/glove.6B', 'glove.6B.100d.txt')
+    filename = os.path.join('/', 'glove.6B.100d.txt')
     with open(filename, 'r', encoding='utf8') as f:
         for line in f.readlines():
             values = line.split()
@@ -93,9 +92,9 @@ def prepare_embedding_matrix(word_index, embeddings_index):
     return embedding_matrix, num_words
 
 
-BASE_DATA_DIR = ""
-TRAIN_EN_FILE = "train100.en"
-TRAIN_DE_FILE = "train100.de"
+BASE_DATA_DIR = "/"
+TRAIN_EN_FILE = "train.en"
+TRAIN_DE_FILE = "train.de"
 
 english_train_file = os.path.join(BASE_DATA_DIR, TRAIN_EN_FILE)
 german_train_file = os.path.join(BASE_DATA_DIR, TRAIN_DE_FILE)
