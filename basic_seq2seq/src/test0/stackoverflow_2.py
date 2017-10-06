@@ -12,7 +12,7 @@ import numpy as np
 EMBEDDING_DIM = 100
 MAX_NUM_WORDS = 20000
 MAX_SEQ_LEN = 500
-
+BASE_DATA_DIR = "../data"
 
 def load(file):
     """
@@ -20,7 +20,7 @@ def load(file):
     :param file: the file which should be loaded
     :return: list of data
     """
-    with(open(file, 'r')) as file:
+    with(open(file, encoding='utf8')) as file:
         data = file.readlines()
 
     print('Loaded', len(data), "lines of data.")
@@ -62,7 +62,7 @@ def load_embedding():
     print('Indexing word vectors.')
 
     embeddings_index = {}
-    filename = os.path.join('/', 'glove.6B.100d.txt')
+    filename = os.path.join(BASE_DATA_DIR, 'glove.6B.100d.txt')
     with open(filename, 'r', encoding='utf8') as f:
         for line in f.readlines():
             values = line.split()
@@ -92,7 +92,6 @@ def prepare_embedding_matrix(word_index, embeddings_index):
     return embedding_matrix, num_words
 
 
-BASE_DATA_DIR = "/"
 TRAIN_EN_FILE = "train.en"
 TRAIN_DE_FILE = "train.de"
 
