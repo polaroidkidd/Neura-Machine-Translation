@@ -1,8 +1,13 @@
 from itertools import islice
-from keras import Input, callbacks
+
+import time
+from keras import callbacks
 from keras.layers import TimeDistributed, Dropout
 from keras.models import Sequential
-from keras.utils import to_categorical
+from keras.utils import to_categorical as to_cat0
+from tensorflow.contrib.keras.python.keras.utils import to_categorical as to_cat1
+from tensorflow.contrib.keras.python.keras.utils.np_utils import to_categorical as to_cat2
+from thinc.neural.util import to_categorical as to_cat3
 import os
 from keras.layers import LSTM, Dense
 from keras.layers import Embedding
@@ -17,7 +22,7 @@ MAX_SENTENCES = 1000
 BASE_DATA_DIR = os.path.join("../..", "data")
 
 
-#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 def load(file):
@@ -28,11 +33,12 @@ def load(file):
     """
     with(open(file, encoding='utf8')) as file:
         data = file.readlines()
-        #data = []
-        #for i in range(MAX_SENTENCES):
+        # data = []
+        # for i in range(MAX_SENTENCES):
         #    data.append(lines[i])
     print('Loaded', len(data), "lines of data.")
     return data
+
 
 def convert_last_dim_to_one_hot_enc(target, vocab_size):
     """
@@ -45,6 +51,36 @@ def convert_last_dim_to_one_hot_enc(target, vocab_size):
         for token in s:
             x[idx, :len(target)] = to_categorical(token, num_classes=vocab_size)
     return x
+
+
+def serve_batch_perfomance(data_x, data_y):
+    counter = 0
+    #print(data_x.shape)
+    #print(data_y.shape)
+    batch_X = np.zeros((batch_size, data_x.shape[1]))
+    batch_Y = np.zeros((batch_size, data_y.shape[1], vocab_size))
+    #print('batch_X.shape', batch_X.shape)
+    #print('batch_Y.shape', batch_Y.shape)
+    for i, _ in enumerate(data_x):
+        in_X = data_x[i]
+        out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
+        #print('in_X.shape', in_X.shape)
+        #print("out_Y.shape", out_Y.shape)
+
+
+        for token in data_y[i]:
+            out_Y[0, :len(data_y)] = to_cat3(token, nb_classes=vocab_size)
+
+
+
+        batch_X[counter] = in_X
+        batch_Y[counter] = out_Y
+        counter += 1
+        #print("counter", counter)
+        if counter == batch_size:
+            print("counter == batch_size", i)
+            counter = 0
+            yield batch_X, batch_Y
 
 
 def serve_sentence(data_x, data_y):
@@ -152,6 +188,10 @@ S = MAX_SEQ_LEN
 V = vocab_size
 E = EMBEDDING_DIM
 emb_W = embedding_matrix
+#x, y = next(serve_batch_perfomance(input_data, target_data))
+# x, y = next(serve_batch(input_data, target_data,vocab_size, batch_size))
+
+
 
 ## dropout parameters
 p_dense = p_dense_dropout
@@ -183,6 +223,8 @@ print(target_data.shape)
 print(target_data[0])
 tbCallBack = callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0,
                                    write_graph=True, write_images=True)
-#M.fit(input_data, target_data, callbacks=[tbCallBack])
-
-M.fit_generator(serve_batch(input_data, target_data, vocab_size, batch_size), 3900, epochs=1, verbose=2, callbacks=[tbCallBack])
+# M.fit(input_data, target_data, callbacks=[tbCallBack])
+normal_epochs = 10
+epochs = 142000/64*normal_epochs
+M.fit_generator(serve_batch_perfomance(input_data, target_data), 1, epochs=epochs, verbose=2, #workers=4,
+                callbacks=[tbCallBack])
