@@ -20,6 +20,10 @@ MAX_NUM_WORDS = 20000
 MAX_SEQ_LEN = 250
 MAX_SENTENCES = 1000
 BASE_DATA_DIR = os.path.join("../..", "data")
+BASIC_PERSISTENT_DIR = '/persistent'
+GRAPH_DIR = 'graph'
+MODEL_DIR = 'model'
+MODEL_CHECKPOINT_DIR = 'model_chkp'
 
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -55,28 +59,26 @@ def convert_last_dim_to_one_hot_enc(target, vocab_size):
 
 def serve_batch_perfomance(data_x, data_y):
     counter = 0
-    #print(data_x.shape)
-    #print(data_y.shape)
+    # print(data_x.shape)
+    # print(data_y.shape)
     batch_X = np.zeros((batch_size, data_x.shape[1]))
     batch_Y = np.zeros((batch_size, data_y.shape[1], vocab_size))
-    #print('batch_X.shape', batch_X.shape)
-    #print('batch_Y.shape', batch_Y.shape)
+    # print('batch_X.shape', batch_X.shape)
+    # print('batch_Y.shape', batch_Y.shape)
     for i, _ in enumerate(data_x):
         in_X = data_x[i]
         out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
-        #print('in_X.shape', in_X.shape)
-        #print("out_Y.shape", out_Y.shape)
+        # print('in_X.shape', in_X.shape)
+        # print("out_Y.shape", out_Y.shape)
 
 
         for token in data_y[i]:
             out_Y[0, :len(data_y)] = to_cat3(token, nb_classes=vocab_size)
 
-
-
         batch_X[counter] = in_X
         batch_Y[counter] = out_Y
         counter += 1
-        #print("counter", counter)
+        # print("counter", counter)
         if counter == batch_size:
             print("counter == batch_size", i)
             counter = 0
@@ -119,7 +121,7 @@ def preprocess_data(input_data, target_data):
     embeddings_index = load_embedding()
     embedding_matrix, num_words = prepare_embedding_matrix(word_index, embeddings_index)
 
-    #target_data = convert_last_dim_to_one_hot_enc(padded_target_data, num_words)
+    # target_data = convert_last_dim_to_one_hot_enc(padded_target_data, num_words)
 
     return padded_input_data, padded_target_data, embedding_matrix, num_words
 
@@ -179,7 +181,7 @@ input_data, target_data, embedding_matrix, num_words = preprocess_data(data_en, 
 
 vocab_size = num_words
 batch_size = 64
-rnn_size = 10
+rnn_size = 200
 p_dense_dropout = 0.8
 
 B = batch_size
@@ -188,7 +190,7 @@ S = MAX_SEQ_LEN
 V = vocab_size
 E = EMBEDDING_DIM
 emb_W = embedding_matrix
-#x, y = next(serve_batch_perfomance(input_data, target_data))
+# x, y = next(serve_batch_perfomance(input_data, target_data))
 # x, y = next(serve_batch(input_data, target_data,vocab_size, batch_size))
 
 
@@ -221,10 +223,13 @@ print(num_words)
 print(input_data.shape)
 print(target_data.shape)
 print(target_data[0])
-tbCallBack = callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0,
+tbCallBack = callbacks.TensorBoard(log_dir=os.path.join(BASIC_PERSISTENT_DIR, GRAPH_DIR), histogram_freq=0,
                                    write_graph=True, write_images=True)
-# M.fit(input_data, target_data, callbacks=[tbCallBack])
+modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'weights.{epoch:02d}-{val_loss:.2f}.hdf5',
+                                          monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False,
+                                          mode='auto', period=5)
 normal_epochs = 10
-epochs = 142000/64*normal_epochs
-M.fit_generator(serve_batch_perfomance(input_data, target_data), 1, epochs=epochs, verbose=2, #workers=4,
+epochs = 142000 / batch_size * normal_epochs
+M.fit_generator(serve_batch_perfomance(input_data, target_data), 1, epochs=epochs, verbose=2,  # workers=4,
                 callbacks=[tbCallBack])
+M.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack2.model'))
