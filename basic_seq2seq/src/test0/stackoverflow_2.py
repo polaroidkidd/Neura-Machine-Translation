@@ -19,11 +19,15 @@ EMBEDDING_DIM = 100
 MAX_NUM_WORDS = 20000
 MAX_SEQ_LEN = 250
 MAX_SENTENCES = 1000
+batch_size = 64
+rnn_size = 200
+p_dense_dropout = 0.8
+
 BASE_DATA_DIR = os.path.join("../..", "data")
 BASIC_PERSISTENT_DIR = '/persistent'
-GRAPH_DIR = 'graph'
-MODEL_DIR = 'model'
-MODEL_CHECKPOINT_DIR = 'model_chkp'
+GRAPH_DIR = 'graph_stack1'
+MODEL_DIR = 'model_stack1'
+MODEL_CHECKPOINT_DIR = 'model_chkp_stack1'
 
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -112,28 +116,35 @@ def serve_batch(data_x, data_y, vocab_size, batch_size):
         yield in_X, out_Y
 
 
-def preprocess_data(input_data, target_data):
-    encoded_input_data, encoded_target_data, word_index = tokenize(input_data, target_data)
+def preprocess_data(train_input_data, train_target_data, val_input_data, val_target_data):
+    train_input_data, train_target_data, val_input_data, val_target_data, word_index = tokenize(train_input_data,
+                                                                                                train_target_data,
+                                                                                                val_input_data,
+                                                                                                val_target_data)
 
-    padded_input_data = pad_sequences(encoded_input_data, maxlen=MAX_SEQ_LEN, padding='post')
-    padded_target_data = pad_sequences(encoded_target_data, maxlen=MAX_SEQ_LEN, padding='post')
+    train_input_data = pad_sequences(train_input_data, maxlen=MAX_SEQ_LEN, padding='post')
+    train_target_data = pad_sequences(train_target_data, maxlen=MAX_SEQ_LEN, padding='post')
+    val_input_data = pad_sequences(val_input_data, maxlen=MAX_SEQ_LEN, padding='post')
+    val_target_data = pad_sequences(val_target_data, maxlen=MAX_SEQ_LEN, padding='post')
 
     embeddings_index = load_embedding()
     embedding_matrix, num_words = prepare_embedding_matrix(word_index, embeddings_index)
 
     # target_data = convert_last_dim_to_one_hot_enc(padded_target_data, num_words)
 
-    return padded_input_data, padded_target_data, embedding_matrix, num_words
+    return train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, num_words
 
 
-def tokenize(input_data, target_data):
+def tokenize(train_input_data, train_target_data, val_input_data, val_target_data):
     tokenizer = Tokenizer(num_words=MAX_NUM_WORDS)
-    tokenizer.fit_on_texts(input_data + target_data)
+    tokenizer.fit_on_texts(train_input_data + train_target_data + val_input_data + val_target_data)
 
-    encoded_input_data = tokenizer.texts_to_sequences(input_data)
-    encoded_target_data = tokenizer.texts_to_sequences(target_data)
+    train_input_data = tokenizer.texts_to_sequences(train_input_data)
+    train_target_data = tokenizer.texts_to_sequences(train_target_data)
+    val_input_data = tokenizer.texts_to_sequences(val_input_data)
+    val_target_data = tokenizer.texts_to_sequences(val_target_data)
 
-    return encoded_input_data, encoded_target_data, tokenizer.word_index
+    return train_input_data, train_target_data, val_input_data, val_target_data, tokenizer.word_index
 
 
 def load_embedding():
@@ -172,17 +183,30 @@ def prepare_embedding_matrix(word_index, embeddings_index):
 
 TRAIN_EN_FILE = "train.en"
 TRAIN_DE_FILE = "train.de"
+VAL_EN_FILE = "newstest2014.en"
+VAL_DE_FILE = "newstest2014.de"
 
 english_train_file = os.path.join(BASE_DATA_DIR, TRAIN_EN_FILE)
 german_train_file = os.path.join(BASE_DATA_DIR, TRAIN_DE_FILE)
+english_val_file = os.path.join(BASE_DATA_DIR, VAL_EN_FILE)
+german_val_file = os.path.join(BASE_DATA_DIR, VAL_DE_FILE)
 data_en = load(english_train_file)
 data_de = load(german_train_file)
-input_data, target_data, embedding_matrix, num_words = preprocess_data(data_en, data_de)
+val_data_en = load(english_val_file)
+val_data_de = load(german_val_file)
+
+train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, num_words = preprocess_data(
+    data_en, data_de, val_data_en, val_data_en)
+
+if len(train_input_data) != len(train_target_data) or len(val_input_data) != len(val_target_data):
+    print("length of input_data and target_data have to be the same")
+    exit(-1)
+num_samples = len(train_input_data)
+
+print("Number of training data:", num_samples)
+print("Number of validation data:", len(val_input_data))
 
 vocab_size = num_words
-batch_size = 64
-rnn_size = 200
-p_dense_dropout = 0.8
 
 B = batch_size
 R = rnn_size
@@ -216,20 +240,14 @@ print('compiling')
 M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 print('compiled')
-print(len(input_data))
-print(len(target_data))
-print(embedding_matrix.shape)
-print(num_words)
-print(input_data.shape)
-print(target_data.shape)
-print(target_data[0])
 tbCallBack = callbacks.TensorBoard(log_dir=os.path.join(BASIC_PERSISTENT_DIR, GRAPH_DIR), histogram_freq=0,
                                    write_graph=True, write_images=True)
 modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'weights.{epoch:02d}-{val_loss:.2f}.hdf5',
                                           monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False,
                                           mode='auto', period=5)
 normal_epochs = 10
-epochs = 142000 / batch_size * normal_epochs
-M.fit_generator(serve_batch_perfomance(input_data, target_data), 1, epochs=epochs, verbose=2,  # workers=4,
-                callbacks=[tbCallBack])
+epochs = np.math.floor(num_samples / batch_size * normal_epochs)
+M.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), 1, epochs=epochs, verbose=2,
+                validation_data=serve_batch_perfomance(val_input_data, val_target_data), validation_steps=1,
+                callbacks=[tbCallBack, modelCallback])
 M.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack2.model'))
