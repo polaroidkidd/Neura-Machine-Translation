@@ -6,7 +6,7 @@ import os
 
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
-from thinc.neural.util import to_categorical as to_cat3
+from thinc.neural.util import to_categorical
 
 EMBEDDING_DIM = 100
 MAX_NUM_WORDS = 20000
@@ -17,11 +17,11 @@ batch_size = 64
 rnn_size = 200
 p_dense_dropout = 0.8
 
-BASE_DATA_DIR = os.path.join("../..", "data")
-BASIC_PERSISTENT_DIR = '/persistent'
-GRAPH_DIR = 'graph_stack1'
-MODEL_DIR = 'model_stack1'
-MODEL_CHECKPOINT_DIR = 'model_chkp_stack1'
+BASE_DATA_DIR = os.path.join("/seq2seq/", "data")
+BASIC_PERSISTENT_DIR = '/persistent/gpu2/'
+GRAPH_DIR = 'graph_stack1/'
+MODEL_DIR = 'model_stack1/'
+MODEL_CHECKPOINT_DIR = 'model_chkp_stack1/'
 
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -58,7 +58,7 @@ def serve_batch_perfomance(data_x, data_y):
 
 
         for token in data_y[i]:
-            out_Y[0, :len(data_y)] = to_cat3(token, nb_classes=vocab_size)
+            out_Y[0, :len(data_y)] = to_categorical(token, nb_classes=vocab_size)
 
         batch_X[counter] = in_X
         batch_Y[counter] = out_Y
@@ -186,7 +186,8 @@ modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'we
                                           mode='auto', period=5)
 normal_epochs = 10
 epochs = np.math.floor(num_samples / batch_size * normal_epochs)
-model.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), 1, epochs=epochs, verbose=2,
-                    validation_data=serve_batch_perfomance(val_input_data, val_target_data), validation_steps=1,
+model.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), num_samples/batch_size, epochs=normal_epochs, verbose=2,
+                    validation_data=serve_batch_perfomance(val_input_data, val_target_data),
+                    validation_steps=len(val_input_data) / batch_size,
                     callbacks=[tbCallBack, modelCallback])
-model.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack1.model'))
+model.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack1.h5'))

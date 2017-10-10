@@ -23,11 +23,11 @@ batch_size = 64
 rnn_size = 200
 p_dense_dropout = 0.8
 
-BASE_DATA_DIR = os.path.join("../..", "data")
-BASIC_PERSISTENT_DIR = '/persistent'
-GRAPH_DIR = 'graph_stack1'
-MODEL_DIR = 'model_stack1'
-MODEL_CHECKPOINT_DIR = 'model_chkp_stack1'
+BASE_DATA_DIR = os.path.join("/seq2seq/", "data")
+BASIC_PERSISTENT_DIR = '/persistent/gpu2/'
+GRAPH_DIR = 'graph_stack2/'
+MODEL_DIR = 'model_stack2/'
+MODEL_CHECKPOINT_DIR = 'model_chkp_stack2/'
 
 
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -248,6 +248,7 @@ modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'we
 normal_epochs = 10
 epochs = np.math.floor(num_samples / batch_size * normal_epochs)
 M.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), 1, epochs=epochs, verbose=2,
-                validation_data=serve_batch_perfomance(val_input_data, val_target_data), validation_steps=1,
+                validation_data=serve_batch_perfomance(val_input_data, val_target_data),
+                validation_steps=len(val_input_data) / batch_size,
                 callbacks=[tbCallBack, modelCallback])
-M.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack2.model'))
+M.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack2.h5'))
