@@ -183,7 +183,7 @@ tbCallBack = callbacks.TensorBoard(log_dir=os.path.join(BASIC_PERSISTENT_DIR, GR
                                    write_graph=True, write_images=True)
 modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'weights.{epoch:02d}-{val_loss:.2f}.hdf5',
                                           monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False,
-                                          mode='auto', period=5)
+                                          mode='auto', period=1)
 normal_epochs = 10
 epochs = np.math.floor(num_samples / batch_size * normal_epochs)
 model.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), num_samples/batch_size, epochs=normal_epochs, verbose=2,
