@@ -12,7 +12,6 @@ EMBEDDING_DIM = 100
 MAX_NUM_WORDS = 20000
 MAX_SEQ_LEN = 250
 MAX_SENTENCES = 1000
-
 batch_size = 64
 rnn_size = 200
 p_dense_dropout = 0.8
@@ -44,30 +43,22 @@ def load(file):
 
 def serve_batch_perfomance(data_x, data_y):
     counter = 0
-    # print(data_x.shape)
-    # print(data_y.shape)
     batch_X = np.zeros((batch_size, data_x.shape[1]))
     batch_Y = np.zeros((batch_size, data_y.shape[1], vocab_size))
-    # print('batch_X.shape', batch_X.shape)
-    # print('batch_Y.shape', batch_Y.shape)
-    for i, _ in enumerate(data_x):
-        in_X = data_x[i]
-        out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
-        # print('in_X.shape', in_X.shape)
-        # print("out_Y.shape", out_Y.shape)
+    while True:
+        for i, _ in enumerate(data_x):
+            in_X = data_x[i]
+            out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
+            for token in data_y[i]:
+                out_Y[0, :len(data_y)] = to_categorical(token, nb_classes=vocab_size)
 
-
-        for token in data_y[i]:
-            out_Y[0, :len(data_y)] = to_categorical(token, nb_classes=vocab_size)
-
-        batch_X[counter] = in_X
-        batch_Y[counter] = out_Y
-        counter += 1
-        # print("counter", counter)
-        if counter == batch_size:
-            print("counter == batch_size", i)
-            counter = 0
-            yield batch_X, batch_Y
+            batch_X[counter] = in_X
+            batch_Y[counter] = out_Y
+            counter += 1
+            if counter == batch_size:
+                print("counter == batch_size", i)
+                counter = 0
+                yield batch_X, batch_Y
 
 
 def preprocess_data(train_input_data, train_target_data, val_input_data, val_target_data):
@@ -144,13 +135,13 @@ english_train_file = os.path.join(BASE_DATA_DIR, TRAIN_EN_FILE)
 german_train_file = os.path.join(BASE_DATA_DIR, TRAIN_DE_FILE)
 english_val_file = os.path.join(BASE_DATA_DIR, VAL_EN_FILE)
 german_val_file = os.path.join(BASE_DATA_DIR, VAL_DE_FILE)
-data_en = load(english_train_file)
-data_de = load(german_train_file)
-val_data_en = load(english_val_file)
-val_data_de = load(german_val_file)
+train_input_data = load(english_train_file)
+train_target_data = load(german_train_file)
+val_input_data = load(english_val_file)
+val_target_data = load(german_val_file)
 
 train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, num_words = preprocess_data(
-    data_en, data_de, val_data_en, val_data_en)
+    train_input_data, train_target_data, val_input_data, val_target_data)
 
 if len(train_input_data) != len(train_target_data) or len(val_input_data) != len(val_target_data):
     print("length of input_data and target_data have to be the same")
@@ -161,22 +152,11 @@ print("Number of training data:", num_samples)
 print("Number of validation data:", len(val_input_data))
 
 vocab_size = num_words
-B = batch_size
-R = rnn_size
-S = MAX_SEQ_LEN
-V = vocab_size
-E = EMBEDDING_DIM
-emb_W = embedding_matrix
-# x, y = next(serve_batch_perfomance(input_data, target_data))
-# x, y = next(serve_batch(input_data, target_data,vocab_size, batch_size))
-
-
-# M.fit(input_data, target_data, callbacks=[tbCallBack])
 
 xin = Input(batch_shape=(batch_size, MAX_SEQ_LEN), dtype='int32')
-xemb = Embedding(V, E)(xin)  # 3 dim (batch,time,feat)
-seq = LSTM(R, return_sequences=True)(xemb)
-mlp = TimeDistributed(Dense(V, activation='softmax'))(seq)
+xemb = Embedding(vocab_size, EMBEDDING_DIM)(xin)  # 3 dim (batch,time,feat)
+seq = LSTM(rnn_size, return_sequences=True)(xemb)
+mlp = TimeDistributed(Dense(vocab_size, activation='softmax'))(seq)
 model = Model(input=xin, output=mlp)
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
 tbCallBack = callbacks.TensorBoard(log_dir=os.path.join(BASIC_PERSISTENT_DIR, GRAPH_DIR), histogram_freq=0,
@@ -186,7 +166,8 @@ modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'we
                                           mode='auto', period=1)
 normal_epochs = 10
 epochs = np.math.floor(num_samples / batch_size * normal_epochs)
-model.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), num_samples/batch_size, epochs=normal_epochs, verbose=2,
+model.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), num_samples / batch_size,
+                    epochs=normal_epochs, verbose=2, max_queue_size=5,
                     validation_data=serve_batch_perfomance(val_input_data, val_target_data),
                     validation_steps=len(val_input_data) / batch_size,
                     callbacks=[tbCallBack, modelCallback])
