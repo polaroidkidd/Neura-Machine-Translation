@@ -9,12 +9,10 @@ binmode(STDIN, ":utf8");
 binmode(STDOUT, ":utf8");
 binmode(STDERR, ":utf8");
 
-use warnings;
 use FindBin qw($Bin);
 use strict;
 
-my $mydir = "$Bin/DataProcessingTools/preprocessing/tools/";
-print STDOUT "$mydir";
+my $mydir = "$Bin/nonbreaking_prefixes";
 
 my %NONBREAKING_PREFIX = ();
 my $language = "en";
@@ -37,11 +35,11 @@ if (!$QUIET) {
 	print STDERR "Language: $language\n";
 }
 
-my $prefixfile = "$mydir/nonbreaking_prefixes/nonbreaking_prefix.$language";
+my $prefixfile = "$mydir/nonbreaking_prefix.$language";
 
 #default back to English if we don't have a language-specific prefix file
 if (!(-e $prefixfile)) {
-	$prefixfile = "$mydir/nonbreaking_prefixes/nonbreaking_prefix.en";
+	$prefixfile = "$mydir/nonbreaking_prefix.en";
 	print STDERR "WARNING: No known abbreviations for language '$language', attempting fall-back to English version...\n";
 	die ("ERROR: No abbreviations files found in $mydir\n") unless (-e $prefixfile);
 }
