@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
    rm -rf /var/lib/apt/lists/*
 RUN apt-get update
 RUN pip3 install --upgrade pip
-RUN pip3 install tensorflow==1.2.1 keras==2.0.8
+RUN pip3 install tensorflow-gpu==1.2.1 keras==2.0.8
 
 COPY /translation/ /translation
 COPY /start_server.sh /

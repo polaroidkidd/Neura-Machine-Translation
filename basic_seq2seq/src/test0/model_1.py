@@ -1,14 +1,12 @@
-from itertools import islice
-from keras import callbacks
-from keras.layers import TimeDistributed, Dropout
-from keras.models import Sequential
-from thinc.neural.util import to_categorical as to_cat3
+from keras import Input, callbacks
+from keras.engine import Model
+from keras.layers import Embedding, LSTM, TimeDistributed, Dense
+import numpy as np
 import os
-from keras.layers import LSTM, Dense
-from keras.layers import Embedding
+
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
-import numpy as np
+from thinc.neural.util import to_categorical
 
 EMBEDDING_DIM = 100
 MAX_NUM_WORDS = 20000
@@ -20,12 +18,9 @@ p_dense_dropout = 0.8
 
 BASE_DATA_DIR = os.path.join("/seq2seq/", "data")
 BASIC_PERSISTENT_DIR = '/persistent/gpu2/'
-GRAPH_DIR = 'graph_stack2/'
-MODEL_DIR = 'model_stack2/'
-MODEL_CHECKPOINT_DIR = 'model_chkp_stack2/'
-
-
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+GRAPH_DIR = 'graph_stack1/'
+MODEL_DIR = 'model_stack1/'
+MODEL_CHECKPOINT_DIR = 'model_chkp_stack1/'
 
 
 def load(file):
@@ -36,27 +31,11 @@ def load(file):
     """
     with(open(file, encoding='utf8')) as file:
         data = file.readlines()
-        # data = []
-        # for i in range(MAX_SENTENCES):
-        #    data.append(lines[i])
     print('Loaded', len(data), "lines of data.")
     return data
 
 
-def convert_last_dim_to_one_hot_enc(target, vocab_size):
-    """
-    :param target: shape: (number of samples, max sentence length)
-    :param vocab_size: size of the vocabulary
-    :return: transformed target with shape: (number of samples, max sentence length, number of words in vocab)
-    """
-    x = np.ones((target.shape[0], target.shape[1], vocab_size), dtype='int32')
-    for idx, s in enumerate(target):
-        for token in s:
-            x[idx, :len(target)] = to_categorical(token, num_classes=vocab_size)
-    return x
-
-
-def serve_batch_perfomance(data_x, data_y):
+def serve_batch(data_x, data_y):
     counter = 0
     batch_X = np.zeros((batch_size, data_x.shape[1]))
     batch_Y = np.zeros((batch_size, data_y.shape[1], vocab_size))
@@ -64,9 +43,8 @@ def serve_batch_perfomance(data_x, data_y):
         for i, _ in enumerate(data_x):
             in_X = data_x[i]
             out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
-
             for token in data_y[i]:
-                out_Y[0, :len(data_y)] = to_cat3(token, nb_classes=vocab_size)
+                out_Y[0, :len(data_y)] = to_categorical(token, nb_classes=vocab_size)
 
             batch_X[counter] = in_X
             batch_Y[counter] = out_Y
@@ -75,33 +53,6 @@ def serve_batch_perfomance(data_x, data_y):
                 print("counter == batch_size", i)
                 counter = 0
                 yield batch_X, batch_Y
-
-
-def serve_sentence(data_x, data_y):
-    for i, _ in enumerate(data_x):
-        in_X = data_x[i]
-        out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
-        for token in data_y[i]:
-            out_Y[0, :len(data_y)] = to_categorical(token, num_classes=vocab_size)
-        yield in_X, out_Y
-
-
-def serve_batch(data_x, data_y, vocab_size, batch_size):
-    dataiter = serve_sentence(data_x, data_y)
-    V = vocab_size
-    S = MAX_SEQ_LEN
-    B = batch_size
-
-    while dataiter:
-        in_X = np.zeros((B, S), dtype=np.int32)
-        out_Y = np.zeros((B, S, V), dtype=np.int32)
-        next_batch = list(islice(dataiter, 0, batch_size))
-        if len(next_batch) < batch_size:
-            raise StopIteration
-        for d_i, (d_X, d_Y) in enumerate(next_batch):
-            in_X[d_i] = d_X
-            out_Y[d_i] = d_Y
-        yield in_X, out_Y
 
 
 def preprocess_data(train_input_data, train_target_data, val_input_data, val_target_data):
@@ -196,27 +147,16 @@ print("Number of validation data:", len(val_input_data))
 
 vocab_size = num_words
 
-## dropout parameters
-p_dense = p_dense_dropout
+xin = Input(batch_shape=(batch_size, MAX_SEQ_LEN), dtype='int32')
+new_in = Input(batch_size=(None,))
+out_emb = Embedding(vocab_size, vocab_size, weights=[np.identity(vocab_size)])(new_in)
 
-M = Sequential()
-M.add(Embedding(vocab_size, EMBEDDING_DIM, weights=[embedding_matrix], mask_zero=True))
+xemb = Embedding(vocab_size, EMBEDDING_DIM)(xin)  # 3 dim (batch,time,feat)
+seq = LSTM(rnn_size, return_sequences=True)(xemb)
+mlp = TimeDistributed(Dense(vocab_size, activation='softmax'))(seq)
+model = Model(input=xin, output=mlp)
+model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-M.add(LSTM(rnn_size, return_sequences=True))
-
-M.add(Dropout(p_dense))
-
-M.add(LSTM(rnn_size * int(1 / p_dense), return_sequences=True))
-
-M.add(Dropout(p_dense))
-
-M.add(TimeDistributed(Dense(vocab_size, activation='softmax')))
-
-print('compiling')
-
-M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-print('compiled')
 tbCallBack = callbacks.TensorBoard(log_dir=os.path.join(BASIC_PERSISTENT_DIR, GRAPH_DIR), histogram_freq=0,
                                    write_graph=True, write_images=True)
 modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'weights.{epoch:02d}-{val_loss:.2f}.hdf5',
@@ -224,7 +164,9 @@ modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'we
                                           mode='auto', period=1)
 normal_epochs = 10
 epochs = np.math.floor(num_samples / batch_size * normal_epochs)
-M.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), 1, epochs=epochs, verbose=2,
-                max_queue_size=5, validation_data=serve_batch_perfomance(val_input_data, val_target_data),
-                validation_steps=len(val_input_data) / batch_size, callbacks=[tbCallBack, modelCallback])
-M.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack2.h5'))
+model.fit_generator(serve_batch(train_input_data, train_target_data), num_samples / batch_size,
+                    epochs=normal_epochs, verbose=2, max_queue_size=5,
+                    validation_data=serve_batch(val_input_data, val_target_data),
+                    validation_steps=len(val_input_data) / batch_size,
+                    callbacks=[tbCallBack, modelCallback])
+model.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack1.h5'))

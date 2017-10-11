@@ -1,12 +1,19 @@
-from keras import Input, callbacks
-from keras.engine import Model
-from keras.layers import Embedding, LSTM, TimeDistributed, Dense
-import numpy as np
-import os
+from itertools import islice
 
+import time
+from keras import callbacks
+from keras.layers import TimeDistributed, Dropout
+from keras.models import Sequential
+from keras.utils import to_categorical as to_cat0
+from tensorflow.contrib.keras.python.keras.utils import to_categorical as to_cat1
+from tensorflow.contrib.keras.python.keras.utils.np_utils import to_categorical as to_cat2
+from thinc.neural.util import to_categorical
+import os
+from keras.layers import LSTM, Dense
+from keras.layers import Embedding
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
-from thinc.neural.util import to_categorical
+import numpy as np
 
 EMBEDDING_DIM = 100
 MAX_NUM_WORDS = 20000
@@ -17,13 +24,10 @@ rnn_size = 200
 p_dense_dropout = 0.8
 
 BASE_DATA_DIR = os.path.join("/seq2seq/", "data")
-BASIC_PERSISTENT_DIR = '/persistent/gpu2/'
+BASIC_PERSISTENT_DIR = '/persistent/'
 GRAPH_DIR = 'graph_stack1/'
 MODEL_DIR = 'model_stack1/'
 MODEL_CHECKPOINT_DIR = 'model_chkp_stack1/'
-
-
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 def load(file):
@@ -41,7 +45,20 @@ def load(file):
     return data
 
 
-def serve_batch_perfomance(data_x, data_y):
+def convert_last_dim_to_one_hot_enc(target, vocab_size):
+    """
+    :param target: shape: (number of samples, max sentence length)
+    :param vocab_size: size of the vocabulary
+    :return: transformed target with shape: (number of samples, max sentence length, number of words in vocab)
+    """
+    x = np.ones((target.shape[0], target.shape[1], vocab_size), dtype='int32')
+    for idx, s in enumerate(target):
+        for token in s:
+            x[idx, :len(target)] = to_categorical(token, num_classes=vocab_size)
+    return x
+
+
+def serve_batch(data_x, data_y):
     counter = 0
     batch_X = np.zeros((batch_size, data_x.shape[1]))
     batch_Y = np.zeros((batch_size, data_y.shape[1], vocab_size))
@@ -49,6 +66,7 @@ def serve_batch_perfomance(data_x, data_y):
         for i, _ in enumerate(data_x):
             in_X = data_x[i]
             out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
+
             for token in data_y[i]:
                 out_Y[0, :len(data_y)] = to_categorical(token, nb_classes=vocab_size)
 
@@ -135,13 +153,13 @@ english_train_file = os.path.join(BASE_DATA_DIR, TRAIN_EN_FILE)
 german_train_file = os.path.join(BASE_DATA_DIR, TRAIN_DE_FILE)
 english_val_file = os.path.join(BASE_DATA_DIR, VAL_EN_FILE)
 german_val_file = os.path.join(BASE_DATA_DIR, VAL_DE_FILE)
-train_input_data = load(english_train_file)
-train_target_data = load(german_train_file)
-val_input_data = load(english_val_file)
-val_target_data = load(german_val_file)
+data_en = load(english_train_file)
+data_de = load(german_train_file)
+val_data_en = load(english_val_file)
+val_data_de = load(german_val_file)
 
 train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, num_words = preprocess_data(
-    train_input_data, train_target_data, val_input_data, val_target_data)
+    data_en, data_de, val_data_en, val_data_en)
 
 if len(train_input_data) != len(train_target_data) or len(val_input_data) != len(val_target_data):
     print("length of input_data and target_data have to be the same")
@@ -153,22 +171,41 @@ print("Number of validation data:", len(val_input_data))
 
 vocab_size = num_words
 
-xin = Input(batch_shape=(batch_size, MAX_SEQ_LEN), dtype='int32')
-xemb = Embedding(vocab_size, EMBEDDING_DIM)(xin)  # 3 dim (batch,time,feat)
-seq = LSTM(rnn_size, return_sequences=True)(xemb)
-mlp = TimeDistributed(Dense(vocab_size, activation='softmax'))(seq)
-model = Model(input=xin, output=mlp)
-model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+B = batch_size
+R = rnn_size
+S = MAX_SEQ_LEN
+V = vocab_size
+E = EMBEDDING_DIM
+emb_W = embedding_matrix
+p_dense = p_dense_dropout
+
+M = Sequential()
+M.add(Embedding(V, E, weights=[emb_W], mask_zero=True))
+
+M.add(LSTM(R, return_sequences=True))
+
+M.add(Dropout(p_dense))
+
+M.add(LSTM(R * int(1 / p_dense), return_sequences=True))
+
+M.add(Dropout(p_dense))
+
+M.add(TimeDistributed(Dense(V, activation='softmax')))
+
+print('compiling')
+
+M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+print('compiled')
 tbCallBack = callbacks.TensorBoard(log_dir=os.path.join(BASIC_PERSISTENT_DIR, GRAPH_DIR), histogram_freq=0,
                                    write_graph=True, write_images=True)
 modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'weights.{epoch:02d}-{val_loss:.2f}.hdf5',
                                           monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False,
-                                          mode='auto', period=1)
+                                          mode='auto', period=5)
 normal_epochs = 10
 epochs = np.math.floor(num_samples / batch_size * normal_epochs)
-model.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), num_samples / batch_size,
-                    epochs=normal_epochs, verbose=2, max_queue_size=5,
-                    validation_data=serve_batch_perfomance(val_input_data, val_target_data),
-                    validation_steps=len(val_input_data) / batch_size,
-                    callbacks=[tbCallBack, modelCallback])
-model.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack1.h5'))
+M.fit_generator(serve_batch(train_input_data, train_target_data), 1, epochs=epochs, verbose=2,
+                validation_data=serve_batch(val_input_data, val_target_data),
+                validation_steps=(len(val_input_data) / batch_size),
+                callbacks=[tbCallBack, modelCallback])
+M.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack2.h5'))

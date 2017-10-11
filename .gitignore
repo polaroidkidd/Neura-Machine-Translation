@@ -156,3 +156,5 @@ venv.bak/
 .mypy_cache/
 
 /basic_seq2seq/data/
+/basic_seq2seq/persistent/
+/basic_seq2seq/persistent2gpu2/
