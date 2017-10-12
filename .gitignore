@@ -158,3 +158,6 @@ venv.bak/
 /basic_seq2seq/data/
 /basic_seq2seq/persistent/
 /basic_seq2seq/persistent2gpu2/
+
+/DataSets/Training/europarl-v7.de-en.en
+/DataSets/Training/europarl-v7.de-en.de
