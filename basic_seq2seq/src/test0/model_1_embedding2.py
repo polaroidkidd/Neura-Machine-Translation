@@ -1,26 +1,41 @@
 from keras import Input, callbacks
 from keras.engine import Model
-from keras.layers import Embedding, LSTM, TimeDistributed, Dense
+from keras.layers import Embedding, LSTM, TimeDistributed, Dense, Lambda
 import numpy as np
 import os
 
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
-from thinc.neural.util import to_categorical
+from utils import neg_log_likelihood
+from utils import CustomLossLayer
+
+# from thinc.neural.util import to_categorical
 
 EMBEDDING_DIM = 100
 MAX_NUM_WORDS = 20000
-MAX_SEQ_LEN = 250
+MAX_SEQ_LEN = 100
 MAX_SENTENCES = 1000
 batch_size = 64
 rnn_size = 200
 p_dense_dropout = 0.8
-
 BASE_DATA_DIR = os.path.join("/seq2seq/", "data")
 BASIC_PERSISTENT_DIR = '/persistent/gpu2/'
 GRAPH_DIR = 'graph_stack1/'
 MODEL_DIR = 'model_stack1/'
 MODEL_CHECKPOINT_DIR = 'model_chkp_stack1/'
+
+try:
+    if os.environ['USERDOMAIN_ROAMINGPROFILE'] == 'DESKTOP-C9M296Q':
+        BASE_DATA_DIR = "../../data"
+        BASIC_PERSISTENT_DIR = '../../persistent/gpu/'
+except Exception:
+    try:
+        if os.environ['USER'] == 'nicolas':
+            BASE_DATA_DIR = "../../data"
+        BASIC_PERSISTENT_DIR = '../../persistent/gpu/'
+    except Exception:
+        pass
+    pass
 
 
 def load(file):
@@ -38,16 +53,11 @@ def load(file):
 def serve_batch(data_x, data_y):
     counter = 0
     batch_X = np.zeros((batch_size, data_x.shape[1]))
-    batch_Y = np.zeros((batch_size, data_y.shape[1], vocab_size))
+    batch_Y = np.zeros((batch_size, data_y.shape[1]))
     while True:
         for i, _ in enumerate(data_x):
-            in_X = data_x[i]
-            out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
-            for token in data_y[i]:
-                out_Y[0, :len(data_y)] = to_categorical(token, nb_classes=vocab_size)
-
-            batch_X[counter] = in_X
-            batch_Y[counter] = out_Y
+            batch_X[counter] = data_x[i]
+            batch_Y[counter] = data_y[i]
             counter += 1
             if counter == batch_size:
                 print("counter == batch_size", i)
@@ -67,11 +77,9 @@ def preprocess_data(train_input_data, train_target_data, val_input_data, val_tar
     val_target_data = pad_sequences(val_target_data, maxlen=MAX_SEQ_LEN, padding='post')
 
     embeddings_index = load_embedding()
-    embedding_matrix, num_words = prepare_embedding_matrix(word_index, embeddings_index)
+    embedding_matrix, vocab_size = prepare_embedding_matrix(word_index, embeddings_index)
 
-    # target_data = convert_last_dim_to_one_hot_enc(padded_target_data, num_words)
-
-    return train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, num_words
+    return train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, vocab_size
 
 
 def tokenize(train_input_data, train_target_data, val_input_data, val_target_data):
@@ -107,8 +115,8 @@ def prepare_embedding_matrix(word_index, embeddings_index):
     print('Preparing embedding matrix.')
 
     # prepare embedding matrix
-    num_words = min(MAX_NUM_WORDS, len(word_index)) + 1
-    embedding_matrix = np.zeros((num_words, EMBEDDING_DIM))
+    vocab_size = min(MAX_NUM_WORDS, len(word_index)) + 1
+    embedding_matrix = np.zeros((vocab_size, EMBEDDING_DIM))
     for word, i in word_index.items():
         if i >= MAX_NUM_WORDS:
             continue
@@ -117,7 +125,7 @@ def prepare_embedding_matrix(word_index, embeddings_index):
             # words not found in embedding index will be all-zeros.
             embedding_matrix[i] = embedding_vector
 
-    return embedding_matrix, num_words
+    return embedding_matrix, vocab_size
 
 
 TRAIN_EN_FILE = "train.en"
@@ -134,7 +142,7 @@ train_target_data = load(german_train_file)
 val_input_data = load(english_val_file)
 val_target_data = load(german_val_file)
 
-train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, num_words = preprocess_data(
+train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, vocab_size = preprocess_data(
     train_input_data, train_target_data, val_input_data, val_target_data)
 
 if len(train_input_data) != len(train_target_data) or len(val_input_data) != len(val_target_data):
@@ -145,15 +153,25 @@ num_samples = len(train_input_data)
 print("Number of training data:", num_samples)
 print("Number of validation data:", len(val_input_data))
 
-vocab_size = num_words
-
 xin = Input(batch_shape=(batch_size, MAX_SEQ_LEN), dtype='int32')
+y_input = Input(batch_shape=(batch_size, MAX_SEQ_LEN))
+out_emb = Embedding(vocab_size, vocab_size, weights=[np.identity(vocab_size)], trainable=False)(y_input)
 
 xemb = Embedding(vocab_size, EMBEDDING_DIM)(xin)  # 3 dim (batch,time,feat)
 seq = LSTM(rnn_size, return_sequences=True)(xemb)
 mlp = TimeDistributed(Dense(vocab_size, activation='softmax'))(seq)
-model = Model(input=xin, output=mlp)
-model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+
+
+xent = Lambda(lambda x: neg_log_likelihood(x[0], x[1]), output_shape=(1,))([out_emb, mlp])
+decoder_outputs = CustomLossLayer()(xent)
+import tensorflow as tf
+
+model = Model(input=xin, output=decoder_outputs)
+# model = Model(input=xin, output=decoder_outputs)
+model.compile(optimizer='Adam', loss=None, metrics=['accuracy'])
 
 tbCallBack = callbacks.TensorBoard(log_dir=os.path.join(BASIC_PERSISTENT_DIR, GRAPH_DIR), histogram_freq=0,
                                    write_graph=True, write_images=True)
