@@ -7,22 +7,15 @@ import os
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 from thinc.neural.util import to_categorical
+from ParamHandler import ParamHandler
 
-# Hyperparameters:
-EMBEDDING_DIM = 100
-MAX_NUM_WORDS = 20000
-MAX_SEQ_LEN = 250
-MAX_SENTENCES = 1000
-batch_size = 64
-rnn_size = 200
-p_dense_dropout = 0.8
+param_handler = ParamHandler("char", additional=['tf'])
 
-# Paths:
 BASE_DATA_DIR = "../../DataSets"
 BASIC_PERSISTENT_DIR = '../../persistent/'
-GRAPH_DIR = 'graph_stack1/'
-MODEL_DIR = 'model_stack1/'
-MODEL_CHECKPOINT_DIR = 'model_chkp_stack1/'
+GRAPH_DIR = 'graph' + param_handler.param_summary()
+MODEL_DIR = 'model' + param_handler.param_summary()
+MODEL_CHECKPOINT_DIR = 'chkp' + param_handler.param_summary()
 
 TRAIN_EN_FILE = "europarl-v7.de-en.en"
 TRAIN_DE_FILE = "europarl-v7.de-en.de"
@@ -49,8 +42,8 @@ def load(file):
 
 def serve_batch(data_x, data_y):
     counter = 0
-    batch_X = np.zeros((batch_size, data_x.shape[1]))
-    batch_Y = np.zeros((batch_size, data_y.shape[1], vocab_size))
+    batch_X = np.zeros((param_handler.params['BATCH_SIZE'], data_x.shape[1]))
+    batch_Y = np.zeros((param_handler.params['BATCH_SIZE'], data_y.shape[1], vocab_size))
     while True:
         for i, _ in enumerate(data_x):
             in_X = data_x[i]
@@ -61,7 +54,7 @@ def serve_batch(data_x, data_y):
             batch_X[counter] = in_X
             batch_Y[counter] = out_Y
             counter += 1
-            if counter == batch_size:
+            if counter == param_handler.params['BATCH_SIZE']:
                 print("counter == batch_size", i)
                 counter = 0
                 yield batch_X, batch_Y
@@ -73,10 +66,10 @@ def preprocess_data(train_input_data, train_target_data, val_input_data, val_tar
                                                                                                 val_input_data,
                                                                                                 val_target_data)
 
-    train_input_data = pad_sequences(train_input_data, maxlen=MAX_SEQ_LEN, padding='post')
-    train_target_data = pad_sequences(train_target_data, maxlen=MAX_SEQ_LEN, padding='post')
-    val_input_data = pad_sequences(val_input_data, maxlen=MAX_SEQ_LEN, padding='post')
-    val_target_data = pad_sequences(val_target_data, maxlen=MAX_SEQ_LEN, padding='post')
+    train_input_data = pad_sequences(train_input_data, maxlen=param_handler.params['MAX_SEQ_LEN'], padding='post')
+    train_target_data = pad_sequences(train_target_data, maxlen=param_handler.params['MAX_SEQ_LEN'], padding='post')
+    val_input_data = pad_sequences(val_input_data, maxlen=param_handler.params['MAX_SEQ_LEN'], padding='post')
+    val_target_data = pad_sequences(val_target_data, maxlen=param_handler.params['MAX_SEQ_LEN'], padding='post')
 
     embeddings_index = load_embedding()
     embedding_matrix, num_words = prepare_embedding_matrix(word_index, embeddings_index)
@@ -87,7 +80,7 @@ def preprocess_data(train_input_data, train_target_data, val_input_data, val_tar
 
 
 def tokenize(train_input_data, train_target_data, val_input_data, val_target_data):
-    tokenizer = Tokenizer(num_words=MAX_NUM_WORDS)
+    tokenizer = Tokenizer(num_words=param_handler.params['MAX_NUM_WORDS'])
     tokenizer.fit_on_texts(train_input_data + train_target_data + val_input_data + val_target_data)
 
     train_input_data = tokenizer.texts_to_sequences(train_input_data)
@@ -102,7 +95,7 @@ def load_embedding():
     print('Indexing word vectors.')
 
     embeddings_index = {}
-    filename = os.path.join(BASE_DATA_DIR, 'glove.6B.100d.txt')
+    filename = os.path.join(BASE_DATA_DIR, param_handler.params['GLOVE_FILE'])
     with open(filename, 'r', encoding='utf8') as f:
         for line in f.readlines():
             values = line.split()
@@ -119,10 +112,10 @@ def prepare_embedding_matrix(word_index, embeddings_index):
     print('Preparing embedding matrix.')
 
     # prepare embedding matrix
-    num_words = min(MAX_NUM_WORDS, len(word_index)) + 1
-    embedding_matrix = np.zeros((num_words, EMBEDDING_DIM))
+    num_words = min(param_handler.params['MAX_NUM_WORDS'], len(word_index)) + 1
+    embedding_matrix = np.zeros((num_words, param_handler.params['EMBEDDING_DIM']))
     for word, i in word_index.items():
-        if i >= MAX_NUM_WORDS:
+        if i >= param_handler.params['MAX_NUM_WORDS']:
             continue
         embedding_vector = embeddings_index.get(word)
         if embedding_vector is not None:
@@ -150,10 +143,10 @@ print("Number of validation data:", len(val_input_data))
 
 vocab_size = num_words
 
-xin = Input(batch_shape=(batch_size, MAX_SEQ_LEN), dtype='int32')
+xin = Input(batch_shape=(param_handler.params['BATCH_SIZE'], param_handler.params['MAX_SEQ_LEN']), dtype='int32')
 
-xemb = Embedding(vocab_size, EMBEDDING_DIM)(xin)  # 3 dim (batch,time,feat)
-seq = LSTM(rnn_size, return_sequences=True)(xemb)
+xemb = Embedding(vocab_size, param_handler.params['EMBEDDING_DIM'])(xin)  # 3 dim (batch,time,feat)
+seq = LSTM(param_handler.params['LATENT_DIM'], return_sequences=True)(xemb)
 mlp = TimeDistributed(Dense(vocab_size, activation='softmax'))(seq)
 model = Model(input=xin, output=mlp)
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
@@ -164,10 +157,10 @@ modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'we
                                           monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False,
                                           mode='auto', period=1)
 normal_epochs = 10
-epochs = np.math.floor(num_samples / batch_size * normal_epochs)
-model.fit_generator(serve_batch(train_input_data, train_target_data), num_samples / batch_size,
+epochs = np.math.floor(num_samples / param_handler.params['BATCH_SIZE'] * normal_epochs)
+model.fit_generator(serve_batch(train_input_data, train_target_data), num_samples / param_handler.params['BATCH_SIZE'],
                     epochs=normal_epochs, verbose=2, max_queue_size=5,
                     validation_data=serve_batch(val_input_data, val_target_data),
-                    validation_steps=len(val_input_data) / batch_size,
+                    validation_steps=len(val_input_data) / param_handler.params['BATCH_SIZE'],
                     callbacks=[tbCallBack, modelCallback])
 model.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack1.h5'))

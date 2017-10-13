@@ -23,7 +23,7 @@ def neg_log_likelihood(y_true, y_pred):
     return 1e-06 + K.sum(-K.log(probs))
 
 
-def categorical_cross_entropyd(y_true, y_pred):
+def categorical_cross_entropy(y_true, y_pred):
     print(log_loss(y_true, y_pred))
     return log_loss(y_true, y_pred)
 

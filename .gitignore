@@ -161,3 +161,4 @@ venv.bak/
 
 /DataSets/Training/europarl-v7.de-en.en
 /DataSets/Training/europarl-v7.de-en.de
+DataSets/Training/merged_en_de.txt
