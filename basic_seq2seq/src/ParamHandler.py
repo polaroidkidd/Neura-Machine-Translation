@@ -8,7 +8,7 @@ class ParamHandler:
         self.params['BATCH_SIZE'] = 64
         self.params['EMBEDDING_DIM'] = 100
         self.params['EPOCHS'] = 15
-        self.params['GLOVE_FILE'] = "glove.6B.100d.txt"
+        #self.params['GLOVE_FILE'] = "glove.6B.100d.txt"
         self.params['LATENT_DIM'] = 256
         self.params['MAX_DECODER_SEQ_LEN'] = 3633
         self.params['NUM_DECODER_TOKENS'] = 321

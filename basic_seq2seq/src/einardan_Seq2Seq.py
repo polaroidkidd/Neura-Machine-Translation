@@ -15,14 +15,14 @@ BASIC_PERSISTENT_DIR = '../../persistent/'
 GRAPH_DIR = 'graph' + param_handler.param_summary()
 MODEL_DIR = 'model' + param_handler.param_summary()
 MODEL_CHECKPOINT_DIR = 'chkp' + param_handler.param_summary()
+input_token_idx_file = os.path.join(BASIC_PERSISTENT_DIR, "input_token_idx")
+target_token_idx_file = os.path.join(BASIC_PERSISTENT_DIR, "target_token_idx")
 
 train_data_path = os.path.join(BASE_DATA_DIR, 'Training', 'merged_en_de.txt')
+val_data_path = os.path.join(BASE_DATA_DIR, 'Validation', 'merged_en_de.txt')
 
 
-# TODO: save num_encoder_tokens
-# TODO: use validation
-def vectorize_data(data_path):
-    # Vectorize the data.
+def split_data_and_count(data_path):
     input_texts = []
     target_texts = []
     input_characters = set()
@@ -51,10 +51,9 @@ def vectorize_data(data_path):
         for char in target_text:
             if char not in target_characters:
                 target_characters.add(char)
-    print(len(input_characters))
-    print(len(target_characters))
-    print(len(input_texts))
-    print(len(target_texts))
+    print("j", input_texts[0], "l", len(input_texts))
+    print("j", target_texts[0], "l", len(target_texts))
+    exit()
     input_characters = sorted(list(input_characters))
     target_characters = sorted(list(target_characters))
     num_encoder_tokens = len(input_characters)
@@ -81,7 +80,7 @@ def vectorize_data(data_path):
     return input_texts, input_token_index, target_token_index, target_texts
 
 
-def serve_batch():
+def serve_batch(input_data, target_data, input_token_idx, target_token_idx):
     encoder_input_data = np.zeros((param_handler.params['BATCH_SIZE'], param_handler.params['MAX_ENCODER_SEQ_LEN'],
                                    param_handler.params['NUM_ENCODER_TOKENS']), dtype='float32')
     decoder_input_data = np.zeros((param_handler.params['BATCH_SIZE'], param_handler.params['MAX_DECODER_SEQ_LEN'],
@@ -90,18 +89,18 @@ def serve_batch():
                                     param_handler.params['NUM_DECODER_TOKENS']), dtype='float32')
     start = 0
     while True:
-        for i, (input_text, target_text) in enumerate(zip(input_texts[start:start + param_handler.params['BATCH_SIZE']],
-                                                          target_texts[
-                                                          start:start + param_handler.params['BATCH_SIZE']])):
+        for i, (input_text, target_text) in enumerate(
+                zip(input_data[start:start + param_handler.params['BATCH_SIZE']],
+                    target_data[start:start + param_handler.params['BATCH_SIZE']])):
             for t, char in enumerate(input_text):
-                encoder_input_data[i, t, input_token_index[char]] = 1.
+                encoder_input_data[i, t, input_token_idx[char]] = 1.
             for t, char in enumerate(target_text):
                 # decoder_target_data is ahead of decoder_target_data by one timestep
-                decoder_input_data[i, t, target_token_index[char]] = 1.
+                decoder_input_data[i, t, target_token_idx[char]] = 1.
                 if t > 0:
                     # decoder_target_data will be ahead by one timestep
                     # and will not include the start character.
-                    decoder_target_data[i, t - 1, target_token_index[char]] = 1.
+                    decoder_target_data[i, t - 1, target_token_idx[char]] = 1.
         start += param_handler.params['BATCH_SIZE']
         yield [encoder_input_data, decoder_input_data], decoder_target_data
 
@@ -130,7 +129,13 @@ def build_model():
     return model
 
 
-input_texts, input_token_index, target_token_index, target_texts = vectorize_data(train_data_path)
+train_input_texts, train_input_token_idx, train_target_token_idx, train_target_texts = split_data_and_count(
+    train_data_path)
+
+np.save(input_token_idx_file, train_input_token_idx)
+np.save(target_token_idx_file, train_target_token_idx)
+
+val_input_texts, _, _, val_target_texts = split_data_and_count(val_data_path)
 
 model = build_model()
 model.summary()
@@ -145,11 +150,13 @@ modelCallback = callbacks.ModelCheckpoint(
     monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False,
     mode='auto', period=1)
 
-# model.fit([encoder_input_data, decoder_input_data], decoder_target_data, batch_size=param_handler.params['BATCH_SIZE'],
-#          epochs=param_handler.params['EPOCHS'],
-#         validation_split=0.2, verbose=1, callbacks=[tbCallBack, modelCallback])
+model.fit_generator(serve_batch(train_input_texts, train_target_texts, train_input_token_idx, train_target_token_idx),
+                    len(train_input_texts) / param_handler.params['BATCH_SIZE'],
+                    epochs=param_handler.params['EPOCHS'], verbose=2,
+                    validation_data=serve_batch(val_input_texts, val_target_texts, train_input_token_idx,
+                                                train_target_token_idx),
+                    validation_steps=len(val_input_texts) / param_handler.params['BATCH_SIZE'],
+                    callbacks=[tbCallBack, modelCallback])
 
-model.fit_generator(serve_batch(), len(input_texts) / param_handler.params['BATCH_SIZE'],
-                    epochs=param_handler.params['EPOCHS'], verbose=2)
 # Save model
 model.save(os.path.join(BASE_DATA_DIR, MODEL_DIR, 'model.h5'))
