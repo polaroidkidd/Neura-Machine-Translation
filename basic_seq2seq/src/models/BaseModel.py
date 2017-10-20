@@ -10,3 +10,6 @@ class BaseModel:
 
     def predict(self):
         pass
+
+    def testaa(self):
+        pass

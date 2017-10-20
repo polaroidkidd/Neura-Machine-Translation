@@ -11,10 +11,12 @@ import os
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 
+from models.BaseModel import BaseModel
 
-class WordSeq2SeqTutStartEndTokenNoUNK():
+
+class WordSeq2SeqTutStartEndTokenNoUNK(BaseModel):
     def __init__(self):
-        self.params = {}
+        BaseModel.__init__()
         self.params['batch_size'] = 128
         self.params['epochs'] = 100
         self.params['latent_dim'] = 256

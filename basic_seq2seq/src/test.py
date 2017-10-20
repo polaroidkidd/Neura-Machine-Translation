@@ -1,4 +1,4 @@
-from models.char_seq2seq_second_approach import Seq2Seq2
+from models.CharSeq2SeqTutIndexInput import CharSeq2SeqTut
 
-char_model = Seq2Seq2()
+char_model = CharSeq2SeqTut()
 char_model.start_training()
