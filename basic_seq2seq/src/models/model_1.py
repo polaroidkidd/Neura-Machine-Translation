@@ -1,18 +1,14 @@
-from keras import Input, callbacks
-from keras.engine import Model
-from keras.layers import Embedding, LSTM, TimeDistributed, Dense, Lambda
-import numpy as np
 import os
 
+import numpy as np
+from keras import Input, callbacks
+from keras.engine import Model
+from keras.layers import Embedding, LSTM, TimeDistributed, Dense
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
-
-from ParamHandler import ParamHandler
-from utils import categorical_cross_entropy
-from utils import CustomLossLayer
-
 from thinc.neural.util import to_categorical
 
+from helpers.ParamHandler import ParamHandler
 
 param_handler = ParamHandler("char", additional=['tf'])
 
@@ -32,6 +28,7 @@ german_train_file = os.path.join(BASE_DATA_DIR, "Training", TRAIN_DE_FILE)
 english_val_file = os.path.join(BASE_DATA_DIR, "Validation", VAL_EN_FILE)
 german_val_file = os.path.join(BASE_DATA_DIR, "Validation", VAL_DE_FILE)
 
+
 def load(file):
     """
     Loads the given file into a list.
@@ -47,11 +44,16 @@ def load(file):
 def serve_batch(data_x, data_y):
     counter = 0
     batch_X = np.zeros((param_handler.params['BATCH_SIZE'], data_x.shape[1]))
-    batch_Y = np.zeros((param_handler.params['BATCH_SIZE'], data_y.shape[1]))
+    batch_Y = np.zeros((param_handler.params['BATCH_SIZE'], data_y.shape[1], vocab_size))
     while True:
         for i, _ in enumerate(data_x):
-            batch_X[counter] = data_x[i]
-            batch_Y[counter] = data_y[i]
+            in_X = data_x[i]
+            out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
+            for token in data_y[i]:
+                out_Y[0, :len(data_y)] = to_categorical(token, nb_classes=vocab_size)
+
+            batch_X[counter] = in_X
+            batch_Y[counter] = out_Y
             counter += 1
             if counter == param_handler.params['BATCH_SIZE']:
                 print("counter == batch_size", i)
@@ -71,9 +73,11 @@ def preprocess_data(train_input_data, train_target_data, val_input_data, val_tar
     val_target_data = pad_sequences(val_target_data, maxlen=param_handler.params['MAX_SEQ_LEN'], padding='post')
 
     embeddings_index = load_embedding()
-    embedding_matrix, vocab_size = prepare_embedding_matrix(word_index, embeddings_index)
+    embedding_matrix, num_words = prepare_embedding_matrix(word_index, embeddings_index)
 
-    return train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, vocab_size
+    # target_data = convert_last_dim_to_one_hot_enc(padded_target_data, num_words)
+
+    return train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, num_words
 
 
 def tokenize(train_input_data, train_target_data, val_input_data, val_target_data):
@@ -109,8 +113,8 @@ def prepare_embedding_matrix(word_index, embeddings_index):
     print('Preparing embedding matrix.')
 
     # prepare embedding matrix
-    vocab_size = min(param_handler.params['MAX_NUM_WORDS'], len(word_index)) + 1
-    embedding_matrix = np.zeros((vocab_size, param_handler.params['EMBEDDING_DIM']))
+    num_words = min(param_handler.params['MAX_NUM_WORDS'], len(word_index)) + 1
+    embedding_matrix = np.zeros((num_words, param_handler.params['EMBEDDING_DIM']))
     for word, i in word_index.items():
         if i >= param_handler.params['MAX_NUM_WORDS']:
             continue
@@ -119,7 +123,7 @@ def prepare_embedding_matrix(word_index, embeddings_index):
             # words not found in embedding index will be all-zeros.
             embedding_matrix[i] = embedding_vector
 
-    return embedding_matrix, vocab_size
+    return embedding_matrix, num_words
 
 
 train_input_data = load(english_train_file)
@@ -127,7 +131,7 @@ train_target_data = load(german_train_file)
 val_input_data = load(english_val_file)
 val_target_data = load(german_val_file)
 
-train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, vocab_size = preprocess_data(
+train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, num_words = preprocess_data(
     train_input_data, train_target_data, val_input_data, val_target_data)
 
 if len(train_input_data) != len(train_target_data) or len(val_input_data) != len(val_target_data):
@@ -138,35 +142,25 @@ num_samples = len(train_input_data)
 print("Number of training data:", num_samples)
 print("Number of validation data:", len(val_input_data))
 
+vocab_size = num_words
+
 xin = Input(batch_shape=(param_handler.params['BATCH_SIZE'], param_handler.params['MAX_SEQ_LEN']), dtype='int32')
-y_input = Input(batch_shape=(param_handler.params['BATCH_SIZE'], param_handler.params['MAX_SEQ_LEN']))
-out_emb = Embedding(vocab_size, vocab_size, weights=[np.identity(vocab_size)], trainable=False)(y_input)
 
 xemb = Embedding(vocab_size, param_handler.params['EMBEDDING_DIM'])(xin)  # 3 dim (batch,time,feat)
 seq = LSTM(param_handler.params['LATENT_DIM'], return_sequences=True)(xemb)
 mlp = TimeDistributed(Dense(vocab_size, activation='softmax'))(seq)
-
-# model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-
-
-xent = Lambda(lambda x: categorical_cross_entropy(x[0], x[1]), output_shape=(1,))([out_emb, mlp])
-decoder_outputs = CustomLossLayer()(xent)
-import tensorflow as tf
-
-model = Model(input=xin, output=decoder_outputs)
-# model = Model(input=xin, output=decoder_outputs)
-model.compile(optimizer='Adam', loss=None, metrics=['accuracy'])
+model = Model(input=xin, output=mlp)
+model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 tbCallBack = callbacks.TensorBoard(log_dir=os.path.join(BASIC_PERSISTENT_DIR, GRAPH_DIR), histogram_freq=0,
                                    write_graph=True, write_images=True)
 modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'weights.{epoch:02d}-{val_loss:.2f}.hdf5',
                                           monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False,
                                           mode='auto', period=1)
-
-epochs = np.math.floor(num_samples / param_handler.params['BATCH_SIZE'] * param_handler.params['EPOCHS'])
+normal_epochs = 10
+epochs = np.math.floor(num_samples / param_handler.params['BATCH_SIZE'] * normal_epochs)
 model.fit_generator(serve_batch(train_input_data, train_target_data), num_samples / param_handler.params['BATCH_SIZE'],
-                    epochs=param_handler.params['EPOCHS'], verbose=2, max_queue_size=5,
+                    epochs=normal_epochs, verbose=2, max_queue_size=5,
                     validation_data=serve_batch(val_input_data, val_target_data),
                     validation_steps=len(val_input_data) / param_handler.params['BATCH_SIZE'],
                     callbacks=[tbCallBack, modelCallback])

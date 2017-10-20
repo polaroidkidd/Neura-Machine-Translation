@@ -1,7 +1,7 @@
-BASE_DATA_DIR = '../../DataSets/Training/'
+BASE_DATA_DIR = '../../DataSets/Validation/'
 
-en = 'europarl-v7.de-en.en'
-de = 'europarl-v7.de-en.de'
+en = 'newstest2013.en'
+de = 'newstest2013.de'
 
 out = 'merged_en_de.txt'
 import os

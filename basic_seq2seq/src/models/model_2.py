@@ -1,13 +1,16 @@
-from keras import Input, callbacks
-from keras.engine import Model
-from keras.layers import Embedding, LSTM, TimeDistributed, Dense
-import numpy as np
 import os
 
+import numpy as np
+from keras import callbacks
+from keras.layers import Embedding
+from keras.layers import LSTM, Dense
+from keras.layers import TimeDistributed, Dropout
+from keras.models import Sequential
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 from thinc.neural.util import to_categorical
-from ParamHandler import ParamHandler
+
+from helpers.ParamHandler import ParamHandler
 
 param_handler = ParamHandler("char", additional=['tf'])
 
@@ -36,8 +39,24 @@ def load(file):
     """
     with(open(file, encoding='utf8')) as file:
         data = file.readlines()
+        # data = []
+        # for i in range(MAX_SENTENCES):
+        #    data.append(lines[i])
     print('Loaded', len(data), "lines of data.")
     return data
+
+
+def convert_last_dim_to_one_hot_enc(target, vocab_size):
+    """
+    :param target: shape: (number of samples, max sentence length)
+    :param vocab_size: size of the vocabulary
+    :return: transformed target with shape: (number of samples, max sentence length, number of words in vocab)
+    """
+    x = np.ones((target.shape[0], target.shape[1], vocab_size), dtype='int32')
+    for idx, s in enumerate(target):
+        for token in s:
+            x[idx, :len(target)] = to_categorical(token, num_classes=vocab_size)
+    return x
 
 
 def serve_batch(data_x, data_y):
@@ -48,6 +67,7 @@ def serve_batch(data_x, data_y):
         for i, _ in enumerate(data_x):
             in_X = data_x[i]
             out_Y = np.zeros((1, data_y.shape[1], vocab_size), dtype='int32')
+
             for token in data_y[i]:
                 out_Y[0, :len(data_y)] = to_categorical(token, nb_classes=vocab_size)
 
@@ -55,7 +75,7 @@ def serve_batch(data_x, data_y):
             batch_Y[counter] = out_Y
             counter += 1
             if counter == param_handler.params['BATCH_SIZE']:
-                print("counter == batch_size", i)
+                print("counter == param_handler.params['BATCH_SIZE']", i)
                 counter = 0
                 yield batch_X, batch_Y
 
@@ -95,7 +115,7 @@ def load_embedding():
     print('Indexing word vectors.')
 
     embeddings_index = {}
-    filename = os.path.join(BASE_DATA_DIR, param_handler.params['GLOVE_FILE'])
+    filename = os.path.join(BASE_DATA_DIR, 'glove.6B.100d.txt')
     with open(filename, 'r', encoding='utf8') as f:
         for line in f.readlines():
             values = line.split()
@@ -125,13 +145,13 @@ def prepare_embedding_matrix(word_index, embeddings_index):
     return embedding_matrix, num_words
 
 
-train_input_data = load(english_train_file)
-train_target_data = load(german_train_file)
-val_input_data = load(english_val_file)
-val_target_data = load(german_val_file)
+data_en = load(english_train_file)
+data_de = load(german_train_file)
+val_data_en = load(english_val_file)
+val_data_de = load(german_val_file)
 
-train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, num_words = preprocess_data(
-    train_input_data, train_target_data, val_input_data, val_target_data)
+train_input_data, train_target_data, val_input_data, val_target_data, embedding_matrix, vocab_size = preprocess_data(
+    data_en, data_de, val_data_en, val_data_en)
 
 if len(train_input_data) != len(train_target_data) or len(val_input_data) != len(val_target_data):
     print("length of input_data and target_data have to be the same")
@@ -141,26 +161,34 @@ num_samples = len(train_input_data)
 print("Number of training data:", num_samples)
 print("Number of validation data:", len(val_input_data))
 
-vocab_size = num_words
+M = Sequential()
+M.add(Embedding(vocab_size, param_handler.params['EMBEDDING_DIM'], weights=[embedding_matrix], mask_zero=True))
 
-xin = Input(batch_shape=(param_handler.params['BATCH_SIZE'], param_handler.params['MAX_SEQ_LEN']), dtype='int32')
+M.add(LSTM(param_handler.params['LATENT_DIM'], return_sequences=True))
 
-xemb = Embedding(vocab_size, param_handler.params['EMBEDDING_DIM'])(xin)  # 3 dim (batch,time,feat)
-seq = LSTM(param_handler.params['LATENT_DIM'], return_sequences=True)(xemb)
-mlp = TimeDistributed(Dense(vocab_size, activation='softmax'))(seq)
-model = Model(input=xin, output=mlp)
-model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+M.add(Dropout(param_handler.params['P_DENSE_DROPOUT']))
 
+M.add(
+    LSTM(param_handler.params['LATENT_DIM'] * int(1 / param_handler.params['P_DENSE_DROPOUT']), return_sequences=True))
+
+M.add(Dropout(param_handler.params['P_DENSE_DROPOUT']))
+
+M.add(TimeDistributed(Dense(vocab_size, activation='softmax')))
+
+print('compiling')
+
+M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+print('compiled')
 tbCallBack = callbacks.TensorBoard(log_dir=os.path.join(BASIC_PERSISTENT_DIR, GRAPH_DIR), histogram_freq=0,
                                    write_graph=True, write_images=True)
 modelCallback = callbacks.ModelCheckpoint(BASIC_PERSISTENT_DIR + GRAPH_DIR + 'weights.{epoch:02d}-{val_loss:.2f}.hdf5',
                                           monitor='val_loss', verbose=1, save_best_only=False, save_weights_only=False,
-                                          mode='auto', period=1)
+                                          mode='auto', period=5)
 normal_epochs = 10
 epochs = np.math.floor(num_samples / param_handler.params['BATCH_SIZE'] * normal_epochs)
-model.fit_generator(serve_batch(train_input_data, train_target_data), num_samples / param_handler.params['BATCH_SIZE'],
-                    epochs=normal_epochs, verbose=2, max_queue_size=5,
-                    validation_data=serve_batch(val_input_data, val_target_data),
-                    validation_steps=len(val_input_data) / param_handler.params['BATCH_SIZE'],
-                    callbacks=[tbCallBack, modelCallback])
-model.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack1.h5'))
+M.fit_generator(serve_batch(train_input_data, train_target_data), 1, epochs=epochs, verbose=2,
+                validation_data=serve_batch(val_input_data, val_target_data),
+                validation_steps=(len(val_input_data) / param_handler.params['BATCH_SIZE']),
+                callbacks=[tbCallBack, modelCallback])
+M.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack2.h5'))

@@ -1,0 +1,4 @@
+from models.WordSeq2SeqTutStartEndTokenNoUNK import WordSeq2SeqTutStartEndTokenNoUNK
+
+model = WordSeq2SeqTutStartEndTokenNoUNK()
+model.start_training()

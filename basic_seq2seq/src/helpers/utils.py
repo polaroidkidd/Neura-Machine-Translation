@@ -1,8 +1,8 @@
 from keras.engine.topology import Layer
 from keras.layers.merge import multiply
+from keras.layers.merge import add
 import keras.backend as K
 from sklearn.metrics import log_loss
-
 
 # Custom loss
 
@@ -24,8 +24,10 @@ def neg_log_likelihood(y_true, y_pred):
 
 
 def categorical_cross_entropy(y_true, y_pred):
-    print(log_loss(y_true, y_pred))
-    return log_loss(y_true, y_pred)
+    print(y_true.shape, y_pred.shape)
+    #y_true = K.reshape(y_true, (y_true.shape[0] * y_true.shape[1], y_true.shape[2]))
+    #y_pred = K.reshape(y_pred, (y_pred.shape[0] * y_pred.shape[1], y_pred.shape[2]))
+    return log_loss(y_true,y_pred)
 
 
 # monitoring
@@ -35,3 +37,5 @@ def identity(y_true, y_pred):
 
 def zero(y_true, y_pred):
     return K.zeros((1,))
+
+
