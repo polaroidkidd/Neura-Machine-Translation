@@ -3,8 +3,6 @@ import os
 
 from keras.preprocessing.text import Tokenizer
 
-# from thinc.neural.util import to_categorical
-
 EMBEDDING_DIM = 100
 MAX_NUM_WORDS = 20000
 MAX_SEQ_LEN = 250

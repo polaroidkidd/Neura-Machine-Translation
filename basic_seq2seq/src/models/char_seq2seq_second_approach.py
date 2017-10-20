@@ -12,7 +12,9 @@ from models.BaseModel import BaseModel
 
 class Seq2Seq2(BaseModel):
     def __init__(self):
-        self.params = {}
+        BaseModel.__init__(self)
+        self.identifier = 'char_seq2seq_second_approach'
+
         self.params['BATCH_SIZE'] = 128
         self.params['EMBEDDING_DIM'] = 100
         self.params['EPOCHS'] = 15
@@ -38,6 +40,8 @@ class Seq2Seq2(BaseModel):
         self.decoder_model_file = os.path.join(self.MODEL_DIR, 'decoder_model.h5')
 
     def start_training(self):
+        print("2")
+        exit()
         train_input_texts, token_index, train_target_texts = self.split_data_and_count()
         gc.collect()
         np.save(self.token_idx_file, token_index)
@@ -110,7 +114,6 @@ class Seq2Seq2(BaseModel):
         decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
         decoder_model.save(self.decoder_model_file)
 
-
     def setup_inferencejlk(self):
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None, self.params['NUM_TOKENS']))
@@ -134,7 +137,6 @@ class Seq2Seq2(BaseModel):
         model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
         model.load_weights(self.LATEST_MODEL_CHKPT)
 
-
         self.encoder_model = Model(encoder_inputs, encoder_states)
 
         decoder_state_input_h = Input(shape=(self.params['LATENT_DIM'],))
@@ -144,7 +146,6 @@ class Seq2Seq2(BaseModel):
         decoder_states = [state_h, state_c]
         decoder_outputs = decoder_dense(decoder_outputs)
         self.decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
-
 
         self.char_index = np.load(self.token_idx_file)
         self.char_index = self.char_index.item()
@@ -177,7 +178,6 @@ class Seq2Seq2(BaseModel):
 
         model.load_weights(self.LATEST_MODEL_CHKPT)
 
-
         self.encoder_model = Model(encoder_inputs, encoder_states)
 
         decoder_state_input_h = Input(shape=(self.params['LATENT_DIM'],))
@@ -187,7 +187,6 @@ class Seq2Seq2(BaseModel):
         decoder_states = [state_h, state_c]
         decoder_outputs = decoder_dense(decoder_outputs)
         self.decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
-
 
         self.char_index = np.load(self.token_idx_file)
         self.char_index = self.char_index.item()
@@ -219,7 +218,7 @@ class Seq2Seq2(BaseModel):
         self.char_index = self.char_index.item()
         self.reverse_char_index = dict((i, char) for char, i in self.char_index.items())
 
-    def predict(self, sentence):
+    def predict_one_sentence(self, sentence):
         # Take one sequence (part of the training test)
         # for trying out decoding.
         input_seq = np.zeros((1, self.params['MAX_SEQ_LEN'], self.params['NUM_TOKENS']))
@@ -235,7 +234,7 @@ class Seq2Seq2(BaseModel):
         decoded_sentence = self.decode_sequence(input_seq, self.char_index, self.reverse_char_index)
         return decoded_sentence
 
-    def split_data_and_count(self):
+    def _split_data_and_count(self):
         input_texts = []
         target_texts = []
         characters_dict = {}
@@ -384,8 +383,7 @@ class Seq2Seq2(BaseModel):
 
         return decoded_sentence
 
-
-    def get_hidden_state(self, sentence):
+    def calculate_hiddenstate_after_decoder(self, sentence):
         input_seq = np.zeros((1, self.params['MAX_SEQ_LEN'], self.params['NUM_TOKENS']))
 
         index = 0
@@ -398,3 +396,15 @@ class Seq2Seq2(BaseModel):
 
         states_value = self.encoder_model.predict(input_seq)
         return states_value
+
+    def predict_batch(self, sentences):
+        raise NotImplementedError()
+
+    def calculate_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate(self, sentence):
+        raise NotImplementedError()

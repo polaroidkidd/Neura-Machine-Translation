@@ -7,11 +7,11 @@ from keras.models import load_model
 from keras import callbacks
 import os
 import gc
+from models.BaseModel import BaseModel
 
-
-class KerasTutSeq2Seq():
+class KerasTutSeq2Seq(BaseModel):
     def __init__(self):
-        self.params = {}
+        BaseModel.__init__(self)
         self.params['BATCH_SIZE'] = 256
         self.params['EPOCHS'] = 100
         self.params['LATENT_DIM'] = 256

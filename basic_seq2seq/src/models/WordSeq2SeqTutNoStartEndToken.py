@@ -11,10 +11,14 @@ import os
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 
+from models.BaseModel import BaseModel
 
-class WordSeq2SeqTut():
+
+class Seq2Seq2(BaseModel):
     def __init__(self):
-        self.params = {}
+        BaseModel.__init__(self)
+        self.identifier = 'WordSeq2SeqTutNoStartEndToken'
+
         self.params['batch_size'] = 128
         self.params['epochs'] = 100
         self.params['latent_dim'] = 256
@@ -237,7 +241,7 @@ class WordSeq2SeqTut():
 
         self.reverse_token_index = dict((i, char) for char, i in self.token_index.items())
 
-    def predict(self, sentence):
+    def predict_one_sentence(self, sentence):
         input_seq = np.zeros((1, 71, 91))
 
         index = 0
@@ -282,3 +286,19 @@ class WordSeq2SeqTut():
             states_value = [h, c]
 
         return decoded_sentence
+
+    def predict_batch(self, sentences):
+        raise NotImplementedError()
+
+    def calculate_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_hiddenstate_after_decoder(self, sentence):
+        raise NotImplementedError()
+

@@ -14,9 +14,11 @@ from keras.preprocessing.text import Tokenizer
 from models.BaseModel import BaseModel
 
 
-class WordSeq2SeqTutStartEndTokenNoUNK(BaseModel):
+class Seq2Seq2(BaseModel):
     def __init__(self):
-        BaseModel.__init__()
+        BaseModel.__init__(self)
+        self.identifier = 'WordSeq2SeqTutStartEndTokenNoUNK'
+
         self.params['batch_size'] = 128
         self.params['epochs'] = 100
         self.params['latent_dim'] = 256
@@ -176,7 +178,7 @@ class WordSeq2SeqTutStartEndTokenNoUNK(BaseModel):
             tokenizer.word_index[word] = tokenizer.word_index[word] + 2
         tokenizer.word_index[self.START_TOKEN] = 1
         tokenizer.word_index[self.END_TOKEN] = 2
-        tokenizer.num_words = tokenizer.num_words +2
+        tokenizer.num_words = tokenizer.num_words + 2
         self.word_index = tokenizer.word_index
 
         try:
@@ -193,12 +195,12 @@ class WordSeq2SeqTutStartEndTokenNoUNK(BaseModel):
         self.input_texts = tokenizer.texts_to_sequences(self.input_texts)
         self.target_texts = tokenizer.texts_to_sequences(self.target_texts)
         for idx in range(len(self.target_texts)):
-            self.target_texts[idx] = [self.word_index[self.START_TOKEN]] + self.target_texts[idx] + [self.word_index[self.END_TOKEN]]
+            self.target_texts[idx] = [self.word_index[self.START_TOKEN]] + self.target_texts[idx] + [
+                self.word_index[self.END_TOKEN]]
             if self.target_texts[idx][0] != 1:
                 print(idx)
                 print(self.target_texts[idx])
                 exit(-1)
-
 
         self.input_texts = pad_sequences(self.input_texts, maxlen=self.params['max_seq_length'], padding='post')
         self.target_texts = pad_sequences(self.target_texts, maxlen=self.params['max_seq_length'], padding='post')
@@ -282,7 +284,7 @@ class WordSeq2SeqTutStartEndTokenNoUNK(BaseModel):
 
         self.reverse_token_index = dict((i, char) for char, i in self.token_index.items())
 
-    def predict(self, sentence):
+    def predict_one_sentence(self, sentence):
         input_seq = np.zeros((1, 71, 91))
 
         index = 0
@@ -327,3 +329,18 @@ class WordSeq2SeqTutStartEndTokenNoUNK(BaseModel):
             states_value = [h, c]
 
         return decoded_sentence
+
+    def predict_batch(self, sentences):
+        raise NotImplementedError()
+
+    def calculate_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_hiddenstate_after_decoder(self, sentence):
+        raise NotImplementedError()

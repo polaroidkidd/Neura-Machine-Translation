@@ -7,11 +7,15 @@ from keras.models import load_model
 from keras import callbacks
 import os
 
+from models.BaseModel import BaseModel
 
-class CharSeq2SeqTut():
+
+class Seq2Seq2(BaseModel):
     def __init__(self):
-        self.params = {}
-        self.params['batch_size'] = 265
+        BaseModel.__init__(self)
+        self.identifier = 'CharSeq2SeqTutIndexInput'
+
+        self.params['batch_size'] = 128
         self.params['epochs'] = 100
         self.params['latent_dim'] = 256
         self.params['num_samples'] = 150000
@@ -21,11 +25,11 @@ class CharSeq2SeqTut():
         self.params['max_decoder_seq_length'] = 138
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../persistent/chr_teacher_force_manythings'
+        self.BASIC_PERSISTENT_DIR = '../../persistent/charSeq2SeqTutIndexInput'
         self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
         self.input_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "input_token_index.npy")
         self.target_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "target_token_index.npy")
-        self.data_path = 'deu.txt'
+        self.data_path = os.path.join(self.BASE_DATA_DIR, 'Training/deu.txt')
         self.encoder_model_file = os.path.join(self.MODEL_DIR, 'encoder_model.h5')
         self.model_file = os.path.join(self.MODEL_DIR, 'model.h5')
         self.decoder_model_file = os.path.join(self.MODEL_DIR, 'decoder_model.h5')
@@ -51,14 +55,14 @@ class CharSeq2SeqTut():
                     decoder_target_data[i, t - 1, target_token_index[char]] = 1.
 
         # Define an input sequence and process it.
-        encoder_inputs = Input(shape=(None, self.params['num_encoder_tokens']))
+        encoder_inputs = Input(shape=(None,))
         encoder = LSTM(self.params['latent_dim'], return_state=True)
         encoder_outputs, state_h, state_c = encoder(encoder_inputs)
         # We discard `encoder_outputs` and only keep the states.
         encoder_states = [state_h, state_c]
 
         # Set up the decoder, using `encoder_states` as initial state.
-        decoder_inputs = Input(shape=(None, self.params['num_decoder_tokens']))
+        decoder_inputs = Input(shape=(None,))
         # We set up our decoder to return full output sequences,
         # and to return internal states as well. We don't use the
         # return states in the training model, but we will use them in inference.
@@ -207,7 +211,7 @@ class CharSeq2SeqTut():
         self.reverse_input_char_index = dict((i, char) for char, i in self.input_token_index.items())
         self.reverse_target_char_index = dict((i, char) for char, i in self.target_token_index.items())
 
-    def predict(self, sentence):
+    def predict_one_sentence(self, sentence):
         input_seq = np.zeros((1, 71, 91))
 
         index = 0
@@ -252,3 +256,19 @@ class CharSeq2SeqTut():
             states_value = [h, c]
 
         return decoded_sentence
+
+
+    def predict_batch(self, sentences):
+        raise NotImplementedError()
+
+    def calculate_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_hiddenstate_after_decoder(self, sentence):
+        raise NotImplementedError()

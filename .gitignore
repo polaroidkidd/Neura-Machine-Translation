@@ -180,5 +180,5 @@ DataSets/Training/deu.txt
 DataSets/Validation/newstest2013.de
 persistent/model_einrdan_seq2seq1/input_token_idx.npy
 persistent/model_einrdan_seq2seq1/target_token_idx.npy
-DataSets/Training/deu.txt
 basic_seq2seq/src/first_approac_hiddenstates.npy
+/basic_seq2seq/src/playground/

@@ -7,10 +7,14 @@ from keras.models import load_model
 from keras import callbacks
 import os
 
+from models.BaseModel import BaseModel
 
-class CharSeq2SeqTut():
+
+class Seq2Seq2(BaseModel):
     def __init__(self):
-        self.params = {}
+        BaseModel.__init__(self)
+        self.identifier = 'CharSeq2SeqTutOneHotInput'
+
         self.params['batch_size'] = 265
         self.params['epochs'] = 100
         self.params['latent_dim'] = 256
@@ -211,7 +215,7 @@ class CharSeq2SeqTut():
         self.reverse_input_char_index = dict((i, char) for char, i in self.input_token_index.items())
         self.reverse_target_char_index = dict((i, char) for char, i in self.target_token_index.items())
 
-    def predict(self, sentence):
+    def predict_one_sentence(self, sentence):
         input_seq = np.zeros((1, 71, 91))
 
         index = 0
@@ -256,3 +260,18 @@ class CharSeq2SeqTut():
             states_value = [h, c]
 
         return decoded_sentence
+
+    def predict_batch(self, sentences):
+        raise NotImplementedError()
+
+    def calculate_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate_after_encoder(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_every_hiddenstate(self, sentence):
+        raise NotImplementedError()
+
+    def calculate_hiddenstate_after_decoder(self, sentence):
+        raise NotImplementedError()

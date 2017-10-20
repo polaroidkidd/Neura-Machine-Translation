@@ -5,7 +5,6 @@ from keras import callbacks, Input
 from keras.engine import Model
 from keras.layers import TimeDistributed, Dropout
 from keras.models import Sequential
-# from thinc.neural.util import to_categorical as to_cat3
 import os
 from keras.layers import LSTM, Dense
 from keras.layers import Embedding
