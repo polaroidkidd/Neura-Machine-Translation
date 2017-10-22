@@ -24,7 +24,7 @@ class Bleu(BaseMetric):
             }
 
         self.params['RESULT_DIR'] = '../../../evaluations/' + self.params['model']
-        if not os.path.exists(self.params['BLEU_RESULT_DIR']):
+        if not os.path.exists(self.params['RESULT_DIR']):
             os.mkdir(self.params['RESULT_DIR'])
         self.params['FILE_NAME'] = model + '_' + self.params['timestamp'] + '_BLEU.txt'
         self.params['FILE_PATH'] = self.params['RESULT_DIR'] + '/' + self.params['FILE_NAME']
@@ -64,11 +64,9 @@ class Bleu(BaseMetric):
         if not (os.path.exists(references) or os.path.exists(hypothesis)):
             raise FileNotFoundError
         else:
-            with open(hypothesis, 'r') as hyp, open(references, 'r') as ref:
-                while hyp.readline() and ref.readline():
-                    hypothesis = hyp.readline()
-                    references = ref.readline()
-                    self.evaluate_hypothesis_single(hypothesis, references)
+            with open(hypothesis, 'r') as hyp_file, open(references, 'r') as ref_file:
+                for references_line, hypothesis_line in zip(ref_file, hyp_file):
+                    self.evaluate_hypothesis_single(hypothesis_line.strip('\n'), references_line.strip('\n'))
 
     def evaluate_hypothesis_corpus(self, hypothesis, references):
         pass
@@ -83,4 +81,3 @@ class Bleu(BaseMetric):
                                               references=self.params['hypothesis_reference']['ref']),
                      hypothesis, references), file=file)
 
-# score = Bleu('testing_this', True).evaluate_hypothesis_single('this is the sky', 'this is not the sky')
