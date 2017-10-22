@@ -7,9 +7,11 @@ import os
 class Bleu(BaseMetric):
     def __init__(self, model, timestamp=False):
         """
+        This is a wrapper class for nltk's bleu score evaluation designed to work on individual statements
+        and reference/hypothesis files.
 
-        :param model: The name of the model.
-        :param timestamp: if set to true the file name will be appended by a time stamp
+        :param model: The name of the model which was used to generate the hypothesis
+        :param timestamp: if set to true the file name will be appended by a time stamp (for bookkeeping purposes)
         """
         BaseMetric.__init__(self)
         self.params['model'] = model
