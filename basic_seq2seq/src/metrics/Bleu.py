@@ -4,7 +4,11 @@ import os
 
 
 class Bleu:
-    def __init__(self, model):
+    def __init__(self, model, timestamp=False):
+        if timestamp:
+            timestamp = datetime.strftime(datetime.now(), "%Y-%m-%d__%H-%M-%S")
+        else:
+            timestamp = ''
         self.model = model
         self.hypothesis_reference = {
             'hyp': None,
@@ -16,7 +20,7 @@ class Bleu:
         self.BLEU_RESULT_DIR = '../../../evaluations/' + self.model
         if not os.path.exists(self.BLEU_RESULT_DIR):
             os.mkdir(self.BLEU_RESULT_DIR)
-        self.FILE_NAME = model + '_' + 'BLEU.txt'
+        self.FILE_NAME = model + '_' + timestamp + '_BLEU.txt'
         self.FILE_PATH = self.BLEU_RESULT_DIR + '/' + self.FILE_NAME
 
     def evaluate_single_hypothesis(self, hypothesis: str, references: list):
