@@ -16,7 +16,7 @@ class Bleu:
         self.BLEU_RESULT_DIR = '../../../evaluations/' + self.model
         if not os.path.exists(self.BLEU_RESULT_DIR):
             os.mkdir(self.BLEU_RESULT_DIR)
-        self.FILE_NAME = model + '_' + datetime.strftime(datetime.now(), "%Y%m%d_%H-%M-%S") + '.txt'
+        self.FILE_NAME = model + '_' + 'BLEU.txt'
         self.FILE_PATH = self.BLEU_RESULT_DIR + '/' + self.FILE_NAME
 
     def evaluate_single_hypothesis(self, hypothesis: str, references: list):
@@ -34,8 +34,19 @@ class Bleu:
             self.references = [self.references]
         self.hypothesis_reference['hyp'] = self.hypothesis
         self.hypothesis_reference['ref'] = self.references
-        with open(self.FILE_PATH, 'w') as file:
-            print('Score: {:.12f} \t Hypothesis: {} \t Reference(s): {}'.
-                  format(bleu_score.sentence_bleu(hypothesis=self.hypothesis_reference['hyp'],
-                                                  references=self.hypothesis_reference['ref']),
-                         self.hypothesis, self.references), file=file)
+        if os.path.exists(self.FILE_PATH):
+            with open(self.FILE_PATH, 'a') as file:
+                self.write_to_file(file)
+        else:
+            with open(self.FILE_PATH, 'w') as file:
+                self.write_to_file(file)
+
+    def write_to_file(self, file):
+        print('TimeStamp: {} \t'
+              'Score: {:.12f} \t'
+              'Hypothesis: {} \t'
+              'Reference(s): {}'.
+              format(datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"),
+                     bleu_score.sentence_bleu(hypothesis=self.hypothesis_reference['hyp'],
+                                              references=self.hypothesis_reference['ref']),
+                     self.hypothesis, self.references), file=file)
