@@ -55,9 +55,9 @@ class Bleu(BaseMetric):
         This method loops through two separate files (references and hypothesis), calculates the BLEU scores of each
         hypothesis and writes it into a file located in the director evaluations/model_name/
 
-        :param references: A text file containing all the references. If there are multiple for one translation the
-        references these should be separated by a '\t'. Each reference should be listed on it's own line
-        :param hypothesis: A text file containing all the hypothesis, one per line
+        :param references: A text file (including path) containing all the references. If there are multiple for one
+        translation the references these should be separated by a '\t'. Each reference should be listed on it's own line
+        :param hypothesis: A text file (including path)containing all the hypothesis, one per line
         :return: This method writes the respective BLEU scores into the file specified at class instantiation time.
         """
 
@@ -80,4 +80,3 @@ class Bleu(BaseMetric):
                      bleu_score.sentence_bleu(hypothesis=self.params['hypothesis_reference']['hyp'],
                                               references=self.params['hypothesis_reference']['ref']),
                      hypothesis, references), file=file)
-
