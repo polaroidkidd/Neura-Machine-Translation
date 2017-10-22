@@ -29,7 +29,7 @@ class Seq2Seq2(BaseModel):
         self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
         self.input_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "input_token_index.npy")
         self.target_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "target_token_index.npy")
-        self.data_path = 'deu.txt'
+        self.data_path = self.BASE_DATA_DIR + 'Training/deu.txt'
         self.encoder_model_file = os.path.join(self.MODEL_DIR, 'encoder_model.h5')
         self.model_file = os.path.join(self.MODEL_DIR, 'model.h5')
         self.decoder_model_file = os.path.join(self.MODEL_DIR, 'decoder_model.h5')
