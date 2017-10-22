@@ -1,29 +1,35 @@
 from nltk.translate import bleu_score
 from datetime import datetime
+from metrics.BaseMetric import BaseMetric
 import os
 
 
-class Bleu:
+class Bleu(BaseMetric):
     def __init__(self, model, timestamp=False):
+        """
+
+        :param model: The name of the model.
+        :param timestamp: if set to true the file name will be appended by a time stamp
+        """
+        BaseMetric.__init__(self)
+        self.params['model'] = model
+
         if timestamp:
-            timestamp = datetime.strftime(datetime.now(), "%Y-%m-%d__%H-%M-%S")
+            self.params['timestamp'] = datetime.strftime(datetime.now(), "%Y-%m-%d__%H-%M-%S")
         else:
-            timestamp = ''
-        self.model = model
-        self.hypothesis_reference = {
+            self.params['timestamp'] = ''
+        self.params['hypothesis_reference'] = {
             'hyp': None,
             'ref': None
             }
-        self.hypothesis = ''
-        self.references = []
 
-        self.BLEU_RESULT_DIR = '../../../evaluations/' + self.model
-        if not os.path.exists(self.BLEU_RESULT_DIR):
-            os.mkdir(self.BLEU_RESULT_DIR)
-        self.FILE_NAME = model + '_' + timestamp + '_BLEU.txt'
-        self.FILE_PATH = self.BLEU_RESULT_DIR + '/' + self.FILE_NAME
+        self.params['RESULT_DIR'] = '../../../evaluations/' + self.params['model']
+        if not os.path.exists(self.params['BLEU_RESULT_DIR']):
+            os.mkdir(self.params['RESULT_DIR'])
+        self.params['FILE_NAME'] = model + '_' + self.params['timestamp'] + '_BLEU.txt'
+        self.params['FILE_PATH'] = self.params['RESULT_DIR'] + '/' + self.params['FILE_NAME']
 
-    def evaluate_single_hypothesis(self, hypothesis: str, references: list):
+    def evaluate_hypothesis_single(self, hypothesis: str, references: list):
         """
         Evaluates predictions via the bleu score metric
         :param references: A list of references against which the predicted string is measured. If only one reference
@@ -32,25 +38,49 @@ class Bleu:
         :type hypothesis: list
         :type references: list
         """
-        self.hypothesis = hypothesis
-        self.references = references
-        if not type(self.references) == list:
-            self.references = [self.references]
-        self.hypothesis_reference['hyp'] = self.hypothesis
-        self.hypothesis_reference['ref'] = self.references
-        if os.path.exists(self.FILE_PATH):
-            with open(self.FILE_PATH, 'a') as file:
-                self.write_to_file(file)
-        else:
-            with open(self.FILE_PATH, 'w') as file:
-                self.write_to_file(file)
 
-    def write_to_file(self, file):
+        if not type(references) == list:
+            references = [references]
+        self.params['hypothesis_reference']['hyp'] = hypothesis
+        self.params['hypothesis_reference']['ref'] = references
+        if os.path.exists(self.params['FILE_PATH']):
+            with open(self.params['FILE_PATH'], 'a') as file:
+                self.write_to_file(file, hypothesis, references)
+        else:
+            with open(self.params['FILE_PATH'], 'w') as file:
+                self.write_to_file(file, hypothesis, references)
+
+    def evaluate_hypothesis_batch_single(self, references, hypothesis):
+        """
+        This method loops through two separate files (references and hypothesis), calculates the BLEU scores of each
+        hypothesis and writes it into a file located in the director evaluations/model_name/
+
+        :param references: A text file containing all the references. If there are multiple for one translation the
+        references these should be separated by a '\t'. Each reference should be listed on it's own line
+        :param hypothesis: A text file containing all the hypothesis, one per line
+        :return: This method writes the respective BLEU scores into the file specified at class instantiation time.
+        """
+
+        if not (os.path.exists(references) or os.path.exists(hypothesis)):
+            raise FileNotFoundError
+        else:
+            with open(hypothesis, 'r') as hyp, open(references, 'r') as ref:
+                while hyp.readline() and ref.readline():
+                    hypothesis = hyp.readline()
+                    references = ref.readline()
+                    self.evaluate_hypothesis_single(hypothesis, references)
+
+    def evaluate_hypothesis_corpus(self, hypothesis, references):
+        pass
+
+    def write_to_file(self, file, hypothesis, references):
         print('TimeStamp: {} \t'
               'Score: {:.12f} \t'
               'Hypothesis: {} \t'
               'Reference(s): {}'.
               format(datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"),
-                     bleu_score.sentence_bleu(hypothesis=self.hypothesis_reference['hyp'],
-                                              references=self.hypothesis_reference['ref']),
-                     self.hypothesis, self.references), file=file)
+                     bleu_score.sentence_bleu(hypothesis=self.params['hypothesis_reference']['hyp'],
+                                              references=self.params['hypothesis_reference']['ref']),
+                     hypothesis, references), file=file)
+
+# score = Bleu('testing_this', True).evaluate_hypothesis_single('this is the sky', 'this is not the sky')
