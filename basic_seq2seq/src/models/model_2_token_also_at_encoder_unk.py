@@ -19,7 +19,7 @@ class Seq2Seq2(BaseModel):
         self.identifier = 'model_2_token_also_at_encoder_unk'
 
         self.params['batch_size'] = 128
-        self.params['epochs'] = 15
+        self.params['epochs'] = 5
         self.params['latent_dim'] = 256
         self.params['num_samples'] = 150000
         self.params['num_tokens'] = 91
@@ -99,7 +99,7 @@ class Seq2Seq2(BaseModel):
 
         print('compiled')
 
-        steps = 5
+        steps = 4
         mod_epochs = np.math.floor(self.num_samples / self.params['batch_size'] / steps * self.params['epochs'])
         tbCallBack = callbacks.TensorBoard(log_dir=self.GRAPH_DIR, histogram_freq=0, write_graph=True,
                                            write_images=True)
