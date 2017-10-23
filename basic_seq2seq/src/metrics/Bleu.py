@@ -41,30 +41,25 @@ class Bleu(BaseMetric):
         :param hypothesis: The predicted string(s)
         """
 
-        if not type(references) == list:
-            references = [references]
-        self.params['hypothesis_reference']['hyp'] = hypothesis
-        self.params['hypothesis_reference']['ref'] = references
+        self.params['hypothesis_reference']['hyp'] = hypothesis.strip('\n').split(' ')
+        for i in references:
+            self.params['hypothesis_reference']['ref'].append(i.strip('\n').split(' '))
         if os.path.exists(self.params['FILE_PATH']):
             with open(self.params['FILE_PATH'], 'a') as file:
-                self.__write_single_or_batch_single_to_file(file,
-                                                            bleu_score.sentence_bleu(
-                                                                    references=self.params['hypothesis_reference'][
-                                                                        'ref'],
-                                                                    hypothesis=self.params['hypothesis_reference'][
-                                                                        'hyp']),
-                                                            self.params['hypothesis_reference']['ref'],
-                                                            self.params['hypothesis_reference']['hyp'])
+                self.__write_single_or_batch_single(file,
+                                                    bleu_score.sentence_bleu(
+                                                            references=self.params['hypothesis_reference']['ref'],
+                                                            hypothesis=self.params['hypothesis_reference']['hyp']),
+                                                    self.params['hypothesis_reference']['ref'],
+                                                    self.params['hypothesis_reference']['hyp'])
         else:
             with open(self.params['FILE_PATH'], 'w') as file:
-                self.__write_single_or_batch_single_to_file(file,
-                                                            bleu_score.sentence_bleu(
-                                                                    references=self.params['hypothesis_reference'][
-                                                                        'ref'],
-                                                                    hypothesis=self.params['hypothesis_reference'][
-                                                                        'hyp']),
-                                                            self.params['hypothesis_reference']['ref'],
-                                                            self.params['hypothesis_reference']['hyp'])
+                self.__write_single_or_batch_single(file,
+                                                    bleu_score.sentence_bleu(
+                                                            references=self.params['hypothesis_reference']['ref'],
+                                                            hypothesis=self.params['hypothesis_reference']['hyp']),
+                                                    self.params['hypothesis_reference']['ref'],
+                                                    self.params['hypothesis_reference']['hyp'])
 
     def evaluate_hypothesis_batch_single(self, hypothesis: str, references: list):
         """
@@ -76,7 +71,6 @@ class Bleu(BaseMetric):
         :param hypothesis: A text file (including path)containing all the hypothesis, one per line
         :return: This method writes the respective BLEU scores into the file specified at class instantiation time.
         """
-        # TODO Split up hypothesis and references into list(str)
         if not (os.path.exists(references) or os.path.exists(hypothesis)):
             raise FileNotFoundError
         else:
@@ -104,21 +98,21 @@ class Bleu(BaseMetric):
                         self.params['hypothesis_reference']['ref'].append([ref_i])
             if os.path.exists(self.params['FILE_PATH']):
                 with open(self.params['FILE_PATH'], 'a') as file:
-                    self.__write_corpus_to_file(file,
-                                                self.params['model'],
-                                                bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
-                                                                       self.params['hypothesis_reference']['hyp']),
-                                                self.params['metric'])
+                    self.__write_corpus(file,
+                                        self.params['model'],
+                                        bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
+                                                               self.params['hypothesis_reference']['hyp']),
+                                        self.params['metric'])
             else:
                 with open(self.params['FILE_PATH'], 'w') as file:
-                    self.__write_corpus_to_file(file,
-                                                self.params['model'],
-                                                bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
-                                                                       self.params['hypothesis_reference']['hyp']),
-                                                self.params['metric'])
+                    self.__write_corpus(file,
+                                        self.params['model'],
+                                        bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
+                                                               self.params['hypothesis_reference']['hyp']),
+                                        self.params['metric'])
 
     @staticmethod
-    def __write_corpus_to_file(file, model: str, score: float, metric: str):
+    def __write_corpus(file, model: str, score: float, metric: str):
         """
         Helper Method which writes evaluations into the corresponding file
 
@@ -139,7 +133,7 @@ class Bleu(BaseMetric):
               file=file)
 
     @staticmethod
-    def __write_single_or_batch_single_to_file(file, score: float, hypothesis: str, references: list):
+    def __write_single_or_batch_single(file, score: float, references: list, hypothesis: str):
         """
         Helper Method which writes evaluations into the corresponding file
 
