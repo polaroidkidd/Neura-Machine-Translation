@@ -40,9 +40,7 @@ class Seq2Seq2(BaseModel):
         self.decoder_model_file = os.path.join(self.MODEL_DIR, 'decoder_model.h5')
 
     def start_training(self):
-        print("2")
-        exit()
-        train_input_texts, token_index, train_target_texts = self.split_data_and_count()
+        train_input_texts, token_index, train_target_texts = self._split_data_and_count()
         gc.collect()
         np.save(self.token_idx_file, token_index)
 

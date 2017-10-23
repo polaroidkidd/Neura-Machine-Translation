@@ -10,10 +10,6 @@ class BaseModel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def setup_inference(self):
-        pass
-
-    @abstractmethod
     def predict_one_sentence(self, sentence):
         pass
 

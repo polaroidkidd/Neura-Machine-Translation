@@ -196,7 +196,7 @@ class Seq2Seq2(BaseModel):
         self.reverse_input_char_index = dict((i, char) for char, i in self.input_token_index.items())
         self.reverse_target_char_index = dict((i, char) for char, i in self.target_token_index.items())
 
-    def setup_inference(self):
+    def _setup_inference(self):
         self.model = load_model('./data/s2s2.h5')
         self.encoder_model = load_model('./data/encoder_model.h5')
         self.decoder_model = load_model('./data/decoder_model.h5')
@@ -212,6 +212,7 @@ class Seq2Seq2(BaseModel):
         self.reverse_target_char_index = dict((i, char) for char, i in self.target_token_index.items())
 
     def predict_one_sentence(self, sentence):
+        self._setup_inference()
         input_seq = np.zeros((1, 71, 91))
 
         index = 0
@@ -219,10 +220,10 @@ class Seq2Seq2(BaseModel):
             input_seq[0][index][self.input_token_index[char]] = 1.
             index += 1
 
-        decoded_sentence = self.decode_sequence(input_seq)
+        decoded_sentence = self._decode_sequence(input_seq)
         return decoded_sentence
 
-    def decode_sequence(self, input_sequence):
+    def _decode_sequence(self, input_sequence):
         # Encode the input as state vectors.
         states_value = self.encoder_model.predict(input_sequence)
 

@@ -6,7 +6,7 @@ Interactive inference of pretrained models via terminal.
 import sys
 
 
-def predict_interactive_per_sentence():
+def predict_interactive_per_sentence(inference_model):
     while True:
         print("\n\nPlease type in the sentence which should be translated:")
         source_sentence = input()
@@ -15,7 +15,7 @@ def predict_interactive_per_sentence():
         if source_sentence == '\m':
             inference_model = model_repo.interactive_model_selection()
             continue
-        target_sentence = inference_model.predict(source_sentence)
+        target_sentence = inference_model.predict_one_sentence(source_sentence)
 
         print("Source sentence:\n", source_sentence)
         print("Translated sentence:\n", target_sentence)
@@ -32,8 +32,8 @@ else:
         print("Mode: \n0: per sentence prediction\n1: batch prediction")
         mode = input()
 
-    if mode == 0:
-        predict_interactive_per_sentence()
-    elif mode == 1:
+    if mode == '0':
+        predict_interactive_per_sentence(model)
+    elif mode == '1':
         pass
         # implement batch prediction
