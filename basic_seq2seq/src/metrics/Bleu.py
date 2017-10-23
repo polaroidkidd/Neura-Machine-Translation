@@ -5,17 +5,19 @@ import os
 
 
 class Bleu(BaseMetric):
-    def __init__(self, model, timestamp=False):
+    def __init__(self, model: str, metric: str, timestamp: bool = False):
         """
         This is a wrapper class for nltk's bleu score evaluation designed to work on individual statements
         and reference/hypothesis files.
 
         :param model: The name of the model which was used to generate the hypothesis
         :param timestamp: if set to true the file name will be appended by a time stamp (for bookkeeping purposes)
+        :param metric: The metric used to evaluate the hypothesis
+
         """
         BaseMetric.__init__(self)
         self.params['model'] = model
-
+        self.params['metric'] = metric
         if timestamp:
             self.params['timestamp'] = datetime.strftime(datetime.now(), "%Y-%m-%d__%H-%M-%S")
         else:
@@ -37,8 +39,6 @@ class Bleu(BaseMetric):
         :param references: A list of references against which the predicted string is measured. If only one reference
         is available this method accepts it as a string and converts it to a single-item list
         :param hypothesis: The predicted string(s)
-        :type hypothesis: list
-        :type references: list
         """
 
         if not type(references) == list:
@@ -52,7 +52,7 @@ class Bleu(BaseMetric):
             with open(self.params['FILE_PATH'], 'w') as file:
                 self.write_to_file(file, hypothesis, references)
 
-    def evaluate_hypothesis_batch_single(self, references, hypothesis):
+    def evaluate_hypothesis_batch_single(self, hypothesis: str, references: list):
         """
         This method loops through two separate files (references and hypothesis), calculates the BLEU scores of each
         hypothesis and writes it into a file located in the director evaluations/model_name/
@@ -70,10 +70,18 @@ class Bleu(BaseMetric):
                 for references_line, hypothesis_line in zip(ref_file, hyp_file):
                     self.evaluate_hypothesis_single(hypothesis_line.strip('\n'), references_line.strip('\n'))
 
-    def evaluate_hypothesis_corpus(self, hypothesis, references):
+    def evaluate_hypothesis_corpus(self, hypothesis: str, references: list):
+
         pass
 
     def write_to_file(self, file, hypothesis, references):
+        """
+
+        :param file: the opened file with correct attribute ('a' if it exists, otherwise 'w')
+        :param hypothesis: The hypothesis to be evaluated
+        :param references: The references against which the hypothesis is being evaluated
+        :return: This method write the result into the corresponding file
+        """
         print('TimeStamp: {} \t'
               'Score: {:.12f} \t'
               'Hypothesis: {} \t'
