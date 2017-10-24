@@ -265,9 +265,10 @@ class Seq2Seq2(BaseModel):
             for i in range(self.input_texts.shape[0]):
                 in_X = self.input_texts[i]
                 out_Y = np.zeros((1, self.target_texts.shape[1], self.params['MAX_WORDS'] + 3), dtype='int32')
+                token_counter = 0
                 for token in self.target_texts[i]:
-                    out_Y[0, :len(self.target_texts)] = to_categorical(token, num_classes=self.params['MAX_WORDS'] + 3)
-
+                    out_Y[0, token_counter, :] = to_categorical(token, num_classes=self.params['MAX_WORDS'] + 3)
+                    token_counter += 1
                 self.batch_X[counter] = in_X
                 self.batch_Y[counter] = out_Y
                 counter += 1
@@ -344,7 +345,8 @@ class Seq2Seq2(BaseModel):
         self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
         self.word_index = self.word_index.item()
         tokenizer.word_index = self.word_index
-        tokenizer.num_words = len(self.word_index)
+        self.num_words = self.params['MAX_WORDS'] + 3
+        tokenizer.num_words = self.num_words
 
         try:
             self.word_index[self.START_TOKEN]
@@ -416,7 +418,77 @@ class Seq2Seq2(BaseModel):
         raise NotImplementedError()
 
     def calculate_hiddenstate_after_encoder(self, sentence):
-        raise NotImplementedError()
+
+        tokenizer = Tokenizer()
+        self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
+        self.word_index = self.word_index.item()
+        tokenizer.word_index = self.word_index
+        self.num_words = self.params['MAX_WORDS'] + 3
+        tokenizer.num_words = self.num_words
+
+        try:
+            self.word_index[self.START_TOKEN]
+            self.word_index[self.END_TOKEN]
+        except Exception as e:
+            print(e, "why")
+            exit()
+        self.embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy')
+
+        print(sentence)
+        sentence = tokenizer.texts_to_sequences([sentence])
+        print(sentence)
+        sentence = pad_sequences(sentence, maxlen=self.params['max_seq_length'], padding='post')
+        print(sentence.shape)
+        print(sentence)
+        sentence = sentence.reshape(sentence.shape[0], sentence.shape[1])
+        print(sentence.shape)
+
+
+        encoder_name = 'encoder'
+        M = Sequential()
+        M.add(Embedding(self.params['MAX_WORDS'] + 1, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
+                        mask_zero=True))
+
+        M.add(LSTM(self.params['latent_dim'], return_sequences=True, name=encoder_name))
+
+        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
+
+        M.add(
+            LSTM(self.params['latent_dim'] * int(1 / self.params['P_DENSE_DROPOUT']), return_sequences=True))
+
+        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
+
+        M.add(TimeDistributed(Dense(self.params['MAX_WORDS'] + 1,
+                                    input_shape=(None, self.params['num_tokens'], self.params['MAX_WORDS'] + 1),
+                                    activation='softmax')))
+
+        print('compiling')
+        M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        print('compiled')
+
+        M.load_weights(self.LATEST_MODELCHKPT)
+
+
+        encoder = Model(inputs=M.input, outputs=M.get_layer(encoder_name).output)
+
+        prediction = encoder.predict(sentence, batch_size=1)
+        print(prediction)
+        print(prediction.shape)
+        predicted_sentence = []
+        reverse_word_index = dict((i, word) for word, i in self.word_index.items())
+        for sentence in prediction:
+            for token in sentence:
+                print(token)
+                print(token.shape)
+                max_idx = np.argmax(token)
+                print(max_idx)
+                if max_idx == 0:
+                    print("id of max token = 0")
+                else:
+                    print(reverse_word_index[max_idx])
+                    predicted_sentence += self.word_index[max_idx]
+
+        return predicted_sentence
 
     def calculate_every_hiddenstate_after_encoder(self, sentence):
         raise NotImplementedError()

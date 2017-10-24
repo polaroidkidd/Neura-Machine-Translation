@@ -366,7 +366,6 @@ class Seq2Seq2(BaseModel):
         raise NotImplementedError()
 
     def calculate_hiddenstate_after_encoder(self, sentence):
-
         tokenizer = Tokenizer()
         self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
         self.word_index = self.word_index.item()

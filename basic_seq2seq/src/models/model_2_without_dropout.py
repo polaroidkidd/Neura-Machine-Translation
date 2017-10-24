@@ -344,8 +344,7 @@ class Seq2Seq2(BaseModel):
                 if max_idx == 0:
                     print("id of max token = 0")
                 else:
-                    print(reverse_word_index[max_idx])
-                    predicted_sentence += self.word_index[max_idx]
+                    predicted_sentence += reverse_word_index[max_idx]
 
         return predicted_sentence
 

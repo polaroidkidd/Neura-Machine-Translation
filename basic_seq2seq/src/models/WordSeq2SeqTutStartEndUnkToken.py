@@ -45,7 +45,7 @@ class Seq2Seq2(BaseModel):
         self.decoder_model_file = os.path.join(self.MODEL_DIR, 'decoder_model.h5')
         self.PRETRAINED_GLOVE_FILE = os.path.join(self.BASE_DATA_DIR, 'glove.6B.100d.txt')
         self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        self.LATEST_MODEL_CHKPT = os.path.join(self.BASIC_PERSISTENT_DIR, 'model.22999-2858.89.hdf5')
+        self.LATEST_MODEL_CHKPT = os.path.join(self.BASIC_PERSISTENT_DIR, 'model.292-2428.95.hdf5')
         self.WORD_IDX_FILE = os.path.join(self.BASIC_PERSISTENT_DIR, "word_idx")
 
         self.START_TOKEN = "_GO"
@@ -61,7 +61,7 @@ class Seq2Seq2(BaseModel):
         np.save(self.BASIC_PERSISTENT_DIR + '/unk_token_vector.npy', self.UNK_TOKEN_VECTOR)
 
         self._split_count_data()
-
+        next(self._serve_batch())
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None,))
         encoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
@@ -166,7 +166,6 @@ class Seq2Seq2(BaseModel):
                         # decoder_target_data will be ahead by one timestep
                         # and will not include the start character.
                         self.decoder_target_data[i, t - 1, token] = 1.
-
             from_idx += self.params['batch_size']
             if from_idx + self.params['batch_size'] > len(self.input_texts):
                 from_idx = 0
@@ -263,64 +262,24 @@ class Seq2Seq2(BaseModel):
         np.save(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy', self.embedding_matrix)
 
     def predict_one_sentence(self, sentence):
-        input_texts = []
-        target_texts = []
-        lines = open(self.data_path, encoding='UTF-8').read().split('\n')
-        for line in lines[: min(self.params['num_samples'], len(lines) - 1)]:
-            input_text, target_text = line.split('\t')
-            input_texts.append(input_text)
-            target_text = target_text
-            target_texts.append(target_text)
-        num_samples = len(input_texts)
-        tokenizer = Tokenizer(num_words=self.params['MAX_WORDS'])
-        tokenizer.fit_on_texts(input_texts + target_texts)
-        for word in tokenizer.word_index:
-            tokenizer.word_index[word] = tokenizer.word_index[word] + 3
-        tokenizer.word_index[self.START_TOKEN] = 1
-        tokenizer.word_index[self.END_TOKEN] = 2
-        tokenizer.word_index[self.UNK_TOKEN] = 2
-        tokenizer.num_words = tokenizer.num_words + 3
-        word_index = tokenizer.word_index
-        self.word_index = word_index
+        self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
+        self.word_index = self.word_index.item()
+        self.num_words = self.params['MAX_WORDS'] + 3
+        tokenizer = Tokenizer(num_words=self.params['MAX_WORDS'] + 3)
+        tokenizer.word_index = self.word_index
+        tokenizer.num_words = self.num_words
         try:
-            word_index[self.START_TOKEN]
-            word_index[self.END_TOKEN]
+            self.word_index[self.START_TOKEN]
+            self.word_index[self.END_TOKEN]
+            self.word_index[self.UNK_TOKEN]
         except Exception as e:
             print(e, "why")
             exit()
-        input_texts = None
-        target_texts = None
 
         sentence = tokenizer.texts_to_sequences([sentence])
-
         sentence = pad_sequences(sentence, maxlen=self.params['max_seq_length'], padding='post')
 
-        embeddings_index = {}
-        filename = self.PRETRAINED_GLOVE_FILE
-        with open(filename, 'r', encoding='utf8') as f:
-            for line in f.readlines():
-                values = line.split()
-                word = values[0]
-                coefs = np.asarray(values[1:], dtype='float32')
-                embeddings_index[word] = coefs
-
-        print('Found %s word vectors.' % len(embeddings_index))
-
-        self.num_words = self.params['MAX_WORDS'] + 3
-        self.embedding_matrix = np.zeros((self.num_words, self.params['EMBEDDING_DIM']))
-        for word, i in self.word_index.items():
-            if i >= self.params['MAX_WORDS'] + 3 and word not in [self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN]:
-                continue
-            embedding_vector = None
-            if word == self.START_TOKEN:
-                embedding_vector = self.START_TOKEN_VECTOR
-            elif word == self.END_TOKEN:
-                embedding_vector = self.END_TOKEN_VECTOR
-            else:
-                embedding_vector = embeddings_index.get(word)
-            if embedding_vector is None:
-                embedding_vector = self.UNK_TOKEN_VECTOR
-            self.embedding_matrix[i] = embedding_vector
+        self.embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy')
 
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None,))
@@ -414,7 +373,62 @@ class Seq2Seq2(BaseModel):
         raise NotImplementedError()
 
     def calculate_hiddenstate_after_encoder(self, sentence):
-        raise NotImplementedError()
+        self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
+        self.word_index = self.word_index.item()
+        self.num_words = self.params['MAX_WORDS'] + 3
+        tokenizer = Tokenizer(num_words=self.params['MAX_WORDS'] + 3)
+        tokenizer.word_index = self.word_index
+        tokenizer.num_words = self.num_words
+
+        try:
+            self.word_index[self.START_TOKEN]
+            self.word_index[self.END_TOKEN]
+            self.word_index[self.UNK_TOKEN]
+        except Exception as e:
+            print(e, "why")
+            exit()
+
+        sentence = tokenizer.texts_to_sequences([sentence])
+        sentence = pad_sequences(sentence, maxlen=self.params['max_seq_length'], padding='post')
+
+        self.embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy')
+
+        # Define an input sequence and process it.
+        encoder_inputs = Input(shape=(None,))
+        encoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
+                                      mask_zero=True)
+        encoder_embedded = encoder_embedding(encoder_inputs)
+        encoder = LSTM(self.params['latent_dim'], return_state=True)
+        encoder_outputs, state_h, state_c = encoder(encoder_embedded)
+        # We discard `encoder_outputs` and only keep the states.
+        encoder_states = [state_h, state_c]
+
+        # Set up the decoder, using `encoder_states` as initial state.
+        decoder_inputs = Input(shape=(None,))
+        decoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
+                                      mask_zero=True)
+        decoder_embedded = decoder_embedding(decoder_inputs)
+        # We set up our decoder to return full output sequences,
+        # and to return internal states as well. We don't use the
+        # return states in the training model, but we will use them in inference.
+        decoder_lstm = LSTM(self.params['latent_dim'], return_sequences=True, return_state=True)
+        decoder_outputs, _, _ = decoder_lstm(decoder_embedded, initial_state=encoder_states)
+        decoder_dense = Dense(self.num_words, activation='softmax')
+        decoder_outputs = decoder_dense(decoder_outputs)
+
+        # Define the model that will turn
+        # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
+        model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+
+        # Run training
+        model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+
+        model.load_weights(self.LATEST_MODEL_CHKPT)
+
+        # Define sampling models
+        self.encoder_model = Model(encoder_inputs, encoder_states)
+
+        return self.encoder_model.predict(sentence)
 
     def calculate_every_hiddenstate_after_encoder(self, sentence):
         raise NotImplementedError()
