@@ -100,7 +100,7 @@ class Seq2Seq2(BaseModel):
                             validation_data=self.serve_batch(val_input_data, val_target_data),
                             validation_steps=len(val_input_data) / self.params['BATCH_SIZE'],
                             callbacks=[tbCallBack, modelCallback])
-        model.save_model(os.path.join(self.BASIC_PERSISTENT_DIR, self.MODEL_DIR, 'stack1.h5'))
+        model.save(os.path.join(self.BASIC_PERSISTENT_DIR, self.MODEL_DIR, 'stack1.h5'))
 
     def load(self, file):
         """

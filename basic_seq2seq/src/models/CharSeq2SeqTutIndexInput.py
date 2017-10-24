@@ -25,13 +25,13 @@ class Seq2Seq2(BaseModel):
         self.params['max_decoder_seq_length'] = 138
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../persistent/charSeq2SeqTutIndexInput'
+        self.BASIC_PERSISTENT_DIR = '../../persistent/'+ self.identifier
         self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
         self.input_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "input_token_index.npy")
         self.target_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "target_token_index.npy")
         self.data_path = os.path.join(self.BASE_DATA_DIR, 'Training/deu.txt')
         self.encoder_model_file = os.path.join(self.MODEL_DIR, 'encoder_model.h5')
-        self.model_file = os.path.join(self.MODEL_DIR, 'model.h5')
+        self.model_file = os.path.join(self.MODEL_DIR, 's2s2.h5')
         self.decoder_model_file = os.path.join(self.MODEL_DIR, 'decoder_model.h5')
 
     def start_training(self):
@@ -197,9 +197,9 @@ class Seq2Seq2(BaseModel):
         self.reverse_target_char_index = dict((i, char) for char, i in self.target_token_index.items())
 
     def _setup_inference(self):
-        self.model = load_model('./data/s2s2.h5')
-        self.encoder_model = load_model('./data/encoder_model.h5')
-        self.decoder_model = load_model('./data/decoder_model.h5')
+        self.model = load_model(self.model_file)
+        self.encoder_model = load_model(self.encoder_model_file)
+        self.decoder_model = load_model(self.decoder_model_file)
 
         # Reverse-lookup token index to decode sequences back to
         # something readable.
@@ -263,7 +263,17 @@ class Seq2Seq2(BaseModel):
         raise NotImplementedError()
 
     def calculate_hiddenstate_after_encoder(self, sentence):
-        raise NotImplementedError()
+        self._setup_inference()
+        input_seq = np.zeros((1, self.params[Ä]))
+
+        index = 0
+        for char in sentence:
+            input_seq[0][index][self.input_token_index[char]] = 1.
+            index += 1
+
+            # Encode the input as state vectors.
+        states_value = self.encoder_model.predict(input_seq)
+        return states_value
 
     def calculate_every_hiddenstate_after_encoder(self, sentence):
         raise NotImplementedError()

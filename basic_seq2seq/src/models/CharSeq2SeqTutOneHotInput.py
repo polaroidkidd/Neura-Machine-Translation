@@ -31,7 +31,7 @@ class Seq2Seq2(BaseModel):
         self.target_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "target_token_index.npy")
         self.data_path = self.BASE_DATA_DIR + 'Training/deu.txt'
         self.encoder_model_file = os.path.join(self.MODEL_DIR, 'encoder_model.h5')
-        self.model_file = os.path.join(self.MODEL_DIR, 'model.h5')
+        self.model_file = os.path.join(self.MODEL_DIR, 's2s2.h5')
         self.decoder_model_file = os.path.join(self.MODEL_DIR, 'decoder_model.h5')
 
     def start_training(self):
@@ -200,10 +200,10 @@ class Seq2Seq2(BaseModel):
         self.reverse_input_char_index = dict((i, char) for char, i in self.input_token_index.items())
         self.reverse_target_char_index = dict((i, char) for char, i in self.target_token_index.items())
 
-    def setup_inference(self):
-        self.model = load_model('./data/s2s2.h5')
-        self.encoder_model = load_model('./data/encoder_model.h5')
-        self.decoder_model = load_model('./data/decoder_model.h5')
+    def _setup_inference(self):
+        self.model = load_model(self.model_file)
+        self.encoder_model = load_model(self.encoder_model_file)
+        self.decoder_model = load_model(self.decoder_model_file)
 
         # Reverse-lookup token index to decode sequences back to
         # something readable.
@@ -216,17 +216,19 @@ class Seq2Seq2(BaseModel):
         self.reverse_target_char_index = dict((i, char) for char, i in self.target_token_index.items())
 
     def predict_one_sentence(self, sentence):
-        input_seq = np.zeros((1, 71, 91))
+        self._setup_inference()
+        #input_seq = np.zeros((1, 71, 91))
+        input_seq = np.zeros((1, self.params['max_encoder_seq_length'], self.params['num_encoder_tokens']))
 
         index = 0
         for char in sentence:
             input_seq[0][index][self.input_token_index[char]] = 1.
             index += 1
 
-        decoded_sentence = self.decode_sequence(input_seq)
+        decoded_sentence = self._decode_sequence(input_seq)
         return decoded_sentence
 
-    def decode_sequence(self, input_sequence):
+    def _decode_sequence(self, input_sequence):
         # Encode the input as state vectors.
         states_value = self.encoder_model.predict(input_sequence)
 
@@ -265,7 +267,18 @@ class Seq2Seq2(BaseModel):
         raise NotImplementedError()
 
     def calculate_hiddenstate_after_encoder(self, sentence):
-        raise NotImplementedError()
+        self._setup_inference()
+        input_seq = np.zeros((1, self.params['max_encoder_seq_length'], self.params['num_encoder_tokens']))
+
+        index = 0
+        for char in sentence:
+            input_seq[0][index][self.input_token_index[char]] = 1.
+            index += 1
+
+        # Encode the input as state vectors.
+        states_value = self.encoder_model.predict(input_seq)
+
+        return states_value
 
     def calculate_every_hiddenstate_after_encoder(self, sentence):
         raise NotImplementedError()

@@ -41,13 +41,13 @@ class Seq2Seq2(BaseModel):
         self.PRETRAINED_GLOVE_FILE = os.path.join(self.BASE_DATA_DIR, 'glove.6B.100d.txt')
         self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
         self.LATEST_MODEL_CHKPT = os.path.join(self.BASIC_PERSISTENT_DIR, 'model.12999-2774.86.hdf5')
-        self.WORD_IDX_FILE = os.path.join(self.BASIC_PERSISTENT_DIR, "word_idx")
+        self.WORD_IDX_FILE = os.path.join(self.BASIC_PERSISTENT_DIR, "word_idx.npy")
 
         self.START_TOKEN = "_GO"
         self.END_TOKEN = "_EOS"
 
     def start_training(self):
-        self.split_count_data()
+        self._split_count_data()
 
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None,))
@@ -79,17 +79,14 @@ class Seq2Seq2(BaseModel):
         # Run training
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
 
+        steps = 5
+        mod_epochs = np.math.floor(self.num_samples / self.params['batch_size'] / steps * self.params['epochs'])
         tbCallBack = callbacks.TensorBoard(log_dir=self.GRAPH_DIR, histogram_freq=0, write_graph=True,
                                            write_images=True)
         modelCallback = callbacks.ModelCheckpoint(self.MODEL_CHECKPOINT_DIR + '/model.{epoch:02d}-{loss:.2f}.hdf5',
                                                   monitor='loss', verbose=1, save_best_only=False,
-                                                  save_weights_only=True, mode='auto', period=1000)
-
-        # model.fit([input_texts, target_texts], target_texts, batch_size=self.params['batch_size'],
-        #          epochs=self.params['epochs'],
-        #          validation_split=0.2, verbose=1, callbacks=[tbCallBack])
-        steps = 5
-        mod_epochs = np.math.floor(self.num_samples / self.params['batch_size'] / steps * self.params['epochs'])
+                                                  save_weights_only=True, mode='auto',
+                                                  period=mod_epochs / self.params['epochs'])
         model.fit_generator(self.serve_batch(), steps, epochs=mod_epochs, verbose=2, max_queue_size=5,
                             callbacks=[tbCallBack, modelCallback])
 
@@ -149,19 +146,6 @@ class Seq2Seq2(BaseModel):
                 from_idx = 0
             yield [self.encoder_input_data, self.decoder_input_data], self.decoder_target_data
 
-    def _map_to(self, d):
-        # iterate over the key/values pairings
-        for k, v in d.items():
-            # if v is a list join and encode else just encode as it is a string
-            if isinstance(v, list):
-                d[k] = ",".join(v).encode("utf-8")
-            else:
-                try:
-                    d[k] = v.encode("utf-8")
-                except AttributeError:
-                    d[k] = v
-        print(d)
-
     def _split_count_data(self):
         self.input_texts = []
         self.target_texts = []
@@ -190,8 +174,6 @@ class Seq2Seq2(BaseModel):
             exit()
 
         np.save(self.WORD_IDX_FILE, self.word_index)
-        self.map_to(self.word_index)
-        # self.map_to(self.word_index)
 
         self.input_texts = tokenizer.texts_to_sequences(self.input_texts)
         self.target_texts = tokenizer.texts_to_sequences(self.target_texts)
@@ -227,37 +209,16 @@ class Seq2Seq2(BaseModel):
                 # words not found in embedding index will be all-zeros.
                 self.embedding_matrix[i] = embedding_vector
 
+        np.save(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy', self.embedding_matrix)
 
-    def predict_one_sentence(self, sentence):
-        input_texts = []
-        target_texts = []
-        lines = open(self.data_path, encoding='UTF-8').read().split('\n')
-        for line in lines[: min(self.params['num_samples'], len(lines) - 1)]:
-            input_text, target_text = line.split('\t')
-            input_texts.append(input_text)
-            target_text = target_text
-            target_texts.append(target_text)
-        num_samples = len(input_texts)
+    def predict_one_sentence_old(self, sentence):
+        self.word_index = np.load(self.WORD_IDX_FILE)
+        self.word_index = self.word_index.item()
         tokenizer = Tokenizer(num_words=self.params['MAX_WORDS'])
-        tokenizer.fit_on_texts(input_texts + target_texts)
-        for word in tokenizer.word_index:
-            tokenizer.word_index[word] = tokenizer.word_index[word] + 2
-        tokenizer.word_index[self.START_TOKEN] = 1
-        tokenizer.word_index[self.END_TOKEN] = 2
-        tokenizer.num_words = tokenizer.num_words + 2
-        word_index = tokenizer.word_index
-        self.word_index =word_index
-        try:
-            word_index[self.START_TOKEN]
-            word_index[self.END_TOKEN]
-        except Exception as e:
-            print(e, "why")
-            exit()
-        input_texts = None
-        target_texts = None
+        tokenizer.word_index = self.word_index
+        tokenizer.num_words = len(self.word_index)
 
         sentence = tokenizer.texts_to_sequences([sentence])
-
 
         sentence = pad_sequences(sentence, maxlen=self.params['max_seq_length'], padding='post')
 
@@ -272,17 +233,15 @@ class Seq2Seq2(BaseModel):
 
         print('Found %s word vectors.' % len(embeddings_index))
 
-        self.num_words = min(self.params['MAX_WORDS'], len(word_index)) + 1
+        self.num_words = min(self.params['MAX_WORDS'], len(self.word_index)) + 1
         self.embedding_matrix = np.zeros((self.num_words, self.params['EMBEDDING_DIM']))
-        for word, i in word_index.items():
+        for word, i in self.word_index.items():
             if i >= self.params['MAX_WORDS']:
                 continue
             embedding_vector = embeddings_index.get(word)
             if embedding_vector is not None:
                 # words not found in embedding index will be all-zeros.
                 self.embedding_matrix[i] = embedding_vector
-
-
 
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None,))
@@ -316,6 +275,76 @@ class Seq2Seq2(BaseModel):
 
         model.load_weights(self.LATEST_MODEL_CHKPT)
 
+        # Define sampling models
+        self.encoder_model = Model(encoder_inputs, encoder_states)
+
+        decoder_state_input_h = Input(shape=(self.params['latent_dim'],), name='dec_state_inpu_h')
+        decoder_state_input_c = Input(shape=(self.params['latent_dim'],), name='dec_state_input_c')
+        decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
+        decoder_outputs, state_h, state_c = decoder_lstm(decoder_embedded, initial_state=decoder_states_inputs)
+        decoder_states = [state_h, state_c]
+        decoder_outputs = decoder_dense(decoder_outputs)
+        self.decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
+
+        decoded_sentence = self.decode_sequence(sentence)
+        return decoded_sentence
+
+    def _set_up_inference(self):
+        self.word_index = np.load(self.WORD_IDX_FILE)
+        self.word_index = self.word_index.item()
+
+        embeddings_index = {}
+        filename = self.PRETRAINED_GLOVE_FILE
+        with open(filename, 'r', encoding='utf8') as f:
+            for line in f.readlines():
+                values = line.split()
+                word = values[0]
+                coefs = np.asarray(values[1:], dtype='float32')
+                embeddings_index[word] = coefs
+
+        print('Found %s word vectors.' % len(embeddings_index))
+
+        self.num_words = min(self.params['MAX_WORDS'], len(self.word_index)) + 1
+        self.embedding_matrix = np.zeros((self.num_words, self.params['EMBEDDING_DIM']))
+        for word, i in self.word_index.items():
+            if i >= self.params['MAX_WORDS']:
+                continue
+            embedding_vector = embeddings_index.get(word)
+            if embedding_vector is not None:
+                # words not found in embedding index will be all-zeros.
+                self.embedding_matrix[i] = embedding_vector
+
+        # Define an input sequence and process it.
+        encoder_inputs = Input(shape=(None,))
+        encoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
+                                      mask_zero=True)
+        encoder_embedded = encoder_embedding(encoder_inputs)
+        encoder = LSTM(self.params['latent_dim'], return_state=True)
+        encoder_outputs, state_h, state_c = encoder(encoder_embedded)
+        # We discard `encoder_outputs` and only keep the states.
+        encoder_states = [state_h, state_c]
+
+        # Set up the decoder, using `encoder_states` as initial state.
+        decoder_inputs = Input(shape=(None,))
+        decoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
+                                      mask_zero=True)
+        decoder_embedded = decoder_embedding(decoder_inputs)
+        # We set up our decoder to return full output sequences,
+        # and to return internal states as well. We don't use the
+        # return states in the training model, but we will use them in inference.
+        decoder_lstm = LSTM(self.params['latent_dim'], return_sequences=True, return_state=True)
+        decoder_outputs, _, _ = decoder_lstm(decoder_embedded, initial_state=encoder_states)
+        decoder_dense = Dense(self.num_words, activation='softmax')
+        decoder_outputs = decoder_dense(decoder_outputs)
+
+        # Define the model that will turn
+        # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
+        model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+
+        # Run training
+        model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+
+        model.load_weights(self.LATEST_MODEL_CHKPT)
 
         # Define sampling models
         self.encoder_model = Model(encoder_inputs, encoder_states)
@@ -327,6 +356,21 @@ class Seq2Seq2(BaseModel):
         decoder_states = [state_h, state_c]
         decoder_outputs = decoder_dense(decoder_outputs)
         self.decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
+
+        #model = load_model(self.model_file)
+        #model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+        #model.load_weights(self.LATEST_MODEL_CHKPT)
+        #self.encoder_model = load_model(self.encoder_model_file)
+        #self.decoder_model = load_model(self.decoder_model_file)
+
+    def predict_one_sentence(self, sentence):
+        self._set_up_inference()
+
+        tokenizer = Tokenizer(num_words=self.params['MAX_WORDS'])
+        tokenizer.word_index = self.word_index
+        tokenizer.num_words = len(self.word_index)
+        sentence = tokenizer.texts_to_sequences([sentence])
+        sentence = pad_sequences(sentence, maxlen=self.params['max_seq_length'], padding='post')
 
         decoded_sentence = self.decode_sequence(sentence)
         return decoded_sentence
@@ -342,8 +386,8 @@ class Seq2Seq2(BaseModel):
 
         # Sampling loop for a batch of sequences
         # (to simplify, here we assume a batch of size 1).
-        p = [target_seq]+states_value
-        #print(np.array(p).shape)
+        p = [target_seq] + states_value
+        # print(np.array(p).shape)
         stop_condition = False
         decoded_sentence = ''
         reverse_word_index = dict((i, word) for word, i in self.word_index.items())

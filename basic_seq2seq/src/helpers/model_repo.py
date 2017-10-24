@@ -1,15 +1,15 @@
+from models import CharSeq2SeqTutOneHotInput, CharSeq2SeqTutIndexInput
+from models import WordSeq2SeqTutNoStartEndToken
+from models import WordSeq2SeqTutStartEndTokenNoUNK
+from models import WordSeq2SeqTutStartEndUnkToken
 from models import char_seq2seq_second_approach
-from models import CharSeq2SeqTutIndexInput
-from models import CharSeq2SeqTutOneHotInput
 from models import model_1
 from models import model_1_embedding2
 from models import model_2
-from models import model_2_without_dropout
-from models import WordSeq2SeqTutNoStartEndToken
-from models import WordSeq2SeqTutStartEndTokenNoUNK
 from models import model_2_token_also_at_encoder
 from models import model_2_token_also_at_encoder_unk
 from models import model_2_unk
+from models import model_2_without_dropout
 
 # from models import model_2_token_also_at_encoder_without_dropout
 # from models import model_2_token_also_at_encoder_without_dropout_unk
@@ -27,7 +27,8 @@ models = {'char_seq2seq_second_approach': '0',
           'WordSeq2SeqTutStartEndTokenNoUNK': '8',
           'model_2_token_also_at_encoder': '9',
           'model_2_token_also_at_encoder_unk': '10',
-          'model_2_unk': '11'
+          'model_2_unk': '11',
+          'WordSeq2SeqTutStartEndUnkToken': '12'
           }
 
 
@@ -70,6 +71,10 @@ def determine_model(searched_model):
 
     elif searched_model == 'model_2_unk' or searched_model == models['model_2_unk']:
         model = model_2_unk.Seq2Seq2()
+
+    elif searched_model == 'WordSeq2SeqTutStartEndUnkToken' or searched_model == models['WordSeq2SeqTutStartEndUnkToken']:
+        model = WordSeq2SeqTutStartEndUnkToken.Seq2Seq2()
+
     return model
 
 
@@ -79,7 +84,7 @@ def print_models():
 
 
 def interactive_model_selection():
-    print("Which model do you want to train?")
+    print("Which model do you want to use?")
 
     model = -1
     while model == -1:

@@ -109,7 +109,7 @@ class Seq2Seq2(BaseModel):
 
         M.fit_generator(self.serve_batch(), steps, epochs=mod_epochs, verbose=2, max_queue_size=5,
                             callbacks=[tbCallBack, modelCallback])
-        M.save_model(self.model_file)
+        M.save(self.model_file)
 
 
     def _split_count_data(self):
@@ -306,26 +306,12 @@ class Seq2Seq2(BaseModel):
 
 
     def predict_one_sentence(self, sentence):
-        raise NotImplementedError()
-        # from split_and_count_data
-        self.input_texts = []
-        self.target_texts = []
-        lines = open(self.data_path, encoding='UTF-8').read().split('\n')
-        for line in lines[: min(self.params['num_samples'], len(lines) - 1)]:
-            input_text, target_text = line.split('\t')
-            self.input_texts.append(input_text)
-            target_text = target_text
-            self.target_texts.append(target_text)
-        self.num_samples = len(self.input_texts)
-        tokenizer = Tokenizer(num_words=self.params['MAX_WORDS'])
-        tokenizer.fit_on_texts(self.input_texts + self.target_texts)
-        self.word_index = tokenizer.word_index
-        for word in tokenizer.word_index:
-            tokenizer.word_index[word] = tokenizer.word_index[word] + 2
-        tokenizer.word_index[self.START_TOKEN] = 1
-        tokenizer.word_index[self.END_TOKEN] = 2
-        tokenizer.num_words = tokenizer.num_words + 2
-        self.word_index = tokenizer.word_index
+        #todo handel unk
+        tokenizer = Tokenizer()
+        self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
+        self.word_index = self.word_index.item()
+        tokenizer.word_index = self.word_index
+        tokenizer.num_words = len(self.word_index)
 
         try:
             self.word_index[self.START_TOKEN]
@@ -333,36 +319,45 @@ class Seq2Seq2(BaseModel):
         except Exception as e:
             print(e, "why")
             exit()
+        self.embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy')
 
-        # np.save(self.WORD_IDX_FILE, self.word_index)
-        # self.map_to(self.word_index)
-        # self.map_to(self.word_index)
         print(sentence)
         sentence = tokenizer.texts_to_sequences([sentence])
         print(sentence)
         sentence = pad_sequences(sentence, maxlen=self.params['max_seq_length'], padding='post')
         print(sentence.shape)
         print(sentence)
-        sentence=sentence.reshape(sentence.shape[0],sentence.shape[1])
+        sentence = sentence.reshape(sentence.shape[0], sentence.shape[1])
         print(sentence.shape)
 
+        M = Sequential()
+        M.add(Embedding(self.params['MAX_WORDS'] + 1, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
+                        mask_zero=True))
 
+        M.add(LSTM(self.params['latent_dim'], return_sequences=True))
 
+        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
 
-        xin = Input(batch_shape=(1, self.params['max_seq_length']),
-                    dtype='int32')
+        M.add(
+            LSTM(self.params['latent_dim'] * int(1 / self.params['P_DENSE_DROPOUT']), return_sequences=True))
 
-        xemb = Embedding(self.params['MAX_WORDS'], self.params['EMBEDDING_DIM'])(xin)  # 3 dim (batch,time,feat)
-        seq = LSTM(self.params['latent_dim'], return_sequences=True)(xemb)
-        mlp = TimeDistributed(Dense(self.params['MAX_WORDS'], activation='softmax'))(seq)
-        model = Model(input=xin, output=mlp)
-        model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
 
-        model.load_weights(self.LATEST_MODELCHKPT)
-        prediction = model.predict(sentence, batch_size=1)
+        M.add(TimeDistributed(Dense(self.params['MAX_WORDS'] + 1,
+                                    input_shape=(None, self.params['num_tokens'], self.params['MAX_WORDS'] + 1),
+                                    activation='softmax')))
+
+        print('compiling')
+        M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        print('compiled')
+
+        M.load_weights(self.LATEST_MODELCHKPT)
+
+        prediction = M.predict(sentence, batch_size=1)
         print(prediction)
         print(prediction.shape)
         predicted_sentence = []
+        reverse_word_index = dict((i, word) for word, i in self.word_index.items())
         for sentence in prediction:
             for token in sentence:
                 print(token)
@@ -372,7 +367,7 @@ class Seq2Seq2(BaseModel):
                 if max_idx == 0:
                     print("id of max token = 0")
                 else:
-                    print(self.word_index[max_idx])
+                    print(reverse_word_index[max_idx])
                     predicted_sentence += self.word_index[max_idx]
 
         return predicted_sentence

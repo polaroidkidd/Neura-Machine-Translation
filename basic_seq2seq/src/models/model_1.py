@@ -27,7 +27,7 @@ class Seq2Seq2(BaseModel):
         self.params['MAX_WORDS'] = 20000
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../persistent/model1'
+        self.BASIC_PERSISTENT_DIR = '../../persistent/' + self.identifier
         self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
         self.GRAPH_DIR = os.path.join(self.BASIC_PERSISTENT_DIR, 'Graph')
         self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
@@ -89,7 +89,7 @@ class Seq2Seq2(BaseModel):
 
         model.fit_generator(self.serve_batch(), steps, epochs=mod_epochs, verbose=2, max_queue_size=5,
                             callbacks=[tbCallBack, modelCallback])
-        model.save_model(self.model_file)
+        model.save(self.model_file)
 
     def _load(self, file):
         """
@@ -102,7 +102,7 @@ class Seq2Seq2(BaseModel):
         print('Loaded', len(data), "lines of data.")
         return data
 
-    def serve_batch(self):
+    def _serve_batch(self):
         counter = 0
         self.batch_X = np.zeros((self.params['batch_size'], self.params['max_seq_length']), dtype='int32')
         self.batch_Y = np.zeros((self.params['batch_size'], self.params['max_seq_length'], self.params['MAX_WORDS']),

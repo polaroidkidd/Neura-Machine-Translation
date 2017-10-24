@@ -68,15 +68,15 @@ class Seq2Seq2(BaseModel):
         # Run training
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
 
+        steps = 5
+        mod_epochs = np.floor(
+            len(train_input_texts) / self.params['BATCH_SIZE'] / steps * self.params['EPOCHS'])
         tbCallBack = callbacks.TensorBoard(log_dir=self.GRAPH_DIR, histogram_freq=0, write_graph=True,
                                            write_images=True)
         modelCallback = callbacks.ModelCheckpoint(self.MODEL_CHECKPOINT_DIR + '/model.{epoch:02d}-{loss:.2f}.hdf5',
                                                   monitor='loss', verbose=1, save_best_only=False,
-                                                  save_weights_only=False, mode='auto', period=1000)
+                                                  save_weights_only=False, mode='auto', period=mod_epochs/self.params['epochs'])
 
-        steps = 5
-        mod_epochs = np.floor(
-            len(train_input_texts) / self.params['BATCH_SIZE'] / steps * self.params['EPOCHS'])
         print('steps', steps, 'mod_epochs', mod_epochs, 'len(train_input_texts)', len(train_input_texts), "batch_size",
               self.params['BATCH_SIZE'], 'epochs', self.params['EPOCHS'])
         model.fit_generator(self.serve_batch(train_input_texts, train_target_texts, token_index),
@@ -149,7 +149,7 @@ class Seq2Seq2(BaseModel):
         self.char_index = self.char_index.item()
         self.reverse_char_index = dict((i, char) for char, i in self.char_index.items())
 
-    def setup_inference(self):
+    def _setup_inference(self):
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None, self.params['NUM_TOKENS']))
         encoder = LSTM(self.params['LATENT_DIM'], return_state=True)
@@ -217,8 +217,7 @@ class Seq2Seq2(BaseModel):
         self.reverse_char_index = dict((i, char) for char, i in self.char_index.items())
 
     def predict_one_sentence(self, sentence):
-        # Take one sequence (part of the training test)
-        # for trying out decoding.
+        self._setup_inference()
         input_seq = np.zeros((1, self.params['MAX_SEQ_LEN'], self.params['NUM_TOKENS']))
 
         index = 0

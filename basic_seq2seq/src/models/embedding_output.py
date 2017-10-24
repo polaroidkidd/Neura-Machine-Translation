@@ -237,4 +237,4 @@ with tf.device("/cpu:0"):
     # M.fit_generator(serve_batch_perfomance(train_input_data, train_target_data), 1, epochs=epochs, verbose=2,
     #                max_queue_size=5, validation_data=serve_batch_perfomance(val_input_data, val_target_data),
     #                validation_steps=len(val_input_data) / batch_size, callbacks=[tbCallBack, modelCallback])
-    M.save_model(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack2.h5'))
+    M.save(os.path.join(BASIC_PERSISTENT_DIR, MODEL_DIR, 'stack2.h5'))
