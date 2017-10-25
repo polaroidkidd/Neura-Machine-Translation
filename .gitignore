@@ -194,3 +194,4 @@ venv.bak/
 /DataSets/glove.6B.200d.txt
 /DataSets/glove.6B.100d.txt
 /Persistence/model_2_token_also_at_encoder_unk/
+.idea/misc.xml
