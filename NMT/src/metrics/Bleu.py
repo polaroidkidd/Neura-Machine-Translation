@@ -76,7 +76,7 @@ class Bleu(BaseMetric):
         if not (os.path.exists(references) or os.path.exists(hypothesis)):
             raise FileNotFoundError
         else:
-            with open(hypothesis, 'r') as hyp_file, open(references, 'r') as ref_file:
+            with open(hypothesis, 'r', encoding='utf8') as hyp_file, open(references, 'r', encoding='utf8') as ref_file:
                 for references_line, hypothesis_line in zip(ref_file, hyp_file):
                     self.evaluate_hypothesis_single(hypothesis_line.strip('\n'), references_line.strip('\n'))
 
