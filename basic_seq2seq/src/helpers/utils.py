@@ -6,8 +6,6 @@ from sklearn.metrics import log_loss
 
 
 # Custom loss
-
-
 class CustomLossLayer(Layer):
     def __init__(self, **kwargs):
         self.is_placeholder = True

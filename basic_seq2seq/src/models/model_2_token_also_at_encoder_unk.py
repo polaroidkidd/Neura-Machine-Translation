@@ -354,7 +354,7 @@ class Seq2Seq2(BaseModel):
         self.M.add(Embedding(self.params['MAX_WORDS'] + 3, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
                         mask_zero=True))
 
-        self.M.add(LSTM(self.params['latent_dim'], return_sequences=True))
+        self.M.add(LSTM(self.params['latent_dim'], return_sequences=True, name='encoder'))
 
         self.M.add(Dropout(self.params['P_DENSE_DROPOUT']))
 
@@ -477,6 +477,8 @@ class Seq2Seq2(BaseModel):
         return predicted_sentences
 
     def calculate_hiddenstate_after_encoder(self, sentence):
+        self.__setup_model()
+
         tokenizer = Tokenizer()
         self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
         self.word_index = self.word_index.item()
@@ -487,59 +489,23 @@ class Seq2Seq2(BaseModel):
         try:
             self.word_index[self.START_TOKEN]
             self.word_index[self.END_TOKEN]
+            self.word_index[self.UNK_TOKEN]
         except Exception as e:
             print(e, "why")
             exit()
-        self.embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy')
 
         sentence = tokenizer.texts_to_sequences([sentence])
-        sentence = pad_sequences(sentence, maxlen=self.params['max_seq_length'], padding='post')
+        sentence = [self.word_index[self.START_TOKEN]] + sentence[0] + [self.word_index[self.END_TOKEN]]
+        sentence = pad_sequences([sentence], maxlen=self.params['max_seq_length'], padding='post')
         sentence = sentence.reshape(sentence.shape[0], sentence.shape[1])
 
         encoder_name = 'encoder'
-        M = Sequential()
-        M.add(Embedding(self.params['MAX_WORDS'] + 1, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
-                        mask_zero=True))
 
-        M.add(LSTM(self.params['latent_dim'], return_sequences=True, name=encoder_name))
-
-        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
-
-        M.add(
-            LSTM(self.params['latent_dim'] * int(1 / self.params['P_DENSE_DROPOUT']), return_sequences=True))
-
-        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
-
-        M.add(TimeDistributed(Dense(self.params['MAX_WORDS'] + 1,
-                                    input_shape=(None, self.params['num_tokens'], self.params['MAX_WORDS'] + 1),
-                                    activation='softmax')))
-
-        print('compiling')
-        M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        print('compiled')
-
-        M.load_weights(self.LATEST_MODELCHKPT)
-
-        encoder = Model(inputs=M.input, outputs=M.get_layer(encoder_name).output)
+        encoder = Model(inputs=self.M.input, outputs=self.M.get_layer(encoder_name).output)
 
         prediction = encoder.predict(sentence, batch_size=1)
-        print(prediction)
         print(prediction.shape)
-        predicted_sentence = []
-        reverse_word_index = dict((i, word) for word, i in self.word_index.items())
-        for sentence in prediction:
-            for token in sentence:
-                print(token)
-                print(token.shape)
-                max_idx = np.argmax(token)
-                print(max_idx)
-                if max_idx == 0:
-                    print("id of max token = 0")
-                else:
-                    print(reverse_word_index[max_idx])
-                    predicted_sentence += self.word_index[max_idx]
-
-        return predicted_sentence
+        return prediction
 
     def calculate_every_hiddenstate_after_encoder(self, sentence):
         raise NotImplementedError()

@@ -10,12 +10,11 @@ def save_hiddenstate_and_state_vector(prediction, output_file, state_file, sente
         for element in prediction[0][0]:
             out_file.write(str(element) + ' ')
         out_file.write('\n')
-    with(open(state_file, 'a')) as out_file:
-        out_file.write(sentence + ' ')
-        for element in prediction[1][0]:
-            out_file.write(str(element) + ' ')
-        out_file.write('\n')
-
+    #with(open(state_file, 'a')) as out_file:
+    #    out_file.write(sentence + ' ')
+    #    for element in prediction[1][0]:
+    #        out_file.write(str(element) + ' ')
+    #    out_file.write('\n')
 
 def batch_predict(in_file):
     # Todo implement this

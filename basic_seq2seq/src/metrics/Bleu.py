@@ -61,7 +61,7 @@ class Bleu(BaseMetric):
                                                     self.params['hypothesis_reference']['ref'],
                                                     self.params['hypothesis_reference']['hyp'])
 
-    def evaluate_hypothesis_batch_single(self, hypothesis: str, references: list):
+    def evaluate_hypothesis_batch_single(self, hypothesis: str, references: str):
         """
         This method loops through two separate files (references and hypothesis), calculates the BLEU scores of each
         hypothesis and writes it into a file located in the director evaluations/model_name/

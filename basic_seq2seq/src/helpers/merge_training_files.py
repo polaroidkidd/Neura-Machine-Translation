@@ -1,3 +1,7 @@
+"""
+Merges two seperate training files, where each one contains one language, into one tab seperated file.
+"""
+
 BASE_DATA_DIR = '../../DataSets/Validation/'
 
 en = 'newstest2013.en'
