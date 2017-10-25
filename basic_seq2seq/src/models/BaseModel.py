@@ -7,10 +7,19 @@ class BaseModel(metaclass=ABCMeta):
 
     @abstractmethod
     def start_training(self):
+        """
+        Starts training and saves the model in a directory with a unique name
+        """
         pass
 
     @abstractmethod
     def predict_one_sentence(self, sentence):
+        """
+        Predicts a translation based on the source sentence.
+        Preprocessing and postprocessing is also handled.
+        :param sentence: The sentence which should be translated
+        :return: the translated sentence as a string
+        """
         pass
 
     @abstractmethod

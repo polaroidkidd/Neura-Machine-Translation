@@ -3,8 +3,6 @@ from models import WordSeq2SeqTutNoStartEndToken
 from models import WordSeq2SeqTutStartEndTokenNoUNK
 from models import WordSeq2SeqTutStartEndUnkToken
 from models import char_seq2seq_second_approach
-from models import model_1
-from models import model_1_embedding2
 from models import model_2
 from models import model_2_token_also_at_encoder
 from models import model_2_token_also_at_encoder_unk
@@ -19,8 +17,6 @@ from models import model_2_without_dropout
 models = {'char_seq2seq_second_approach': '0',
           'CharSeq2SeqTutIndexInput': '1',
           'CharSeq2SeqTutOneHotInput': '2',
-          'model_1': '3',
-          'model_1_embedding2': '4',
           'model_2': '5',
           'model_2_without_dropout': '6',
           'WordSeq2SeqTutNoStartEndToken': '7',
@@ -42,12 +38,6 @@ def determine_model(searched_model):
 
     elif searched_model == 'CharSeq2SeqTutOneHotInput' or searched_model == models['CharSeq2SeqTutOneHotInput']:
         model = CharSeq2SeqTutOneHotInput.Seq2Seq2()
-
-    elif searched_model == 'model_1' or searched_model == models['model_1']:
-        model = model_1.Seq2Seq2()
-
-    elif searched_model == 'model_1_embedding2' or searched_model == models['model_1_embedding2']:
-        model = model_1_embedding2.Seq2Seq2()
 
     elif searched_model == 'model_2' or searched_model == models['model_2']:
         model = model_2.Seq2Seq2()

@@ -45,7 +45,7 @@ class Seq2Seq2(BaseModel):
         self.decoder_model_file = os.path.join(self.MODEL_DIR, 'decoder_model.h5')
         self.PRETRAINED_GLOVE_FILE = os.path.join(self.BASE_DATA_DIR, 'glove.6B.100d.txt')
         self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        self.LATEST_MODEL_CHKPT = os.path.join(self.BASIC_PERSISTENT_DIR, 'model.292-2428.95.hdf5')
+        self.LATEST_MODEL_CHKPT = os.path.join(self.BASIC_PERSISTENT_DIR, 'model.1171-3544.78.hdf5')
         self.WORD_IDX_FILE = os.path.join(self.BASIC_PERSISTENT_DIR, "word_idx")
 
         self.START_TOKEN = "_GO"
