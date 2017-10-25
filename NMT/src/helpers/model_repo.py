@@ -1,5 +1,5 @@
-from models import model_2_token_also_at_encoder_unk
 from models import WordBasedSeq2Seq
+from models import model_2_token_also_at_encoder_unk
 
 models = {'WordBasedSeq2Seq': '0',
           'model_2_token_also_at_encoder_unk': '1'

@@ -1,13 +1,11 @@
 from __future__ import print_function
 
-import gc
-import numpy as np
-from keras.layers import Dense, Input, LSTM, Embedding
-from keras.models import Model
-from keras.models import load_model
-from keras import callbacks
 import os
 
+import numpy as np
+from keras import callbacks
+from keras.layers import Dense, Input, LSTM, Embedding
+from keras.models import Model
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import Tokenizer
 

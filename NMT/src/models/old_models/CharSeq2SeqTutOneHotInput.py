@@ -1,11 +1,12 @@
 from __future__ import print_function
 
+import os
+
 import numpy as np
+from keras import callbacks
 from keras.layers import Dense, Input, LSTM
 from keras.models import Model
 from keras.models import load_model
-from keras import callbacks
-import os
 
 from models.BaseModel import BaseModel
 

@@ -1,7 +1,6 @@
+import keras.backend as K
 from keras.engine.topology import Layer
 from keras.layers.merge import multiply
-from keras.layers.merge import add
-import keras.backend as K
 from sklearn.metrics import log_loss
 
 

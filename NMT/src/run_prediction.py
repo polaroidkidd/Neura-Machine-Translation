@@ -1,5 +1,7 @@
+import os
+import sys
+
 from helpers import model_repo
-import os, sys
 
 """
 Interactive inference of pretrained models via terminal.

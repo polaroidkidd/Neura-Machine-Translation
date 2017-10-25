@@ -1,7 +1,9 @@
-from nltk.translate import bleu_score
-from datetime import datetime
-from metrics.BaseMetric import BaseMetric
 import os
+from datetime import datetime
+
+from nltk.translate import bleu_score
+
+from metrics.BaseMetric import BaseMetric
 
 
 class Bleu(BaseMetric):

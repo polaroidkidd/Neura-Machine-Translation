@@ -1,5 +1,6 @@
-from helpers import model_repo
 import sys
+
+from helpers import model_repo
 
 BASE_DIR = "C:/Users/Nicolas/Desktop/"
 
