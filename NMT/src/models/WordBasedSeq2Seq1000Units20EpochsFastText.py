@@ -14,19 +14,20 @@ from keras.utils import to_categorical
 from models.BaseModel import BaseModel
 
 
+# TODO: Implement one vocabular for each language; Handle Unknown tokens (Tokenizer); Use FastText
 class Seq2Seq2(BaseModel):
     def __init__(self):
         BaseModel.__init__(self)
-        self.identifier = 'WordBasedSeq2Seq'
+        self.identifier = 'WordBasedSeq2Seq1000Units20EpochsFastText'
 
         self.params['batch_size'] = 128
-        self.params['epochs'] = 5
-        self.params['latent_dim'] = 256
+        self.params['epochs'] = 20
+        self.params['latent_dim'] = 1000
         self.params['num_samples'] = 150000
-        self.params['num_tokens'] = 91
-        self.params['max_seq_length'] = 100
-        self.params['EMBEDDING_DIM'] = 100
-        self.params['MAX_WORDS'] = 20000
+        self.params['MAX_SEQ_LEN'] = 100
+        self.params['EMBEDDING_DIM'] = 300
+        self.params['MAX_WORDS_DE'] = 20000
+        self.params['MAX_WORDS_EN'] = 20000
         self.params['P_DENSE_DROPOUT'] = 0.2
 
         self.BASE_DATA_DIR = "../../DataSets"
@@ -52,9 +53,6 @@ class Seq2Seq2(BaseModel):
         self.START_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
         self.END_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
         self.UNK_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
-        np.save(self.BASIC_PERSISTENT_DIR + '/start_token_vector.npy', self.START_TOKEN_VECTOR)
-        np.save(self.BASIC_PERSISTENT_DIR + '/end_token_vector.npy', self.END_TOKEN_VECTOR)
-        np.save(self.BASIC_PERSISTENT_DIR + '/unk_token_vector.npy', self.UNK_TOKEN_VECTOR)
 
         self._split_count_data()
 
