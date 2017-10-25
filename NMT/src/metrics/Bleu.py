@@ -29,7 +29,7 @@ class Bleu(BaseMetric):
             'ref': []
             }
 
-        self.params['RESULT_DIR'] = '../../../evaluations/' + self.params['model']
+        self.params['RESULT_DIR'] = '../../Evaluations/' + self.params['model']
         if not os.path.exists(self.params['RESULT_DIR']):
             os.mkdir(self.params['RESULT_DIR'])
         self.params['FILE_NAME'] = model + '_' + self.params['timestamp'] + '_BLEU.txt'
@@ -92,7 +92,8 @@ class Bleu(BaseMetric):
         if not (os.path.exists(references) or os.path.exists(hypothesis)):
             raise FileNotFoundError
         else:
-            with open(hypothesis, 'r') as hyp_file, open(references, 'r') as ref_file:
+            with open(hypothesis, 'r', encoding='utf-8') \
+                    as hyp_file, open(references, 'r', encoding='utf-8') as ref_file:
                 for hyp_line, ref_line in zip(hyp_file, ref_file):
                     self.params['hypothesis_reference']['hyp'].append(hyp_line.strip('\n').split(' '))
                     for line in ref_line.split('\t'):
