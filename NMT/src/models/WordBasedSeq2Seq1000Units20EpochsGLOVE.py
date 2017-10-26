@@ -92,6 +92,33 @@ class Seq2Seq2(BaseModel):
                         callbacks=[tbCallBack, modelCallback])
         M.save(self.model_file)
 
+    def __build_tokenizers(self):
+        # TODO: implement that tokenizer replaces unknown words with unk token
+        #       decide if tokenizer.filter is good or not
+        en_tokenizer = Tokenizer(num_words=self.params['MAX_WORDS_EN'])
+        en_tokenizer.fit_on_texts(self.input_texts)
+        self.en_word_index = en_tokenizer.word_index
+        for word in en_tokenizer.word_index:
+            en_tokenizer.word_index[word] = en_tokenizer.word_index[word] + 3
+        en_tokenizer.word_index[self.START_TOKEN] = 1
+        en_tokenizer.word_index[self.END_TOKEN] = 2
+        en_tokenizer.word_index[self.UNK_TOKEN] = 3
+        en_tokenizer.num_words = en_tokenizer.num_words + 3
+        self.en_word_index = en_tokenizer.word_index
+
+        de_tokenizer = Tokenizer(num_words=self.params['MAX_WORDS_DE'])
+        de_tokenizer.fit_on_texts(self.input_texts)
+        self.de_word_index = de_tokenizer.word_index
+        for word in de_tokenizer.word_index:
+            de_tokenizer.word_index[word] = de_tokenizer.word_index[word] + 3
+        de_tokenizer.word_index[self.START_TOKEN] = 1
+        de_tokenizer.word_index[self.END_TOKEN] = 2
+        de_tokenizer.word_index[self.UNK_TOKEN] = 3
+        de_tokenizer.num_words = de_tokenizer.num_words + 3
+        self.de_word_index = de_tokenizer.word_index
+
+        return en_tokenizer, de_tokenizer
+
     def _split_count_data(self):
         self.input_texts = []
         self.target_texts = []
@@ -102,27 +129,17 @@ class Seq2Seq2(BaseModel):
             target_text = target_text
             self.target_texts.append(target_text)
         self.num_samples = len(self.input_texts)
-        tokenizer = Tokenizer(num_words=self.params['MAX_WORDS'])
-        tokenizer.fit_on_texts(self.input_texts + self.target_texts)
-        self.word_index = tokenizer.word_index
-        for word in tokenizer.word_index:
-            tokenizer.word_index[word] = tokenizer.word_index[word] + 3
-        tokenizer.word_index[self.START_TOKEN] = 1
-        tokenizer.word_index[self.END_TOKEN] = 2
-        tokenizer.word_index[self.UNK_TOKEN] = 3
-        tokenizer.num_words = tokenizer.num_words + 3
-        self.word_index = tokenizer.word_index
 
-        try:
-            self.word_index[self.START_TOKEN]
-            self.word_index[self.END_TOKEN]
-            self.word_index[self.UNK_TOKEN]
-        except Exception as e:
-            print(e, "why")
-            exit()
+        en_tokenizer, de_tokenizer = self.__build_tokenizers()
 
-        self.input_texts = tokenizer.texts_to_sequences(self.input_texts)
-        self.target_texts = tokenizer.texts_to_sequences(self.target_texts)
+        for sent_idx in len(self.input_texts):
+            for token_idx in len(self.input_texts[sent_idx]):
+                idx_in_word_idx = self.en_word_index.get(self.input_texts[sent_idx][token_idx])
+                if idx_in_word_idx is None or idx_in_word_idx > self.params['MAX_WORDS_EN'] + 3:
+                    self.input_texts[sent_idx][token_idx] = self.UNK_TOKEN
+
+        self.input_texts = en_tokenizer.texts_to_sequences(self.input_texts)
+        self.target_texts = de_tokenizer.texts_to_sequences(self.target_texts)
         for idx in range(len(self.target_texts)):
             self.input_texts[idx] = [self.word_index[self.START_TOKEN]] + self.input_texts[idx] + [
                 self.word_index[self.END_TOKEN]]
