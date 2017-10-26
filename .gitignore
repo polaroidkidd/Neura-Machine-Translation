@@ -195,3 +195,7 @@ venv.bak/
 /DataSets/glove.6B.100d.txt
 /Persistence/model_2_token_also_at_encoder_unk/
 .idea/misc.xml
+persistent/model_2_token_also_at_encoder_unk/end_token_vector.npy
+persistent/model_2_token_also_at_encoder_unk/start_token_vector.npy
+persistent/model_2_token_also_at_encoder_unk/unk_token_vector.npy
+NMT/src/playground.py
