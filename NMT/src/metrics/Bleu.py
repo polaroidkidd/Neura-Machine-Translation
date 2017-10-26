@@ -49,7 +49,7 @@ class Bleu(BaseMetric):
         else:
             refs = references.split('\t')
             for i in refs:
-                self.params['hypothesis_reference']['ref'].append(i.split(' '))
+                self.params['hypothesis_reference']['ref'].append(i)
 
         if os.path.exists(self.params['FILE_PATH']):
             with open(self.params['FILE_PATH'], 'a') as file:
