@@ -209,7 +209,7 @@ I'll be in touch if I have any more questions.	Ich setze mich mit dir in Verbind
 I couldn't have said it any better myself.	Das hätte ich nicht besser sagen können.
 He gets angry at the slightest thing.	Er regt sich über jede Kleinigkeit auf.
 He is a professor of English at Leeds.	Er ist Anglistikprofessor an der Universität Leeds.
-The Tokyo Skytree is the second tallest structure in the world, after the Burj Khalifa.	Der Tōkyōter Himmelsbaum („Tokyo Skytree“) ist nach dem Chalifa-Turm („Burdsch Chalifa“) das zweithöchste Bauwerk der Welt.
+The Tokyo Skytree is the second tallest structure in the world, after the Burj Khalifa.	Der Tökyöter Himmelsbaum („Tokyo Skytree“) ist nach dem Chalifa-Turm („Burdsch Chalifa“) das zweithöchste Bauwerk der Welt.
 Playing tennis is good for your health.	Tennisspielen ist gut für die Gesundheit.
 She got her brother to walk the dog.	Sie hat ihren Bruder dazu gebracht, den Hund auszuführen.
 Tell me where you got this.	Sagt mir, woher ihr das habt!
@@ -1393,7 +1393,7 @@ What you've heard about me isn't true.	Was du über mich gehört hast, stimmt ni
 Life is strange.	Das Leben ist schon seltsam.
 Those books are mine.	Diese Bücher gehören mir.
 He started a new life.	Er begann ein neues Leben.
-I hear my father was as old as I am now when he came up to Tokyo.	Mein Vater soll so alt wie ich gewesen sein, als er nach Tōkyō kam.
+I hear my father was as old as I am now when he came up to Tokyo.	Mein Vater soll so alt wie ich gewesen sein, als er nach Tökyö kam.
 If Tom had asked me for some money, I'd have given it to him.	Wenn mich Tom um etwas Geld gebeten hätte, so hätte ich es ihm gegeben.
 Tom and Mary became lifelong friends.	Aus Tom und Maria wurden Freunde fürs Leben.
 Do you talk about us?	Redet ihr über uns?
@@ -3400,7 +3400,7 @@ Do you want me to read this out loud to you?	Möchtest du, dass ich dir das laut
 It will snow tomorrow.	Es wird morgen schneien.
 Tom just needs a little rest.	Tom braucht einfach etwas Ruhe.
 Tom boiled me some eggs.	Tom kochte mir einige Eier.
-I am leaving for Tokyo tomorrow.	Ich fahre morgen nach Tōkyō.
+I am leaving for Tokyo tomorrow.	Ich fahre morgen nach Tökyö.
 Do you eat breakfast every day?	Frühstückt ihr jeden Tag?
 Just try it.	Versuchen Sie's doch einfach!
 Are you really going to move to Boston?	Hast du wirklich vor, nach Boston zu ziehen?
@@ -7577,7 +7577,7 @@ Can you please pour me some more wine?	Könnt ihr mir bitte noch etwas Wein eins
 I have nothing else to wear.	Ich habe sonst nichts anzuziehen.
 You're always welcome here.	Sie sind hier immer gern gesehen.
 Find a job.	Suchen Sie sich Arbeit.
-My hometown is in the center of Hokkaido.	Meine Heimatstadt liegt im Herzen von Hokkaidō.
+My hometown is in the center of Hokkaido.	Meine Heimatstadt liegt im Herzen von Hokkaidö.
 That's too good to be true.	Das ist zu schön, um wahr zu sein.
 Don't listen to him.	Höre nicht auf ihn!
 I had breakfast at 7:30.	Ich frühstückte um halb acht.
@@ -7646,7 +7646,7 @@ Where should I put my suitcase?	Wo soll ich meinen Koffer hinstellen?
 Tom has just left home.	Tom ist gerade von zu Hause aufgebrochen.
 Tom is playing in the yard.	Tom spielt gerade im Hof.
 He secretly showed me her picture.	Er zeigte mir heimlich ein Bild von ihr.
-I stayed at my uncle's while I was in Tokyo.	Ich bin in Tōkyō bei meinem Onkel untergekommen.
+I stayed at my uncle's while I was in Tokyo.	Ich bin in Tökyö bei meinem Onkel untergekommen.
 The waiter was such a nice man we didn't like to complain about the meal.	Der Kellner war ein so netter Mann, dass wir uns nicht über das Essen beschweren wollten.
 I walked to school.	Ich bin zu Fuß zur Schule gegangen.
 Do you have a headache and a sore throat?	Hast du Kopf- und Halsweh?
@@ -9757,7 +9757,7 @@ Mary likes watching TV.	Maria sieht gern fern.
 He has two daughters, both of whom are married to doctors.	Er hat zwei Töchter, die beide mit Ärzten verheiratet sind.
 She came to Japan for the purpose of studying Japanese.	Sie kam nach Japan, um Japanisch zu lernen.
 Are you going to sing?	Wirst du singen?
-She was born and brought up in Osaka.	Sie wurde in Ōsaka geboren und aufgezogen.
+She was born and brought up in Osaka.	Sie wurde in Ösaka geboren und aufgezogen.
 Check, please.	Die Rechnung, bitte.
 Why do people kiss?	Warum küssen sich die Menschen?
 Tom is a musician.	Tom ist Musiker.
@@ -9960,7 +9960,7 @@ You scared the living day lights out of me!	Du hast mich zu Tode erschreckt!
 Wake up!	Wach auf!
 Tom walked off the dance floor.	Tom verließ die Tanzfläche.
 I live near the sea so I often go to the beach.	Ich wohne direkt am Meer, deswegen gehe ich oft zum Strand.
-I have a return ticket to Tokyo.	Ich habe einen Rückfahrschein nach Tōkyō.
+I have a return ticket to Tokyo.	Ich habe einen Rückfahrschein nach Tökyö.
 I just can't help.	Ich kann nichts dagegen tun.
 It was Marie Curie who discovered radium.	Es war Marie Curie, die Radium entdeckt hat.
 Take your hands off me.	Hände weg!
@@ -10711,7 +10711,7 @@ What is the bad news?	Was ist die schlechte Nachricht?
 Will you please stick a 60-yen stamp on the envelope?	Kannst du bitte eine 60-Yen Marke auf den Briefumschlag kleben?
 I have the keys.	Ich habe die Schlüssel.
 You were the one who told me Tom couldn't be trusted.	Du warst diejenige, die mir gesagt hat, man könne Tom nicht trauen.
-Kyoto and Boston are sister cities.	Kyōto und Boston sind Partnerstädte.
+Kyoto and Boston are sister cities.	Kyöto und Boston sind Partnerstädte.
 Why are people scared of Tom?	Warum haben die Leute Angst vor Tom?
 I've come to know Tom quite well.	Ich kenne Tom inzwischen ganz gut.
 I wonder why tennis is played in mini-skirts.	Ich frage mich, warum Tennis in Miniröcken gespielt wird.
@@ -11605,7 +11605,7 @@ There are some things you can't learn from books.	Manches kann man nicht aus Bü
 Whoever wants it may take it.	Wer immer es möchte, kann es sich nehmen.
 Where do we get the textbooks?	Wo bekommen wir die Lehrbücher?
 Did they approve your project?	Haben sie dein Projekt gutgeheißen?
-According to the newspaper, the cost of living in Tokyo is the highest in the world.	Der Zeitung zufolge sind die Lebenshaltungskosten in Tōkyō die höchsten der Welt.
+According to the newspaper, the cost of living in Tokyo is the highest in the world.	Der Zeitung zufolge sind die Lebenshaltungskosten in Tökyö die höchsten der Welt.
 A lot of villagers were killed by soldiers.	Viele Dorfbewohner wurden von Soldaten getötet.
 The project has to be finished by the end of the week at the latest.	Das Projekt muss spätestens bis zum Ende der Woche fertig sein.
 Last Sunday, Mary and I went to the library together.	Letzten Sonntag bin ich zusammen mit Mary in die Bibliothek gegangen.
@@ -13327,7 +13327,7 @@ Thank you for your trouble.	Danke für deine Bemühungen.
 There's no need to wash your hair every day.	Du brauchst nicht unbedingt jeden Tag deine Haare zu waschen.
 You've come too early.	Du bist zu früh gekommen.
 How are you all?	Wie geht es euch allen?
-It is far from here to Tokyo.	Es ist weit von hier bis nach Tōkyō.
+It is far from here to Tokyo.	Es ist weit von hier bis nach Tökyö.
 She cannot play the piano.	Sie kann nicht Klavier spielen.
 Does that help?	Hilft das?
 I don't know them.	Ich kenne sie nicht.
@@ -15718,7 +15718,7 @@ Everyone makes mistakes.	Jeder macht mal Fehler.
 I'm sorry I didn't reply to you sooner.	Tut mir leid, dass ich Ihnen nicht schon früher geantwortet habe.
 Politics leaves him cold.	Er hat kein Interesse an Politik.
 That girl couldn't take things down in longhand, let alone shorthand.	Diese junge Frau konnte kein Diktat in Schreibschrift aufnehmen, ganz zu schweigen von Stenographie.
-Having lived in Tokyo, I know the city well.	Da ich in Tōkyō gewohnt habe, ist mir die Stadt wohlbekannt.
+Having lived in Tokyo, I know the city well.	Da ich in Tökyö gewohnt habe, ist mir die Stadt wohlbekannt.
 I made my son a new suit.	Ich habe für meinen Sohn einen neuen Anzug angefertigt.
 You won't regret this.	Du wirst das nicht bereuen.
 It was real hard work.	Es war echt harte Arbeit.
@@ -16686,7 +16686,7 @@ It's not legal to keep wild animals as pets.	Es ist nicht legal, sich wilde Tier
 Tom didn't know where Mary was.	Tom wusste nicht, wo Maria war.
 I'll do my best not to disturb your studying.	Ich werde mir Mühe geben, dich nicht beim Lernen zu stören.
 Grandmother's ashes are in an urn at the temple.	Die Asche von Großmutter ist in einer Urne im Tempel.
-I'm working in Tokyo now.	Ich arbeite gerade in Tōkyō.
+I'm working in Tokyo now.	Ich arbeite gerade in Tökyö.
 It's your turn to answer the question.	Du bist an der Reihe, die Frage zu beantworten.
 I don't know what Tom is planning to do.	Ich weiß nicht, was Tom vorhat.
 Feel free to stay.	Bleib ruhig.
@@ -17519,7 +17519,7 @@ Tom has a few friends in Boston.	Tom hat ein paar Freunde in Boston.
 Are you drinking enough water?	Trinkst du genug Wasser?
 What have you ever done for us?	Was habt ihr je für uns getan?
 Tom makes over $300,000 a year.	Tom verdient über 300 000 Dollar im Jahr.
-He came from Tokyo yesterday.	Er ist gestern aus Tōkyō gekommen.
+He came from Tokyo yesterday.	Er ist gestern aus Tökyö gekommen.
 Spring is the time to plant trees.	Frühling ist die Jahreszeit, um Bäume zu pflanzen.
 Where can we buy it?	Wo können wir es kaufen?
 What are you going to do next Sunday?	Was machen Sie nächsten Sonntag?
@@ -18170,7 +18170,7 @@ That doesn't happen often.	Das passiert nicht oft.
 Please don't open the window.	Bitte öffnen Sie das Fenster nicht.
 I'm angry.	Ich bin sauer.
 Tom is the one who told me what to do.	Es ist Tom, der mir gesagt hat, was ich tun soll.
-I've never been to Hokkaido.	Ich war noch nie auf Hokkaidō.
+I've never been to Hokkaido.	Ich war noch nie auf Hokkaidö.
 Tom started taking boxing lessons when he turned twelve.	Tom fing an, Boxstunden zu nehmen, als er zwölf wurde.
 "Where's my hat?" "Right behind you."	„Wo ist mein Hut?“ – „Gleich hinter dir!“
 You should've left it alone.	Du hättest deine Finger davonlassen sollen.
@@ -18646,7 +18646,7 @@ We are traveling to France by air.	Wir reisen mit dem Flugzeug nach Frankreich.
 Tom is much younger than he looks.	Tom ist bei weitem jünger, als er aussieht.
 I have done it before.	Ich habe das schon einmal gemacht.
 The family is eating breakfast outdoors.	Die Familie frühstückt draußen.
-Our main office is in Osaka.	Unsere Zentrale ist in Ōsaka.
+Our main office is in Osaka.	Unsere Zentrale ist in Ösaka.
 I'll sleep when I'm dead.	Schlafen werde ich, wenn ich tot bin.
 Mom is older than Dad.	Mama ist älter als Papa.
 Tom smiled at Mary as he left the room.	Tom lächelte Maria beim Verlassen des Zimmers an.
@@ -18663,7 +18663,7 @@ It's a sunflower.	Das ist eine Sonnenblume.
 Tom had to go there.	Tom musste dort hingehen.
 I can meet you at the bus station.	Ich kann dich am Busbahnhof treffen.
 I bought it in a thrift store.	Ich habe das in einem Gebrauchtwarenladen gekauft.
-He visited Kyoto last year.	Er hat letztes Jahr Kyōto besucht.
+He visited Kyoto last year.	Er hat letztes Jahr Kyöto besucht.
 That's 20% of the world's population.	Das sind 20% der Weltbevölkerung.
 The tie doesn't go with my suit.	Der Schlips passt nicht zu meinem Anzug.
 He was surprised by the sudden appearance of his friend.	Das plötzliche Erscheinen seines Freundes überraschte ihn.
@@ -18976,7 +18976,7 @@ Today is not so cold.	Heute ist es nicht so kalt.
 We're persevering.	Wir sind ausdauernd.
 She refused his offer.	Sie hat sein Angebot ausgeschlagen.
 Can you make an exception?	Können Sie eine Ausnahme machen?
-Nagoya lies between Tokyo and Osaka.	Nagoya liegt zwischen Tōkyō und Ōsaka.
+Nagoya lies between Tokyo and Osaka.	Nagoya liegt zwischen Tökyö und Ösaka.
 I didn't catch what you said.	Ich habe nicht mitbekommen, was du gesagt hast.
 That store closed in 2013.	Der Laden wurde 2013 geschlossen.
 Where's his home?	Wo ist sein Zuhause?
@@ -20862,7 +20862,7 @@ He tried to approach her using every possible means.	Er vesuchte auf jede erdenk
 He doesn't have enough experience.	Er hat nicht genug Erfahrung.
 We'll talk afterwards.	Wir reden später.
 Tom first met Mary in Boston.	Tom hat Maria in Boston kennengelernt.
-I can't taste the tofu. Is there really tofu in this?	Ich schmecke den Tōfu nicht. Ist da wirklich Tōfu drin?
+I can't taste the tofu. Is there really tofu in this?	Ich schmecke den Töfu nicht. Ist da wirklich Töfu drin?
 Onions cook more quickly than potatoes.	Zwiebeln kochen schneller als Kartoffeln.
 Having finished it, he went to bed.	Nachdem er es beendet hatte, ging er schlafen.
 I come from the future.	Ich komme aus der Zukunft.
@@ -22436,7 +22436,7 @@ Don't you like any Chinese food?	Magst du kein chinesisches Essen?
 You'd better do that now.	Das machst du besser gleich.
 She likes sleeping.	Sie schläft gerne.
 She led a solitary life.	Sie führte ein einsames Leben.
-I've lived in Kobe before.	Ich habe früher in Kōbe gelebt.
+I've lived in Kobe before.	Ich habe früher in Köbe gelebt.
 Tom quit his job last week.	Tom hat letzte Woche gekündigt.
 We have a busy week ahead of us.	Wir haben eine aufgabenreiche Woche vor uns.
 You cannot be serious.	Das ist ja wohl nicht dein Ernst.
@@ -22534,7 +22534,7 @@ Won't you sample some of my wine?	Möchtest du nicht etwas von meinem Wein probi
 I want to rent this room to a student.	Ich will dieses Zimmer einem Studenten vermieten.
 Give me a ring if you find out anything.	Ruf mich an, wenn du etwas herausfindest.
 Tom is ill.	Tom ist krank.
-I have been to Kyoto one time.	Ich war einmal in Kyōto.
+I have been to Kyoto one time.	Ich war einmal in Kyöto.
 Why don't you want to eat lunch with us?	Warum möchten sie nicht mit uns mittagessen?
 I have a right to my own opinion.	Ich habe ein Recht auf eine eigene Meinung.
 How did Tom find you?	Wie hat Tom Sie gefunden?
@@ -23412,7 +23412,7 @@ I can't find him anywhere.	Ich kann ihn nirgends finden.
 How often do trains run?	Wie oft fahren Züge?
 Why did you put off the printing of my book?	Warum haben Sie den Druck meines Buches aufgeschoben?
 Tom is homesick.	Tom hat Heimweh.
-He sometimes goes to Tokyo on business.	Er ist manchmal geschäftlich in Tōkyō.
+He sometimes goes to Tokyo on business.	Er ist manchmal geschäftlich in Tökyö.
 I know his family.	Ich kenne seine Familie.
 This is a set expression.	Das ist eine feststehende Redewendung.
 She lived there about five years.	Sie hat ungefähr fünf Jahre dort gelebt.
@@ -23481,7 +23481,7 @@ Will you go with us?	Kommen Sie mit uns?
 Tom is facing up to thirty years in prison.	Tom stehen bis zu dreißig Jahre Gefängnis bevor.
 Tom knows the names of all his customers.	Tom kennt die Namen aller seiner Kunden.
 I asked Tom to give me a second chance.	Ich bat Tom, mir noch eine Chance zu geben.
-He came to Tokyo at the age of three.	Er kam nach Tōkyō, als er drei war.
+He came to Tokyo at the age of three.	Er kam nach Tökyö, als er drei war.
 I really want to know what's going on here.	Ich will wirklich wissen, was hier geschieht.
 Mom said that we can stay up late tonight.	Mama hat gesagt, dass wir heute länger aufbleiben dürfen.
 Can you make out a light in the distance?	Kannst du in der Ferne ein Licht sehen?
@@ -23944,7 +23944,7 @@ Would Tom help us if we asked?	Hülfe uns Tom, wenn wir ihn bäten?
 We understand each other.	Wir verstehen einander.
 Behave yourself while I'm gone.	Sei artig, während ich weg bin!
 Tom doesn't live here in Boston.	Tom lebt nicht hier in Boston.
-He visited Kyoto last year.	Er war im vergangenen Jahr in Kyōto.
+He visited Kyoto last year.	Er war im vergangenen Jahr in Kyöto.
 I'm not allowed to drink alcohol.	Es ist mir nicht gestattet, Alkohol zu trinken.
 You shouldn't prejudge people.	Du solltest Menschen nicht vorschnell beurteilen.
 That didn't really happen.	Das ist nicht wirklich geschehen.
@@ -24223,7 +24223,7 @@ Who's your favorite DJ?	Wer ist Ihr Lieblings-DJ?
 Tom has probably forgotten what Mary looks like.	Tom hat bestimmt vergessen, wie Maria aussieht.
 Smoke was rising from the chimney.	Aus dem Schornstein stieg Rauch auf.
 It doesn't matter where he comes from.	Es ist unwichtig, woher er kommt.
-He came to Tokyo at the age of three.	Er kam im Alter von drei Jahren nach Tōkyō.
+He came to Tokyo at the age of three.	Er kam im Alter von drei Jahren nach Tökyö.
 You need to get ready.	Du musst dich fertig machen.
 He can speak five languages.	Er kann fünf Sprachen sprechen.
 I don't work there anymore.	Ich arbeite nicht mehr dort.
@@ -25935,7 +25935,7 @@ I've ordered a book from Amazon.com.	Ich habe ein Buch bei Amazon.com bestellt.
 Do you have any CDs?	Haben Sie CDs?
 At present, the cause of the disease is unknown.	Bisher ist die Ursache der Krankheit unbekannt.
 I often listen to jazz.	Ich höre oft Jazz.
-I lived in Tokyo a few years ago, but now I live in Kyoto.	Ich lebte vor ein paar Jahren in Tōkyō; jetzt lebe ich aber in Kyōto.
+I lived in Tokyo a few years ago, but now I live in Kyoto.	Ich lebte vor ein paar Jahren in Tökyö; jetzt lebe ich aber in Kyöto.
 How lucky you are!	Was für ein Glück du hast!
 Perhaps I was wrong.	Vielleicht habe ich mich geirrt.
 His absence was due to the storm.	Er fehlte aufgrund des Sturmes.
@@ -26540,7 +26540,7 @@ Tom is really busy.	Tom ist sehr beschäftigt.
 I like traveling by train.	Ich reise gerne mit dem Zug.
 You don't have a fever.	Du hast kein Fieber.
 I can't answer your question.	Ich kann Ihre Frage nicht beantworten.
-Do you like tofu?	Magst du Tōfu?
+Do you like tofu?	Magst du Töfu?
 I was just teasing you.	Ich wollte dich nur necken.
 My house is very cold.	Mein Haus ist sehr kalt.
 We have the same birthday.	Wir haben am selben Tag Geburtstag.
@@ -27024,7 +27024,7 @@ Tom said you might be interested in this book.	Tom sagte, du könntest Interesse
 I think it's time for me to ask for his advice.	Ich glaube, es ist an der Zeit, dass ich ihn um Rat frage.
 He did what he had been told.	Er tat, wie ihm geheißen.
 It was very cold yesterday morning.	Gestern Morgen war es sehr kalt.
-I plan to go skiing in Hokkaido.	Ich will zum Skifahren nach Hokkaidō.
+I plan to go skiing in Hokkaido.	Ich will zum Skifahren nach Hokkaidö.
 I'm not going to tell you the reason.	Ich werde euch den Grund nicht sagen.
 He stopped talking.	Er hörte auf zu reden.
 Who doesn't write love letters?	Wer schreibt keine Liebesbriefe?
@@ -27185,7 +27185,7 @@ My father is a doctor.	Mein Vater ist Arzt.
 What's Tom's brother's name?	Wie heißt Toms Bruder?
 Tom has been crying all night.	Tom weint schon die ganze Nacht.
 He's no doctor.	Er ist kein Arzt.
-Hokkaido is located in the northern part of Japan.	Hokkaidō liegt im Norden Japans.
+Hokkaido is located in the northern part of Japan.	Hokkaidö liegt im Norden Japans.
 I'm guessing you didn't clean your house yet.	Ich denke mal, du hast dein Haus noch nicht sauber gemacht.
 What did you want to tell me?	Was wollten Sie mir sagen?
 All lawyers are liars.	Alle Anwälte sind Lügner.
@@ -28735,7 +28735,7 @@ Tom has a personal bodyguard.	Tom hat einen persönlichen Leibwächter.
 Since their conversation was in French, I couldn't understand a word.	Dieweil sie sich auf Französisch unterhielten, verstand ich nicht ein Wort.
 Let's have a serious talk about your future.	Lass uns ernsthaft über deine Zukunft sprechen.
 Get away from here.	Macht euch vom Acker.
-Hokkaido is located in the northern part of Japan.	Hokkaidō befindet sich im Norden Japans.
+Hokkaido is located in the northern part of Japan.	Hokkaidö befindet sich im Norden Japans.
 The context is important.	Der Zusammenhang ist wichtig.
 He was put in jail for writing the book.	Weil er das Buch geschrieben hatte, wurde er ins Gefängnis gesteckt.
 They all look the same.	Die sehen alle gleich aus.

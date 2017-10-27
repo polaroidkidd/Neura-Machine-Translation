@@ -1958,7 +1958,7 @@ He is in trouble.	Er steckt in Schwierigkeiten.
 Have you ever seen Tom eat?	Hast du Tom schon einmal essen sehen?
 Possibly, it's true.	Möglicherweise ist es wahr.
 I'm skeptical when I hear someone claim to speak more than five languages fluently.	Ich habe immer so meine Zweifel, wenn jemand von sich behauptet, mehr als fünf Sprachen fließend zu beherrschen.
-Kyoto is worth visiting.	Kyōto lohnt einen Besuch.
+Kyoto is worth visiting.	Kyöto lohnt einen Besuch.
 It's getting worse.	Es wird immer schlimmer.
 I'm not Canadian.	Ich bin kein Kanadier.
 Show it to us.	Zeig ihn uns!
@@ -2585,7 +2585,7 @@ Which do you like better, white rice or brown rice?	Magst du lieber weißen oder
 She values health above wealth.	Gesundheit zählt ihr mehr denn Wohlstand.
 He paid 1,000 yen for this book.	Er hat für dieses Buch 1000 Yen bezahlt.
 A frown may express anger or displeasure.	Ein Stirnrunzeln kann Zorn oder Missmut ausdrücken.
-You're dating a Keio student, aren't you?	Du bist mit einem Keiō-Studenten zusammen, korrekt?
+You're dating a Keio student, aren't you?	Du bist mit einem Keiö-Studenten zusammen, korrekt?
 I've asked you this question before.	Ich habe dir diese Frage schon einmal gestellt.
 Was that you in the car?	Waren Sie das in dem Auto?
 Tom is chopping firewood.	Tom hackt Feuerholz.
@@ -4927,7 +4927,7 @@ Thanks for rescuing me.	Danke, dass du mich gerettet hast.
 I had to shoot my horse because he was in a lot of pain.	Ich musste mein Pferd erschießen, weil es große Schmerzen hatte.
 Can we talk in private?	Können wir uns unter vier Augen unterhalten?
 Turn it off.	Mach sie aus.
-Kobe is famous for its port.	Kōbe ist berühmt für seinen Hafen.
+Kobe is famous for its port.	Köbe ist berühmt für seinen Hafen.
 Would you mind not doing that?	Könnten Sie bitte damit aufhören?
 Tom was beat to a pulp by his father.	Tom wurde von seinem Vater grün und blau geschlagen.
 Van Buren rejected the offer.	Van Buren hat das Angebot abgelehnt.
@@ -5714,7 +5714,7 @@ Tom showed Mary a picture of his dog.	Tom zeigte Maria ein Bild seines Hundes.
 I know that already.	Das weiß ich schon.
 Pasta heated up again is never any good.	Eine wieder aufgewärmte Pasta ist niemals gut.
 The economy is bad.	Der Wirtschaft geht es schlecht.
-We have been to Tokyo many times.	Wir sind schon oft in Tōkyō gewesen.
+We have been to Tokyo many times.	Wir sind schon oft in Tökyö gewesen.
 What do you want to do today?	Was willst du heute machen?
 I hope you'll reconsider.	Ich hoffe, ihr überlegt euch das noch mal.
 Is that ring made of real gold?	Ist dieser Ring aus echtem Gold?
@@ -6549,7 +6549,7 @@ Put yourself in my position.	Versetzt euch in meine Lage.
 Thanks for helping me fix my car.	Danke, dass Sie mir bei der Reparatur meines Wagens geholfen haben!
 The train was on the point of leaving when I got to the station.	Der Zug war im Begriff, abzufahren, als ich am Bahnhof ankam.
 Tom grabbed Mary by the throat and choked her.	Tom griff Mary an die Kehle und würgte sie.
-She is from Hokkaido, but is now living in Tokyo.	Sie kommt aus Hokkaidō, lebt aber jetzt in Tōkyō.
+She is from Hokkaido, but is now living in Tokyo.	Sie kommt aus Hokkaidö, lebt aber jetzt in Tökyö.
 I'm not sure of anything.	Ich bin mir bei nichts sicher.
 We mentioned that gentleman in the conversation.	Wir erwähnten den Herrn in dem Gespräch.
 I'd like some ice cream.	Ich hätte gerne ein Eis.
@@ -8565,7 +8565,7 @@ He often asks silly questions.	Er stellt oft dumme Fragen.
 You should be careful what you say.	Du solltest aufpassen, was du sagst.
 They smiled.	Sie lächelten.
 This tanker is bound for Kuwait.	Dieser Tanker fährt nach Kuwait.
-He has just arrived at New Tokyo International Airport.	Er ist gerade am Neuen Internationalen Flughafen Tōkyō angekommen.
+He has just arrived at New Tokyo International Airport.	Er ist gerade am Neuen Internationalen Flughafen Tökyö angekommen.
 They went to the music festival.	Sie besuchten die Musikfestspiele.
 What does the doctor think is wrong?	Was meint der Arzt, was ich habe?
 Everything must be handled very carefully.	Es muss alles sehr vorsichtig behandelt werden.
@@ -9811,7 +9811,7 @@ What exactly is it that you want me to say?	Was genau möchten Sie von mir höre
 Why are you wearing my dress?	Warum trägst du mein Kleid?
 Thank you for decorating my house.	Danke, dass du mein Haus geschmückt hast!
 Tom spends all day speaking French at school and only speaks English at home.	Tom spricht in der Schule den ganzen Tag Französisch, Englisch nur daheim.
-How long have you been staying in Osaka?	Wie lange bist du schon in Ōsaka?
+How long have you been staying in Osaka?	Wie lange bist du schon in Ösaka?
 Tom stuck his nose where it didn't belong.	Tom steckte seine Nase in Dinge, die ihn nichts angingen.
 Where is your school?	Wo ist eure Schule?
 We don't have to go anywhere.	Wir müssen nirgendwo hingehen.
@@ -9873,7 +9873,7 @@ I don't know when I can get away.	Ich weiß nicht, wann ich wegkomme.
 Let me win for once.	Lass mich auch einmal gewinnen.
 Can I help you with that?	Kann ich Ihnen dabei helfen?
 I'm innocent.	Ich bin unschuldig.
-I graduated from the University of Kyoto.	Ich habe an der Universität Kyōto studiert.
+I graduated from the University of Kyoto.	Ich habe an der Universität Kyöto studiert.
 Never tell a lie!	Lügt nie!
 Let's have dinner.	Lasst uns zu Abend essen.
 There's nothing I can do about it.	Es gibt nichts, was ich dafür tun kann.
@@ -10799,7 +10799,7 @@ This painting is a forgery.	Das Gemälde hier ist eine Fälschung.
 Choose between these two.	Wähle zwischen diesen beiden.
 Mary is saving money so she can go to Japan.	Maria spart Geld für eine Japanreise.
 I remember playing with magnets in kindergarten.	Ich erinnere mich noch, dass ich im Kindergarten mit Magneten gespielt habe.
-I graduated from Kyoto University.	Ich bin Absolventin der Universität Kyōto.
+I graduated from Kyoto University.	Ich bin Absolventin der Universität Kyöto.
 I'm reading this book.	Ich lese dieses Buch.
 Tom is irritating because he always has to have the last word in any argument.	Tom nervt, weil er immer, in jeder Diskussion, das letzte Wort haben muss.
 I wonder what Tom and Mary are up to.	Ich frage mich, was Tom und Maria im Schilde führen.
@@ -11747,7 +11747,7 @@ Tom doesn't know what to do with all his money.	Tom weiß nicht, was er mit all 
 Everyone's holding their breath.	Es halten alle den Atem an.
 You can finish your essay now.	Du kannst deinen Aufsatz jetzt beenden.
 If you don't believe me, ask Tom.	Wenn Sie mir nicht glauben, fragen Sie Tom!
-Toudaiji is the bigger of the two temples.	Der Tōdai-ji ist der größere der zwei Tempel.
+Toudaiji is the bigger of the two temples.	Der Tödai-ji ist der größere der zwei Tempel.
 I really love my blue pen.	Ich mag meinen blauen Stift echt gern.
 She gave me a book for Christmas.	Sie schenkte mir ein Buch zu Weihnachten.
 Is this made in Switzerland?	Wird das in der Schweiz hergestellt?
@@ -12500,7 +12500,7 @@ I think I understand.	Ich glaube, dass ich es verstehe.
 It was only yesterday that I called on him.	Erst gestern habe ich mal bei ihm vorbeigeschaut.
 Her bag is the same design as her mother's.	Ihre Tasche hat das gleiche Design wie die ihrer Mutter.
 Tom and Mary are still just kids.	Tom und Maria sind noch Kinder.
-I want you to go to Osaka at once.	Ich will, dass ihr sofort nach Ōsaka fahrt!
+I want you to go to Osaka at once.	Ich will, dass ihr sofort nach Ösaka fahrt!
 There's nothing more you can do for me.	Du kannst nicht mehr für mich tun.
 Go find somebody who can help.	Such jemanden, der helfen kann!
 It is foggy.	Es ist neblig.
@@ -13251,7 +13251,7 @@ I am not always at home on Sundays.	Ich bin sonntags nicht immer zu Hause.
 I'll take you to school.	Ich bring dich zur Schule.
 I still need to buy some bread.	Ich muss noch Brot kaufen.
 I appreciate what you did yesterday.	Ich bin dir dankbar für das, was du gestern getan hast!
-I'm working in Tokyo now.	Ich arbeite jetzt in Tōkyō.
+I'm working in Tokyo now.	Ich arbeite jetzt in Tökyö.
 Do whatever you like.	Tu, was auch immer du willst.
 Please write down my address.	Bitte schreiben Sie meine Adresse auf.
 Nobody was able to suggest a solution.	Niemand hatte einen Lösungsvorschlag parat.
@@ -13594,7 +13594,7 @@ Are you going to have dinner at home?	Isst du daheim zu Abend?
 This beautiful dress is made of silk.	Dieses schöne Kleid ist aus Seide.
 Tom'll go.	Tom wird gehen.
 This room is too hot to study in. I can't stand it any more.	Dieses Zimmer ist zu heiß zum Lernen. Ich halte es nicht mehr aus.
-I am going to Tokyo tomorrow.	Ich fahre morgen nach Tōkyō.
+I am going to Tokyo tomorrow.	Ich fahre morgen nach Tökyö.
 She mistook me for my sister.	Sie hielt mich für meine Schwester.
 Tom bowed.	Tom verneigte sich.
 I don't want you to go to Boston.	Ich will nicht, dass Sie nach Boston fahren.
@@ -13647,7 +13647,7 @@ Oil has played an important part in the progress of civilization.	Öl spielte ei
 Tom gave Mary a detailed explanation of how it worked.	Tom erklärte Maria eingehend, wie es funktionierte.
 It's an unforgettable impression.	Das ist ein unvergesslicher Eindruck.
 It's clear that he stole money from the safe.	Es ist offensichtlich, dass er das Geld aus dem Tresor gestohlen hat.
-I arrived in Kobe around two thirty.	Ich bin etwa um halb drei in Kōbe angekommen.
+I arrived in Kobe around two thirty.	Ich bin etwa um halb drei in Köbe angekommen.
 This photo was taken in Nara.	Diese Aufnahme entstand in Nara.
 You mean a lot to me.	Du bedeutest mir sehr viel.
 Please ask someone else.	Fragen Sie bitte jemand anderen.
@@ -14041,7 +14041,7 @@ Do you think we're going to be rescued?	Glaubst du, man wird uns retten?
 Your death will be painless.	Du wirst einen schmerzlosen Tod haben.
 I thought you'd wear something like that.	Ich dachte mir, du würdest so etwas tragen.
 I think love doesn't exist.	Ich halte dafür, dass Liebe nicht existiert.
-She graduated from Kobe University.	Sie hat ihren Abschluss an der Universität Kōbe gemacht.
+She graduated from Kobe University.	Sie hat ihren Abschluss an der Universität Köbe gemacht.
 I invited all my friends.	Ich habe alle meine Freunde eingeladen.
 I thought I was dying.	Ich glaubte, ich müsste sterben.
 Tom came to ask us for our help.	Tom kam, um uns um Hilfe zu bitten.
@@ -14511,7 +14511,7 @@ Come on, you really don't mean that!	Komm, das meinst du doch nicht ernst!
 He is taking a day off today.	Er nimmt sich heute frei.
 I'm not going to waste time.	Ich werde keine Zeit verschwenden.
 This dictionary is superior to that one.	Dieses Wörterbuch ist diesem anderen überlegen.
-Kyoto is famous for its old temples.	Kyōto ist berühmt für seine alten Tempel.
+Kyoto is famous for its old temples.	Kyöto ist berühmt für seine alten Tempel.
 This intersection is dangerous.	Diese Kreuzung ist gefährlich.
 The soldiers stopped at every farm and village.	Die Soldaten machten bei jedem Bauernhof und Dorf Halt.
 I want to be fluent in French.	Ich will fließend im Französischen werden.
@@ -15067,7 +15067,7 @@ These apples taste good.	Diese Äpfel schmecken gut.
 Are you excited?	Seid ihr aufgeregt?
 My sister has been sick.	Meine Schwester ist krank.
 She's accustomed to getting up early.	Sie ist frühes Aufstehen gewohnt.
-We refer to this city as Little Kyoto.	Wir nennen diese Stadt „Klein-Kyōto“.
+We refer to this city as Little Kyoto.	Wir nennen diese Stadt „Klein-Kyöto“.
 How long is this visa good for?	Wie lange ist dieses Visum gültig?
 He arrived too early.	Er ist zu früh angekommen.
 That won't happen.	Dazu kommt es nicht.
@@ -15235,7 +15235,7 @@ Love is not a crime.	Liebe ist kein Verbrechen.
 The girl always looked happy, but she wasn't at all happy.	Das Mädchen sah immer glücklich aus, aber es war ganz und gar nicht glücklich.
 Have you ever translated a book?	Haben Sie schon einmal ein Buch übersetzt?
 It's yours if you want it.	Es gehört dir, wenn du es willst.
-My grandfather comes from Osaka.	Mein Großvater kommt aus Ōsaka.
+My grandfather comes from Osaka.	Mein Großvater kommt aus Ösaka.
 I discussed the problem with Tom.	Ich habe das Problem mit Tom besprochen.
 Today is my lucky day.	Heute ist mein Glückstag.
 They teased each other.	Sie zogen einander auf.
