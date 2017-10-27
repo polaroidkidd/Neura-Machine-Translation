@@ -14,7 +14,7 @@ from keras.utils import to_categorical
 from models.BaseModel import BaseModel
 
 
-# TODO: Implement one vocabular for each language; Handle Unknown tokens (Tokenizer); Use FastText
+# TODO: Implement one vocabular for each language; Handle Unknown tokens (Tokenizer); Use FastText; Use validation during training; Use Blue metric
 class Seq2Seq2(BaseModel):
     def __init__(self):
         BaseModel.__init__(self)
@@ -31,9 +31,9 @@ class Seq2Seq2(BaseModel):
         self.params['P_DENSE_DROPOUT'] = 0.2
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../persistent/' + self.identifier
-        if not os.path.exists("../../persistent"):
-            os.makedirs("../../persistent")
+        self.BASIC_PERSISTENT_DIR = '../../Persistence/' + self.identifier
+        if not os.path.exists("../../Persistence"):
+            os.makedirs("../../Persistence")
         if not os.path.exists(self.BASIC_PERSISTENT_DIR):
             os.makedirs(self.BASIC_PERSISTENT_DIR)
         self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
