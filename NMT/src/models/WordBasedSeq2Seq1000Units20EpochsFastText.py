@@ -14,7 +14,7 @@ from keras.utils import to_categorical
 from models.BaseModel import BaseModel
 
 
-# TODO: Implement one vocabular for each language; Handle Unknown tokens (Tokenizer); Use FastText
+# TODO: Implement one vocabular for each language; Handle Unknown tokens (Tokenizer); Use FastText; Use validation during training; Use Blue metric
 class Seq2Seq2(BaseModel):
     def __init__(self):
         BaseModel.__init__(self)

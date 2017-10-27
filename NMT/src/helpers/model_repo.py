@@ -1,15 +1,22 @@
-from models import WordBasedSeq2Seq
+from models import WordBasedSeq2Seq1000Units20EpochsGLOVE
+from models import WordBasedSeq2Seq1000Units20EpochsFastText
 from models import model_2_token_also_at_encoder_unk
 
-models = {'WordBasedSeq2Seq': '0',
-          'model_2_token_also_at_encoder_unk': '1'
+models = {'WordBasedSeq2Seq1000Units20EpochsGLOVE': '0',
+          'WordBasedSeq2Seq1000Units20EpochsFastText': '1',
+          'model_2_token_also_at_encoder_unk': '2'
           }
 
 
 def determine_model(searched_model):
     model = -1
-    if searched_model == 'WordBasedSeq2Seq' or searched_model == models['WordBasedSeq2Seq']:
-        model = WordBasedSeq2Seq.Seq2Seq2()
+    if searched_model == 'WordBasedSeq2Seq1000Units20EpochsGLOVE' or searched_model == models[
+        'WordBasedSeq2Seq1000Units20EpochsGLOVE']:
+        model = WordBasedSeq2Seq1000Units20EpochsGLOVE.Seq2Seq2()
+
+    elif searched_model == 'WordBasedSeq2Seq1000Units20EpochsFastText' or searched_model == models[
+        'WordBasedSeq2Seq1000Units20EpochsFastText']:
+        model = WordBasedSeq2Seq1000Units20EpochsFastText.Seq2Seq2()
 
     elif searched_model == 'model_2_token_also_at_encoder_unk' or searched_model == models[
         'model_2_token_also_at_encoder_unk']:
