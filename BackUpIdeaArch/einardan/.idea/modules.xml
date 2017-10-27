@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/DataProcessingTools/DataProcessingTools.iml" filepath="$PROJECT_DIR$/DataProcessingTools/DataProcessingTools.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DataSets/DataSets.iml" filepath="$PROJECT_DIR$/DataSets/DataSets.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Docker/Docker.iml" filepath="$PROJECT_DIR$/Docker/Docker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Documents/Documents.iml" filepath="$PROJECT_DIR$/Documents/Documents.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Evaluations/Evaluations.iml" filepath="$PROJECT_DIR$/Evaluations/Evaluations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NMT/NMT.iml" filepath="$PROJECT_DIR$/NMT/NMT.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Persistence/Persistence.iml" filepath="$PROJECT_DIR$/Persistence/Persistence.iml" />
+    </modules>
+  </component>
+</project>

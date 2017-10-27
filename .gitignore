@@ -17,7 +17,7 @@
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 *.iml
-.idea/
+/.idea/
 
 # Gradle:
 .idea/**/gradle.xml
