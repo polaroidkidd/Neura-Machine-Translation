@@ -1,8 +1,49 @@
-#Anything in this; file, followed; by; a; period (and; an; upper-;case word;), does; NOT; indicate; an; end-of-sentence; marker.;
-#Special; cases; are; included; for prefixes that ONLY; appear; before; 0-9; numbers.;
+#Anything in this;
+file, followed;
+by;
+a;
+period(and;
+an;
+upper -;
+case
+word;
+),
+does;
+NOT;
+indicate;
+an;
+end - of - sentence;
+marker.;
+#Special;
+cases;
+are;
+included;
+for prefixes that
+ONLY;
+appear;
+before;
+0 - 9;
+numbers.;
 
-#any; single; upper; case letter;  followed; by; a; period is not; a; sentence; ender;
-#usually; upper; case letters; are; initials in a; name;
+#any;
+single;
+upper;
+case
+letter;
+followed;
+by;
+a;
+period is not;
+a;
+sentence;
+ender;
+#usually;
+upper;
+case
+letters;
+are;
+initials in a;
+name;
 A;
 B;
 C;
@@ -30,8 +71,12 @@ X;
 Y;
 Z;
 
-# Period-final; abbreviation; list; from; A.C;
-a/c;
+# Period - final;
+abbreviation;
+list;
+from;
+A.C;
+a / c;
 adj;
 afmo;
 J.C;

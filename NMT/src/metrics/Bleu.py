@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 from nltk.translate import bleu_score
+from nltk.translate.bleu_score import SmoothingFunction
 
 from metrics.BaseMetric import BaseMetric
 
@@ -56,7 +57,9 @@ class Bleu(BaseMetric):
                 self.__write_single_or_batch_single(file,
                                                     bleu_score.sentence_bleu(
                                                             references=self.params['hypothesis_reference']['ref'],
-                                                            hypothesis=self.params['hypothesis_reference']['hyp']),
+                                                            hypothesis=self.params['hypothesis_reference']['hyp'],
+                                                            smoothing_function=SmoothingFunction().method1,
+                                                            auto_reweigh=True),
                                                     self.params['hypothesis_reference']['ref'],
                                                     self.params['hypothesis_reference']['hyp'])
         else:
@@ -81,11 +84,13 @@ class Bleu(BaseMetric):
         if not (os.path.exists(references) or os.path.exists(hypothesis)):
             raise FileNotFoundError
         else:
-            with open(hypothesis, 'r', encoding='utf8') as hyp_file, open(references, 'r', encoding='utf8') as ref_file:
+            with \
+                    open(hypothesis, 'r', encoding='utf-8') as hyp_file, \
+                    open(references, 'r', encoding='utf-8') as ref_file:
                 for hypothesis_line, references_line in zip(hyp_file, ref_file):
                     self.evaluate_hypothesis_single(hypothesis_line.strip('\n'), references_line.strip('\n'))
 
-    def evaluate_hypothesis_corpus(self, hypothesis: str, references: str):
+    def evaluate_hypothesis_corpus(self, hypothesis: str or list, references: str or list):
         """
         Wrapper method for evaluating an entire corpus.
 
@@ -94,30 +99,38 @@ class Bleu(BaseMetric):
         translation they have to be separated by a '\t'
         :return: The result is written into the evaluations directory
         """
-        if not (os.path.exists(references) or os.path.exists(hypothesis)):
-            raise FileNotFoundError
-        else:
-            with open(hypothesis, 'r', encoding='utf-8') \
-                    as hyp_file, open(references, 'r', encoding='utf-8') as ref_file:
-                for hyp_line, ref_line in zip(hyp_file, ref_file):
-                    self.params['hypothesis_reference']['hyp'].append(hyp_line.strip('\n').split(' '))
-                    for line in ref_line.split('\t'):
-                        ref_i = line.strip('\n').split(' ')
-                        self.params['hypothesis_reference']['ref'].append([ref_i])
-            if os.path.exists(self.params['FILE_PATH']):
-                with open(self.params['FILE_PATH'], 'a') as file:
-                    self.__write_corpus(file,
-                                        self.params['model'],
-                                        bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
-                                                               self.params['hypothesis_reference']['hyp']),
-                                        self.params['metric'])
+        if type(hypothesis) == str and type(references) == str:
+            if not (os.path.exists(references) or os.path.exists(hypothesis)):
+                raise FileNotFoundError
             else:
-                with open(self.params['FILE_PATH'], 'w') as file:
-                    self.__write_corpus(file,
-                                        self.params['model'],
-                                        bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
-                                                               self.params['hypothesis_reference']['hyp']),
-                                        self.params['metric'])
+                with \
+                        open(hypothesis, 'r', encoding='utf-8') as hyp_file, \
+                        open(references, 'r', encoding='utf-8') as ref_file:
+                    for hyp_line, ref_line in zip(hyp_file, ref_file):
+                        self.params['hypothesis_reference']['hyp'].append(hyp_line.strip('\n').split(' '))
+                        for line in ref_line.split('\t'):
+                            ref_i = line.strip('\n').split(' ')
+                            self.params['hypothesis_reference']['ref'].append([ref_i])
+                if os.path.exists(self.params['FILE_PATH']):
+                    with open(self.params['FILE_PATH'], 'a') as file:
+                        self.__write_corpus(file,
+                                            self.params['model'],
+                                            bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
+                                                                   self.params['hypothesis_reference']['hyp']),
+                                            self.params['metric'])
+                else:
+                    with open(self.params['FILE_PATH'], 'w') as file:
+                        self.__write_corpus(file,
+                                            self.params['model'],
+                                            bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
+                                                                   self.params['hypothesis_reference']['hyp']),
+                                            self.params['metric'])
+        else:
+            for i in range(len(hypothesis)):
+                for j in range(len(hypothesis[i])):
+                    hypothesis[i] = hypothesis[i][j].strip('\n').split(' ')
+                    references[i] = [references[i][j].strip('\n').split(' ')]
+            return bleu_score.corpus_bleu(references, hypothesis)
 
     @staticmethod
     def __write_corpus(file, model: str, score: float, metric: str):
@@ -151,11 +164,16 @@ class Bleu(BaseMetric):
         :param references: The references against which the hypothesis is being evaluated
         :return: This method write the result into the corresponding file
         """
+        print(references)
         print('TimeStamp: {} \t'
               'Score: {:.12f} \t'
               'Hypothesis: {} \t'
               'Reference(s): {}'.
-              format(datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), score, hypothesis, references), file=file)
+              format(datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"),
+                     score,
+                     hypothesis,
+                     references),
+              file=file)
 
 
-Bleu('test', 'bleu', False).evaluate_hypothesis_batch_single('hyp.txt', 'ref.txt')
+

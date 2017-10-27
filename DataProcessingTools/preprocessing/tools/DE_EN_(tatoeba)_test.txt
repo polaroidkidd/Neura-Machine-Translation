@@ -1518,7 +1518,7 @@ It seemed that he was short of money.	Es hatte den Anschein, als wäre ihm das G
 I've managed to stop the bleeding.	Es ist mir gelungen, die Blutung zu stillen.
 The kidnapper told me he'd kill Tom if I didn't show up alone.	Der Entführer drohte mir, dass er Tom umbrächte, käme ich nicht allein.
 Tom looks happier than usual.	Tom sieht glücklicher aus als sonst.
-My hometown is in the center of Hokkaido.	Meine Heimatstadt liegt im Herzen von Hokkaidō.
+My hometown is in the center of Hokkaido.	Meine Heimatstadt liegt im Herzen von Hokkaidö.
 Are they paying you well enough?	Werdet ihr gut genug bezahlt?
 I found it later.	Ich fand es später.
 I can do it.	Ich kann es schaffen.
@@ -3002,7 +3002,7 @@ There's no reason to complain.	Es gibt keinen Grund zur Klage.
 Why did you leave the light on in the meeting room?	Warum hast du das Licht im Sitzungszimmer angelassen?
 I just don't know why.	Ich weiß nicht, warum.
 The Jordan River is the only river flowing into the Dead Sea.	Der Jordan ist der einzige ins Tote Meer mündende Fluss.
-He wants to sell his old car to a man in Kobe.	Er will seinen alten Wagen einem Mann aus Kōbe verkaufen.
+He wants to sell his old car to a man in Kobe.	Er will seinen alten Wagen einem Mann aus Köbe verkaufen.
 We were late for school because it rained heavily.	Wegen des starken Regens kamen wir zu spät zur Schule.
 I have nothing else scheduled for today.	Ich habe sonst für heute nichts geplant.
 He has something to do with the matter.	Er hat etwas mit der Angelegenheit zu tun.
@@ -3627,7 +3627,7 @@ Few treasures are worth as much as a friend who is wise and helpful.	Wenige Sch�
 Yesterday, Tom told me he couldn't speak French.	Gestern hat mir Tom gesagt, er könne kein Französisch sprechen.
 I can't repeat what Tom said.	Ich kann nicht wiederholen, was Tom sagte.
 We want a car.	Wir wollen ein Auto.
-I've lived in Kobe before.	Ich habe früher in Kōbe gelebt.
+I've lived in Kobe before.	Ich habe früher in Köbe gelebt.
 Do your best in everything.	Gib in allem dein Bestes!
 Everyone screamed.	Alle haben geschrien.
 You can get in touch with him at his home tonight.	Du kannst ihn heute Abend zu Hause erreichen.
@@ -4123,7 +4123,7 @@ Tom and Mary have three daughters.	Tom und Maria haben drei Töchter.
 Don't raise my hopes like that.	Weckt nicht derart meine Hoffnungen.
 I wasn't able to come because of the rain.	Ich konnte wegen des Regens nicht kommen.
 Your names were crossed off the list.	Ihre Namen wurden von der Liste gestrichen.
-How long have you been in Kobe?	Wie lange sind Sie schon in Kōbe?
+How long have you been in Kobe?	Wie lange sind Sie schon in Köbe?
 It may rain.	Vielleicht wird es regnen.
 I have a stepbrother.	Ich habe einen Stiefbruder.
 Tom will never believe that.	Das wird Tom nie glauben.
@@ -5440,7 +5440,7 @@ Maybe we're both mistaken.	Vielleicht irren wir uns beide.
 Tom plays bass in a rock band.	Tom spielt Bass in einer Rockband.
 I fed the leftovers to my dog.	Das übrige Essen ließ ich meinen Hund fressen.
 It's a very sad story.	Das ist eine sehr traurige Geschichte.
-The streets in Hokkaido are wide.	Die Straßen auf Hokkaidō sind breit.
+The streets in Hokkaido are wide.	Die Straßen auf Hokkaidö sind breit.
 Keep your hands off my daughter!	Fass meine Tochter nicht an!
 Do you like pretzels?	Isst du gerne Brezeln?
 Can you come to the office by train?	Können Sie mit dem Zug zum Büro fahren?
@@ -6069,7 +6069,7 @@ That's really sad.	Das ist echt traurig.
 Her house is near the park.	Ihr Haus befindet sich in der Nähe des Parks.
 I am only too glad to help you with your work.	Ich bin nur zu froh, dir bei deiner Arbeit zu helfen.
 The museum is worth a visit.	Das Museum ist sehenswert.
-I want you to go to Osaka at once.	Ich will, dass du sofort nach Ōsaka gehst!
+I want you to go to Osaka at once.	Ich will, dass du sofort nach Ösaka gehst!
 You're really a good photographer.	Du bist wirklich ein guter Fotograf.
 I received your letter yesterday.	Ich habe deinen Brief gestern erhalten.
 The American Navy was ready to fight.	Die amerikanische Marine war bereit zu kämpfen.
@@ -6548,7 +6548,7 @@ She told a white lie out of necessity.	Sie hat aus der Not heraus eine lässlich
 Food should be chewed before being swallowed.	Essen sollte vor dem Herunterschlucken gekaut werden.
 What do you learn Spanish for?	Zu welchem Zwecke lernst du Spanisch?
 He no longer works here.	Er arbeitet nicht mehr hier.
-I arrived in Kobe around two thirty.	Ich bin etwa um halb drei in Kōbe angekommen.
+I arrived in Kobe around two thirty.	Ich bin etwa um halb drei in Köbe angekommen.
 Tom said that he'd never eaten such a delicious meal before.	Tom sagte, dass er nie zuvor ein derart köstliches Mahl zu sich genommen habe.
 Jeans are now in fashion among girls.	Jeans sind jetzt bei Mädchen in Mode.
 He took off his clothes.	Er legte seine Sachen ab.
@@ -6813,7 +6813,7 @@ This book is not as easy as that one.	Dieses Buch ist nicht so einfach wie das d
 You won't be shot.	Du wirst nicht erschossen.
 This watch keeps correct time.	Diese Uhr geht präzis.
 Read as many books as possible.	Lies so viele Bücher wie möglich.
-I want you to go to Osaka at once.	Ich will, dass ihr sofort nach Ōsaka geht!
+I want you to go to Osaka at once.	Ich will, dass ihr sofort nach Ösaka geht!
 Do you mind if I ask you a question?	Darf ich Sie etwas fragen?
 You said there were three, but I could only find two.	Du sagtest, es gäbe drei, ich konnte jedoch nur zwei finden.
 It's not clear when he came here.	Es ist nicht klar, wann er hierher gekommen ist.
@@ -7363,7 +7363,7 @@ How long have you been away?	Wie lange sind Sie fort gewesen?
 Do you have any idea who would do this?	Habt ihr eine Idee, wer das machen würde?
 He played an important role on the committee.	Er spielte im Komitee eine bedeutsame Rolle.
 I just listened and kept quiet.	Ich hörte einfach zu und verhielt mich ruhig.
-My brother goes to college in Tokyo.	Mein Bruder besucht in Tōkyō die Universität.
+My brother goes to college in Tokyo.	Mein Bruder besucht in Tökyö die Universität.
 I don't wear makeup at all.	Ich schminke mich grundsätzlich nicht.
 We're fighting against time.	Wir kämpfen gegen die Zeit.
 None of the old trees survived the fire.	Keiner der alten Bäume überstand das Feuer.
@@ -7899,7 +7899,7 @@ Don't you think it's time for you to settle down?	Finden Sie nicht, dass es an d
 If you run fast, you can catch the train.	Wenn Sie schnell laufen, können Sie den Zug noch erwischen.
 It can be used as a knife.	Man kann es als Messer benutzen.
 Mary is Tom's personal assistant.	Maria ist Toms persönliche Assistentin.
-I stopped off at Osaka on my way to Tokyo.	Auf dem Weg nach Tōkyō legte ich einen Zwischenhalt in Ōsaka ein.
+I stopped off at Osaka on my way to Tokyo.	Auf dem Weg nach Tökyö legte ich einen Zwischenhalt in Ösaka ein.
 The workmen arrived early, bringing their ladders.	Die Arbeiter kamen früh und brachten ihre Leitern mit.
 You two have a lot in common.	Die beiden haben viel gemein.
 A baby has delicate skin.	Ein Baby hat eine empfindliche Haut.
@@ -12095,7 +12095,7 @@ Finish it before you go to bed.	Mach es fertig, bevor du ins Bett gehst.
 Could you turn it down?	Könntest du es leiser machen?
 I didn't know Tom was next door.	Ich wusste nicht, dass Tom nebenan war.
 Don't get involved.	Misch dich nicht ein.
-How did you make a living in Tokyo?	Wie hast du dir in Tōkyō deinen Lebensunterhalt verdient?
+How did you make a living in Tokyo?	Wie hast du dir in Tökyö deinen Lebensunterhalt verdient?
 I was courteous.	Ich war höflich.
 It's up to you.	Es liegt bei dir.
 I could never hate you.	Ich könnte Sie niemals hassen.
@@ -12317,7 +12317,7 @@ I'm sorry I let you down.	Es tut mir leid, dass ich Sie enttäuscht habe.
 Do you like swimming?	Schwimmst du gerne?
 It is a great pity that he died so young.	Es ist sehr schade, dass er so jung gestorben ist.
 Sunblock contains chemicals that can reflect or absorb the ultraviolet light.	Sonnenschutzcreme enthält Stoffe, welche das ultraviolette Licht zurückwerfen oder absorbieren.
-Kyoto is famous for its shrines and temples.	Kyōto ist für seine Schreine und Tempel berühmt.
+Kyoto is famous for its shrines and temples.	Kyöto ist für seine Schreine und Tempel berühmt.
 They laugh at him behind his back.	Sie lachen hinter seinem Rücken über ihn.
 That cost him his job.	Das hat ihn seine Arbeit gekostet.
 Why can't we just be friends?	Warum können wir nicht einfach Freunde sein?
