@@ -1,0 +1,57 @@
+%%	build-queue:
+%%	
+%%	¦¦¦ very first run. No .ist files yet
+%%	¦¦	index, citation/bibliography or glossary changed
+%%	¦	every change apart from the above mentioned. Double run for labels and toc.
+%%	
+%%	¦¦¦xelatex
+%%	¦¦makeglossaries
+%%	¦¦makeindex
+%%	¦¦bibtex
+%%	¦xelatex
+%%	¦xelatex
+%%	
+
+\RequirePackage[l2tabu,orthodox]{nag}
+\documentclass[10pt,a4paper,titlepage,twoside,german]{zhawreprt}
+
+\include{packages}
+\if false
+\include{glossaryentries}
+\fi
+
+\include{zhawSetup}
+
+\newcommand{\AddRequirement}[3]{
+\textbf{#1/#2/ - #3:}
+}
+\newcommand{\AddFRequirement}[2]{
+\AddRequirement{F}{#1}{#2}
+}
+\newcommand{\AddNonFRequirement}[2]{
+\AddRequirement{R}{#1}{#2}
+}
+\newcommand{\AddTestRequirement}[2]{
+\AddRequirement{T}{#1}{#2}
+}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\chapter{Einleitung}\label{chp:Introduction}
+\chapter{Zielbestimmungen}\label{chp:DefinitionOfGoals}
+\section{Musskriterien}\label{sec:MustCriteria}
+\section{Wunschkriterien}\label{sec:WishCriteria}
+\section{Abgrenzungskriterien}\label{sec:DistinctionCriteria}
+\chapter{Produkteinsatz}\label{chp:ProductApplication}
+\section{Anwendungsbereiche}\label{sec:FieldOfApplience}
+\section{Benutzergruppen des Produktes}\label{sec:TargetAudience}
+\chapter{Funktionale Anforderungen}\label{chp:FunctionalRequirements}
+\chapter{Funktionsbaum}\label{chp:FunctionTree}
+\chapter{Nicht-Funktionale Anforderungen}\label{chp:NonFunctionalRequirements}
+\chapter{Abnahmekriterien Anforderungen}\label{chp:TestRequirements}
+\chapter{Verzeichnisse}\label{chp:Index}
+\printglossary\label{sec:Glossar}
+\newpage
+\bibliography{reference}\label{sec:Bibliography}
+\end{document}

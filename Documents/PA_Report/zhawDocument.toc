@@ -8,7 +8,7 @@
 \contentsline {chapter}{\numberline {4}Resultate}{9}{chapter.4}
 \contentsline {chapter}{\numberline {5}Diskussion und Ausblick}{10}{chapter.5}
 \contentsline {chapter}{\numberline {6}Verzeichnisse}{11}{chapter.6}
-\contentsline {section}{\numberline {6.1}\textgerman {Glossar}}{12}{section.6.1}
+\contentsline {section}{\numberline {6.1}Glossar}{12}{section.6.1}
 \contentsline {section}{\numberline {6.2}Abbildungsverzeichnis}{13}{section.6.2}
 \contentsline {section}{\numberline {6.3}Tabellenverzeichnis}{14}{section.6.3}
 \contentsline {section}{\numberline {6.4}Listingverzeichnis}{15}{section.6.4}

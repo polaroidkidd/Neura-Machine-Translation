@@ -1,0 +1,122 @@
+%%	build-queue:
+%%	
+%%	¦¦¦ very first run. No .ist files yet
+%%	¦¦	index, citation/bibliography or glossary changed
+%%	¦	every change apart from the above mentioned. Double run for labels and toc.
+%%	
+%%	¦xelatex
+%%	¦xelatex
+%%	
+
+\RequirePackage[l2tabu,orthodox]{nag}
+\documentclass[10pt,a4paper,titlepage,twoside,german]{zhawreprt}
+
+\include{packages}
+\if false
+\include{glossaryentries}
+\fi
+
+\include{zhawSetup}
+
+\begin{document}
+\begin{landscape}
+\subsection{Netzplan}
+\label{sec:Netzplan}
+
+\definecolor{MainBack1}{RGB}{66,66,68}
+\definecolor{MainBack2}{RGB}{86,86,88}
+\definecolor{MainFront}{RGB}{220,220,220}
+\definecolor{SubBack1}{RGB}{240,240,240}
+\definecolor{SubBack2}{RGB}{255,255,255}
+\definecolor{SubFront}{RGB}{46,46,48}
+\newcommand{\NewMainNode}[3]{ %NewNodeName, Pos, Text
+\node(#1)[MainNode] at (#2) {#3};
+}
+\newcommand{\AddMainNode}[5]{ %NewNodeName, Parent, XOff, YOff, Text
+\node(#1)[MainNode,below=of #2,shift={(#3, #4)}] {#5};
+\coordinate(Temp) at ($(#1)-(#3, -1.3cm)$);
+\draw[line](#2) -- (Temp) -| (#1);
+}
+\newcommand{\CreateNodeOffset}[2]{ %NewNodeName, Parent
+\path (#2) + (30pt, -20.5pt) coordinate (#1);
+}
+\newcommand{\NewSubNode}[3]{ %NewNodeName, Parent, Text
+\node(#1)[SubNode,below=of #2,shift={(40pt, 0pt)}] {#3};
+\draw[line](#2) ++ (SubOffset) |- (#1);
+}
+\newcommand{\AddSubNode}[4]{ %NewNodeName, Parent, BelowSubNode Text
+\node(#1)[SubNode,below=of #3] {#4};
+\draw[line](#2) ++ (SubOffset) |- (#1);
+}
+\begin{center}
+\begin{tikzpicture}[
+text height = 0.1cm,
+every node/.style = {
+	column sep = 0.5cm,
+	row sep = 1cm,
+	thick,
+	node distance = 1em,
+	align = center,
+	font = \small
+},
+base/.style = {
+	text centered,
+	inner sep = 1pt,
+	minimum height = 40pt,
+	minimum width = 100pt,
+},
+MainNode/.style = {
+	base,
+	rectangle,
+	bottom color = MainBack1,
+	top color = MainBack2,
+	text = MainFront,
+	draw = MainBack2
+},
+SubNode/.style = {
+	base,
+	rectangle,
+	bottom color = SubBack1,
+	top color = SubBack2,
+	text = SubFront,
+	draw = SubFront
+},
+line/.style = {
+	draw,
+	-stealth,
+	shorten > = 2pt,
+	thick
+}
+]
+
+\coordinate(SubOffset) at (-30pt,-20pt);
+\coordinate(MainOffset) at (5.5cm, 0cm);
+
+%% LAYOUT
+\NewMainNode{F0100}{0, 0}{Layout}
+
+\NewSubNode{F0110}{F0100}{Design erstellen}
+\AddSubNode{F0110}{F0100}{F0110}{Textinhalte}
+
+%% PROFIL
+\NewMainNode{F0200}{$(F0100)+(MainOffset)$}{Benutzerdaten ändern}
+\NewSubNode{F0210}{F0200}{Name ändern}
+\AddSubNode{F0220}{F0200}{F0210}{Passwort ändern}
+\AddSubNode{F0230}{F0200}{F0220}{E-Mail ändern}
+
+%% TEST 1
+\NewMainNode{F0300}{$(F0100)-(MainOffset)$}{Testing}
+
+\CreateNodeOffset{Off0300}{F0300}
+\NewSubNode{F0310}{Off0300}{TestSub}
+\AddSubNode{F0320}{Off0300}{F0310}{Textinhalt}
+
+%% TEST 2
+\AddMainNode{F0400}{F0300}{2cm}{-4.3cm}{Test}
+\NewSubNode{F0410}{F0400}{Testverfahren}
+
+
+\end{tikzpicture}
+\end{center}
+\end{landscape}
+\end{document}

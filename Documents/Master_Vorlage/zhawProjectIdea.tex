@@ -1,0 +1,54 @@
+%%	build-queue:
+%%	
+%%	¦¦¦ very first run. No .ist files yet
+%%	¦¦	index, citation/bibliography or glossary changed
+%%	¦	every change apart from the above mentioned. Double run for labels and toc.
+%%	
+%%	¦¦¦xelatex
+%%	¦¦makeglossaries
+%%	¦¦makeindex
+%%	¦¦bibtex
+%%	¦xelatex
+%%	¦xelatex
+%%	
+
+\RequirePackage[l2tabu,orthodox]{nag}
+\documentclass[10pt,a4paper,titlepage,twoside,german]{zhawreprt}
+
+\include{packages}
+\if false
+\include{glossaryentries}
+\fi
+
+\include{zhawSetup}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Ziel}\label{chp:Objective}
+\notes{\item Ziel der Webseite(z.B. Information, Spass, Lernplattform, Chatroom, Werbung)}
+\chapter{Produkteinsatz}\label{chp:FieldOfApplience}
+\notes{
+\item Anwendungsbereich(z.B. kommerzielle Nutzung, private Nutzung)
+\item Zielgruppen der Webseite(z.B. Alter, Geschlecht, Region etc.;z.B. Studierende aller Fachhochschulen in der Schweiz, Studierende der ZHAW, Studierende der School of Engineering, Studierende einer Klasse)
+}
+\chapter{Produktfunktionen}\label{chp:ProductFunctions}
+\notes{
+\item Nennung der wichtigsten Arbeitsabläufe, die mit der Webseite durchgeführt werden können
+\item Weitere Ideen/Abgrenzungen(was kann die erste Version noch nicht; was wären weitere Funktionen für nächste Versionen etc.)
+}
+\chapter{Gruppenvorkenntnisse}\label{chp:KnowHow}
+\notes{
+\item Beschreiben Sie Ihren Hintergrund (Ausbildung, Berufserfahrung), Programmiererfahrung (zeitlich und inhaltlich), Erfahrung bezüglich Webtechnologien(zeitlich und inhaltlich) und Projekterfahrung(zeitlich, Umfang, Methodik, Rolle im Team).
+\item Diese Angaben verlangen wir individuell für jedes einzelne Gruppenmitglied. Sie sind wichtig, um abschätzen zu können, ob die Umsetzung Ihrer Projektidee realistisch ist.
+}
+\chapter{Anhang: Dokumentation Brainstorming}\label{chp:AppendixBrainstorming}
+\notes{
+\item Liste der fünf wichtigsten „Ideengruppen“ mit ein bis zwei erklärenden Sätzen pro „Ideengruppe“
+\item Fünf Bewertungskriterien (Tabelle mit Kriterien, Skala pro Kriterium, erklärendem Satz pro Kriterium, allfälligen Gewichtungen, Begründungen der Gewichtungen)
+\item Übersicht Bewertung der Projektideen (Tabelle, ohne Kommentare)
+}
+\end{document}

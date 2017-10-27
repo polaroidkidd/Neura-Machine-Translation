@@ -1,0 +1,87 @@
+%\newcommand{\FullGlossaryEntry}[7]{%Abkz., Typ, Name, Name(plural), Beschr., Beschr.(plural), Erkl.
+%\newglossaryentry{#1}{type=\acronymtype,
+%name={\textit{#3}},
+%plural={\textit{#4}},
+%description={\textit{#5}},
+%first={\textit{#5}(nachfolgend #3)\glsadd{_#1}},
+%firstplural={\textit{#6}(nachfolgend \glsentryplural{#4})},
+%see=[Glossar:]{_#1}
+%}
+%\longnewglossaryentry{_#1}{type=#2,
+%name={\textit{#5}},
+%plural={\textit{#6}}
+%}{\hspace{0pt}\\#7}
+%}
+
+
+% Abkuerzungen
+\newacronym{jlu}{JLU}{Justus-Liebig-Universität}
+\newacronym{hrz}{HRZ}{Hochschulrechenzentrum}
+\newacronym[plural=LEDs, longplural={light-emitting diodes}]{led}{LED}{light-emitting diode}
+\newacronym[plural=EEPROMs, longplural={electrically erasable programmable read-only memories}]{eeprom}{EEPROM}{electrically erasable programmable read-only memory}
+
+%  Glossareintraege
+\newglossaryentry{culdesac}{name=cul-de-sac, description={passage or street closed at one end}, plural=culs-de-sac}
+\newglossaryentry{elite}{name={é}lite, description={select group or class}, sort=elite}
+\newglossaryentry{elitism}{name={é}litism, description={advocacy of dominance by an \gls{elite}}, sort=elitism}
+\newglossaryentry{attache}{name=attaché, description={person with special diplomatic responsibilities}}
+
+% Eintraege für Symbolliste
+\newglossaryentry{ohm}{type=symbols, name={\ensuremath{\Omega}}, sort=Ohm, symbol={\ensuremath{\Omega}}, description={unit of electrical resistance}}
+\newglossaryentry{angstrom}{type=symbols, name={\AA}, sort=angström, symbol={\AA}, description={non-SI unit of length}}
+%
+%\FullGlossaryEntry{zhaw}{main}%
+%{ZHaW}{}%
+%{Zürcher Hochschule der angewandten Wissenschaften}{}%
+%{Name der Hochschule meines Vertrauens.}
+%
+%\FullGlossaryEntry{mnmt1}{main}%
+%{MNMT1}{}%
+%{Mathematik: Numerik für Maschinentechnik 1}{}%
+%{Erstes Numerik-Modul im Studiengang Maschinentechnik an der \gls{zhaw}. Beinhaltet Taylor- und Fourier-Reihen, Numerik gewöhnlicher Differentialgleichungen anhand des Euler-, Taylor- und Runge-Kutta-Verfahren, Numerik nichtlinearer Differentialgleichungen, Lagrange- und Newton-Interpolation, Splines und Ausgleichsrechnung.}
+%
+%\FullGlossaryEntry{mnmt2}{main}%
+%{MNMT2}{}%
+%{Mathematik: Numerik für Maschinentechnik 2}{}%
+%{Zweites Numerik-Modul im Studiengang Maschinentechnik an der \gls{zhaw}. Beinhaltet Randwertprobleme, numerische Differentiation und Integration, Numerik partieller Differentialgleichungen anhand der \gls{fdm} und \gls{fem}, Stabilität von numerischen Verfahren zur Lösung von gewöhnlichen Differentialgleichungen, Schrittweitensteuerung und implizite Runge-Kutta-Verfahren.}
+%
+%\FullGlossaryEntry{fdm}{main}%
+%{FDM}{}%
+%{Finite Differenzen Methode}{}%
+%{Numerisches Verfahren zur Lösung von \glspl{rwp}}
+%
+%\FullGlossaryEntry{fem}{main}%
+%{FEM}{}%
+%{Finite Elemente Methode}{}%
+%{Numerisches Verfahren zur Lösung von \glspl{rwp}}
+%
+%\FullGlossaryEntry{rwp}{main}%
+%{RWP}{RWPs}%
+%{Randwertproblem}{Randwertprobleme}%
+%{Ein Differentialproblem, bei dem diskrete Funktionswerte einer bestimmten Ordnung an beliebigen Stellen gegeben sind.}
+%
+%\FullGlossaryEntry{awp}{main}%
+%{AWP}{AWPs}%
+%{Anfangswertproblem}{Anfangswertprobleme}%
+%{Ein Differentialproblem, bei dem alle diskrete Funktionswerte an einer Anfangsstelle gegeben sind.}
+%
+%\FullGlossaryEntry{dgl}{main}%
+%{DGL}{DGLn}%
+%{Differentialgleichung}{Differentialgleichungen}%
+%{Eine Gleichung, bei der Ableitungen beliebiger Ordnung einer gesuchten Funktion vorkommen.}
+%
+%\FullGlossaryEntry{ode}{main}%
+%{ode}{ode's}%
+%{ordinary differential equation}{ordinary differential equations}%
+%{Englische Bezeichnung für \gls{dgl}}
+%
+%
+%\FullGlossaryEntry{dgls}{main}%
+%{DGLS}{DGLSe}%
+%{Differentialgleichungssystem}{Differentialgleichungssysteme}%
+%{Ein System von Differentialgleichungen}
+%
+%\FullGlossaryEntry{ods}{main}%
+%{ods}{ods's}%
+%{ordinary differential system}{ordinary differential systems}%
+%{Englische Bezeichnung für \gls{dgls}}
