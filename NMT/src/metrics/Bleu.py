@@ -29,13 +29,13 @@ class Bleu(BaseMetric):
             'ref': []
             }
 
-        self.params['RESULT_DIR'] = '../../Evaluations/' + self.params['model']
+        self.params['RESULT_DIR'] = '../../../Evaluations/' + self.params['model']
         if not os.path.exists(self.params['RESULT_DIR']):
             os.mkdir(self.params['RESULT_DIR'])
         self.params['FILE_NAME'] = model + '_' + self.params['timestamp'] + '_BLEU.txt'
         self.params['FILE_PATH'] = self.params['RESULT_DIR'] + '/' + self.params['FILE_NAME']
 
-    def evaluate_hypothesis_single(self, hypothesis: str, references: list):
+    def evaluate_hypothesis_single(self, hypothesis: str, references: list or str):
         """
         Evaluates predictions via the bleu score metric
         :param references: A list of references against which the predicted string is measured. If only one reference
@@ -44,8 +44,13 @@ class Bleu(BaseMetric):
         """
 
         self.params['hypothesis_reference']['hyp'] = hypothesis.strip('\n').split(' ')
-        for i in references:
-            self.params['hypothesis_reference']['ref'].append(i.strip('\n').split(' '))
+        if '\t' not in references:
+            self.params['hypothesis_reference']['ref'] = [references.strip('\n').split(' ')]
+        else:
+            refs = references.split('\t')
+            for i in refs:
+                self.params['hypothesis_reference']['ref'].append(i)
+
         if os.path.exists(self.params['FILE_PATH']):
             with open(self.params['FILE_PATH'], 'a') as file:
                 self.__write_single_or_batch_single(file,
@@ -77,7 +82,7 @@ class Bleu(BaseMetric):
             raise FileNotFoundError
         else:
             with open(hypothesis, 'r', encoding='utf8') as hyp_file, open(references, 'r', encoding='utf8') as ref_file:
-                for references_line, hypothesis_line in zip(ref_file, hyp_file):
+                for hypothesis_line, references_line in zip(hyp_file, ref_file):
                     self.evaluate_hypothesis_single(hypothesis_line.strip('\n'), references_line.strip('\n'))
 
     def evaluate_hypothesis_corpus(self, hypothesis: str, references: str):
@@ -151,3 +156,6 @@ class Bleu(BaseMetric):
               'Hypothesis: {} \t'
               'Reference(s): {}'.
               format(datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"), score, hypothesis, references), file=file)
+
+
+Bleu('test', 'bleu', False).evaluate_hypothesis_batch_single('hyp.txt', 'ref.txt')
