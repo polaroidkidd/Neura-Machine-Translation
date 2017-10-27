@@ -10,6 +10,7 @@ from keras.models import Sequential
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 
+from helpers.CustomCallback import CustomCallback
 from helpers.Tokenizer import Tokenizer
 from models.BaseModel import BaseModel
 
@@ -25,14 +26,14 @@ class Seq2Seq2(BaseModel):
         self.params['latent_dim'] = 1000
         self.params['MAX_SEQ_LEN'] = 100
         self.params['EMBEDDING_DIM'] = 300
-        self.params['MAX_WORDS_DE'] = 20000
-        self.params['MAX_WORDS_EN'] = 20000
+        self.params['MAX_WORDS_DE'] = 32000
+        self.params['MAX_WORDS_EN'] = 16000
         self.params['P_DENSE_DROPOUT'] = 0.2
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../persistent/' + self.identifier
-        if not os.path.exists("../../persistent"):
-            os.makedirs("../../persistent")
+        self.BASIC_PERSISTENT_DIR = '../../Persistence/' + self.identifier
+        if not os.path.exists("../../Persistence"):
+            os.makedirs("../../Persistence")
         if not os.path.exists(self.BASIC_PERSISTENT_DIR):
             os.makedirs(self.BASIC_PERSISTENT_DIR)
         self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
@@ -40,9 +41,9 @@ class Seq2Seq2(BaseModel):
         self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
 
         self.TRAIN_DATA_FILE = os.path.join(self.BASE_DATA_DIR, 'Training/DE_EN_(tatoeba)_train.txt')
-        self.VAL_DATA_FILE = os.path.join(self.BASE_DATA_DIR, 'Training/DE_EN_(tatoeba)_validation.txt')
+        self.VAL_DATA_FILE = os.path.join(self.BASE_DATA_DIR, 'Validation/DE_EN_(tatoeba)_validation.txt')
         self.model_file = os.path.join(self.MODEL_DIR, 'model.h5')
-        self.PRETRAINED_GLOVE_FILE = os.path.join(self.BASE_DATA_DIR, 'glove.6B.100d.txt')
+        self.PRETRAINED_GLOVE_FILE = os.path.join(self.BASE_DATA_DIR, 'glove.6B.300d.txt')
         self.LATEST_MODELCHKPT = os.path.join(self.MODEL_CHECKPOINT_DIR, 'model.878-1.90.hdf5')
 
         self.START_TOKEN = "_GO"
@@ -103,46 +104,48 @@ class Seq2Seq2(BaseModel):
         self.END_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
         self.UNK_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
 
-        self.train_input_text, self.train_target_text = self.__split_data(self.TRAIN_DATA_FILE)
-        self.num_train_samples = len(self.train_input_text)
-        self.val_input_text, self.val_target_text = self.__split_data(self.VAL_DATA_FILE)
+        self.train_input_texts, self.train_target_texts = self.__split_data(self.TRAIN_DATA_FILE)
+        self.num_train_samples = len(self.train_input_texts)
+        self.val_input_texts, self.val_target_texts = self.__split_data(self.VAL_DATA_FILE)
         self.__create_vocab()
 
         M = Sequential()
-        M.add(Embedding(self.params['MAX_WORDS'] + 3, self.params['EMBEDDING_DIM'], weights=[self.en_embedding_matrix],
-                        mask_zero=True))
+        M.add(
+            Embedding(self.params['MAX_WORDS_EN'] + 3, self.params['EMBEDDING_DIM'], weights=[self.en_embedding_matrix],
+                      mask_zero=True))
 
         M.add(LSTM(self.params['latent_dim'], return_sequences=True))
 
         M.add(Dropout(self.params['P_DENSE_DROPOUT']))
 
-        M.add(
-            LSTM(self.params['latent_dim'] * int(1 / self.params['P_DENSE_DROPOUT']), return_sequences=True))
+        # M.add(LSTM(self.params['latent_dim'] * int(1 / self.params['P_DENSE_DROPOUT']), return_sequences=True))
+        M.add(LSTM(self.params['latent_dim'], return_sequences=True))
 
         M.add(Dropout(self.params['P_DENSE_DROPOUT']))
 
         M.add(TimeDistributed(Dense(self.params['MAX_WORDS_DE'] + 3,
-                                    input_shape=(None, self.params['num_tokens'], self.params['MAX_WORDS_DE'] + 3),
+                                    input_shape=(None, self.params['MAX_SEQ_LEN'], self.params['MAX_WORDS_DE'] + 3),
                                     activation='softmax')))
 
         print('compiling')
 
-        M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        M.compile(optimizer='Adam', loss='categorical_crossentropy')
 
         print('compiled')
 
-        steps_per_epoch = 4
+        steps_per_epoch = 1
         mod_epochs = np.math.floor(
-            self.num_samples / self.params['batch_size'] / steps_per_epoch * self.params['epochs'])
-        tbCallBack = callbacks.TensorBoard(log_dir=self.GRAPH_DIR, histogram_freq=0, write_graph=True,
+            self.num_train_samples / self.params['batch_size'] / steps_per_epoch * self.params['epochs'])
+        tbCallBack = callbacks.TensorBoard(log_dir=self.GRAPH_DIR, histogram_freq=0, write_grads=True, write_graph=True,
                                            write_images=True)
-        modelCallback = callbacks.ModelCheckpoint(self.MODEL_CHECKPOINT_DIR + '/model.{epoch:02d}-{loss:.2f}.hdf5',
-                                                  monitor='loss', verbose=1, save_best_only=False,
-                                                  save_weights_only=True, mode='auto',
-                                                  period=mod_epochs / self.params['epochs'])
-
+        modelCallback = callbacks.ModelCheckpoint(
+            self.MODEL_CHECKPOINT_DIR + '/model.{epoch:03d}-{loss:.3f}-{val-loss:.3f}.hdf5',
+            monitor='loss', verbose=1, save_best_only=False,
+            save_weights_only=True, mode='auto',
+            period=mod_epochs / self.params['epochs'])
+        customCallback = CustomCallback()
         M.fit_generator(self.__serve_batch(self.train_input_texts, self.train_target_texts), steps_per_epoch,
-                        epochs=mod_epochs, verbose=2, callbacks=[tbCallBack, modelCallback],
+                        epochs=mod_epochs, verbose=2, callbacks=[tbCallBack, modelCallback, customCallback],
                         validation_data=self.__serve_batch(self.val_input_texts, self.val_target_texts),
                         validation_steps=len(self.val_input_texts) / self.params['batch_size'])
         M.save(self.model_file)

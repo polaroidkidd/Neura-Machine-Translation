@@ -28,9 +28,9 @@ class Seq2Seq2(BaseModel):
         self.params['MAX_WORDS'] = 20000
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../persistent/WordSeq2SeqTutStartEndUnkToken'
-        if not os.path.exists("../../persistent"):
-            os.makedirs("../../persistent")
+        self.BASIC_PERSISTENT_DIR = '../../Persistence/WordSeq2SeqTutStartEndUnkToken'
+        if not os.path.exists("../../Persistence"):
+            os.makedirs("../../Persistence")
         if not os.path.exists(self.BASIC_PERSISTENT_DIR):
             os.makedirs(self.BASIC_PERSISTENT_DIR)
         self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
