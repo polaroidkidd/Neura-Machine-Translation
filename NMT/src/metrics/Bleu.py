@@ -107,16 +107,11 @@ class Bleu(BaseMetric):
                 with \
                         open(hypothesis, 'r', encoding='utf-8') as hyp_file, \
                         open(references, 'r', encoding='utf-8') as ref_file:
-                    for hyp_line, ref_line in zip(hyp_file, ref_file):
-                        self.params['hypothesis_reference']['hyp'].append(hyp_line.strip('\n').split(' '))
-                        for line in ref_line.split('\t'):
-                            ref_i = line.strip('\n').split(' ')
-                            self.params['hypothesis_reference']['ref'].append([ref_i])
+                    for hyp, ref in zip(hyp_file, ref_file):
+                        self.parse_data(hyp, ref)
         else:
-            for i in range(len(hypothesis)):
-                for j in range(len(hypothesis[i])):
-                    self.params['hypothesis_reference']['hyp'].append(hypothesis[i][j].strip('\n').split(' '))
-                    self.params['hypothesis_reference']['ref'].append([references[i][j].strip('\n').split(' ')])
+            for hyp, ref in zip(hypothesis, references):
+                self.parse_data(hyp, ref)
         if os.path.exists(self.params['FILE_PATH']):
             with open(self.params['FILE_PATH'], 'a') as file:
                 self.__write_corpus(file,
@@ -134,6 +129,18 @@ class Bleu(BaseMetric):
         return bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
                                       self.params['hypothesis_reference']['hyp'])
 
+    def parse_data(self, hyp: str, ref: str):
+        """
+        Places data in params
+        :param hyp: The passed hypothesis
+        :param ref: The passed reference
+        :return: Places the data in the params object in a manner which can be passed to the nltk's bleu
+        """
+        self.params['hypothesis_reference']['hyp'].append(hyp.strip('\n').split(' '))
+        for line in ref.split('\t'):
+            ref_i = line.strip('\n').split(' ')
+            self.params['hypothesis_reference']['ref'].append([ref_i])
+
     def __write_corpus(self, file, model: str, score: float, metric: str):
         """
         Helper Method which writes evaluations into the corresponding file
@@ -144,11 +151,11 @@ class Bleu(BaseMetric):
         :param score: The evaluated corpus score
         :return: This method write the result into the corresponding file
         """
-        cl_output = 'TimeStamp: {}\t'
-        'Score: {:.12f}\t'
-        'Epoch: {}\t'
-        'Metric: {}\t'
-        'Model: {}' \
+        cl_output = 'TimeStamp: {}\t' \
+                    'Score: {:.12f}\t' \
+                    'Epoch: {}\t' \
+                    'Metric: {}\t' \
+                    'Model: {}' \
             .format(datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"),
                     score,
                     self.params['epoch'],
