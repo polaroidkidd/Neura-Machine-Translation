@@ -4,20 +4,24 @@
 import keras
 import numpy as np
 
+from metrics.Bleu import Bleu
+
 
 class CustomCallback(keras.callbacks.Callback):
+    def __init__(self, generator, steps):
+        super(CustomCallback, self).__init__()
+        self.generator = generator
+        self.steps = steps
+
     def on_epoch_end(self, epoch, logs={}):
-        print("callback", self.validation_data)
-        print("\n\n")
-        print("callback", self.validation_data.shape)
+        predictions = []
+        for i in range(self.steps):
+            batch_X, batch_Y = next(self.generator)
+            print("on_epoch_end", i, batch_X.shape)
+            print("on_epoch_end", i, batch_Y.shape)
+            prediction = self.model.predict(self.validation_data[0])
+            print("on_epoch_end", prediction.shape)
+            predictions.append(prediction)
+        print("on_epoch_end", np.asarray(predictions).shape)
 
-        print(self.validation_data[0])
-        print(self.validation_data[0].shape)
-        predict = np.asarray(self.model.predict(self.validation_data[0]))
-        print(predict.shape)
-        print(predict)
-        print(self.validation_data[1])
-        print(self.validation_data[1].shape)
-
-        with(open("../../Persistence/WordBasedSeq2Seq1000Units20EpochsGLOVE/customcallback.txt", 'a')) as out_file:
-            out_file.write("test")
+        bleu_score = Bleu().evaluate_hypothesis_corpus(predictions, self.validation_data[1], epoch=epoch)
