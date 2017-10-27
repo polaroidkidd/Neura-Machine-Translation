@@ -8,7 +8,7 @@ from metrics.BaseMetric import BaseMetric
 
 
 class Bleu(BaseMetric):
-    def __init__(self, model: str, metric: str, timestamp: bool = False):
+    def __init__(self, model: str, metric: str, epoch: int, timestamp: bool = False):
         """
         This is a wrapper class for nltk's bleu score evaluation designed to work on individual statements
         and reference/hypothesis files.
@@ -21,6 +21,7 @@ class Bleu(BaseMetric):
         BaseMetric.__init__(self)
         self.params['model'] = model
         self.params['metric'] = metric
+        self.params['epoch'] = epoch
         if timestamp:
             self.params['timestamp'] = datetime.strftime(datetime.now(), "%Y-%m-%d__%H-%M-%S")
         else:
@@ -97,7 +98,7 @@ class Bleu(BaseMetric):
         :param hypothesis: A file (including path) containing all hypothesis. Hypothesis are separated by '\n'
         :param references: A file (including path) containing all references. If multiple references exist for one
         translation they have to be separated by a '\t'
-        :return: The result is written into the evaluations directory
+        :return: The result is written into the evaluations directory and returned to the caller
         """
         if type(hypothesis) == str and type(references) == str:
             if not (os.path.exists(references) or os.path.exists(hypothesis)):
@@ -111,29 +112,29 @@ class Bleu(BaseMetric):
                         for line in ref_line.split('\t'):
                             ref_i = line.strip('\n').split(' ')
                             self.params['hypothesis_reference']['ref'].append([ref_i])
-                if os.path.exists(self.params['FILE_PATH']):
-                    with open(self.params['FILE_PATH'], 'a') as file:
-                        self.__write_corpus(file,
-                                            self.params['model'],
-                                            bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
-                                                                   self.params['hypothesis_reference']['hyp']),
-                                            self.params['metric'])
-                else:
-                    with open(self.params['FILE_PATH'], 'w') as file:
-                        self.__write_corpus(file,
-                                            self.params['model'],
-                                            bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
-                                                                   self.params['hypothesis_reference']['hyp']),
-                                            self.params['metric'])
         else:
             for i in range(len(hypothesis)):
                 for j in range(len(hypothesis[i])):
-                    hypothesis[i] = hypothesis[i][j].strip('\n').split(' ')
-                    references[i] = [references[i][j].strip('\n').split(' ')]
-            return bleu_score.corpus_bleu(references, hypothesis)
+                    self.params['hypothesis_reference']['hyp'].append(hypothesis[i][j].strip('\n').split(' '))
+                    self.params['hypothesis_reference']['ref'].append([references[i][j].strip('\n').split(' ')])
+        if os.path.exists(self.params['FILE_PATH']):
+            with open(self.params['FILE_PATH'], 'a') as file:
+                self.__write_corpus(file,
+                                    self.params['model'],
+                                    bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
+                                                           self.params['hypothesis_reference']['hyp']),
+                                    self.params['metric'])
+        else:
+            with open(self.params['FILE_PATH'], 'w') as file:
+                self.__write_corpus(file,
+                                    self.params['model'],
+                                    bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
+                                                           self.params['hypothesis_reference']['hyp']),
+                                    self.params['metric'])
+        return bleu_score.corpus_bleu(self.params['hypothesis_reference']['ref'],
+                                      self.params['hypothesis_reference']['hyp'])
 
-    @staticmethod
-    def __write_corpus(file, model: str, score: float, metric: str):
+    def __write_corpus(self, file, model: str, score: float, metric: str):
         """
         Helper Method which writes evaluations into the corresponding file
 
@@ -143,15 +144,18 @@ class Bleu(BaseMetric):
         :param score: The evaluated corpus score
         :return: This method write the result into the corresponding file
         """
-        print('TimeStamp: {}\t'
-              'Score: {:.12f}\t'
-              'Metric: {}\t'
-              'Model: {}'
-              .format(datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"),
-                      score,
-                      metric,
-                      model),
-              file=file)
+        cl_output = 'TimeStamp: {}\t'
+        'Score: {:.12f}\t'
+        'Epoch: {}\t'
+        'Metric: {}\t'
+        'Model: {}' \
+            .format(datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S"),
+                    score,
+                    self.params['epoch'],
+                    metric,
+                    model)
+        print(cl_output)
+        print(cl_output, file=file)
 
     @staticmethod
     def __write_single_or_batch_single(file, score: float, references: list, hypothesis: str):
@@ -174,6 +178,3 @@ class Bleu(BaseMetric):
                      hypothesis,
                      references),
               file=file)
-
-
-
