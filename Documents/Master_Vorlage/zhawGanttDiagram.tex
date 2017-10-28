@@ -1,0 +1,137 @@
+%%	build-queue:
+%%	
+%%	¦¦¦ very first run. No .ist files yet
+%%	¦¦	index, citation/bibliography or glossary changed
+%%	¦	every change apart from the above mentioned. Double run for labels and toc.
+%%	
+%%	¦xelatex
+%%	¦xelatex
+%%	
+
+\RequirePackage[l2tabu,orthodox]{nag}
+\documentclass[10pt,a4paper,titlepage,twoside,german]{zhawreprt}
+
+\include{packages}
+\if false
+\include{glossaryentries}
+\fi
+
+\include{zhawSetup}
+
+\begin{document}
+\begin{landscape}
+\subsection{Gantt-Diagram}
+\label{sec:GanttDiag}
+
+\definecolor{MainBack1}{RGB}{46,46,48}
+\definecolor{MainBack2}{RGB}{86,86,88}
+\definecolor{MainFront}{RGB}{220,220,220}
+\definecolor{SubBack1}{RGB}{220,220,220}
+\definecolor{SubBack2}{RGB}{255,255,255}
+\definecolor{SubFront}{RGB}{46,46,48}
+
+\newcounter{myWeekNum}
+\newcommand{\myWeek}{\themyWeekNum
+    \stepcounter{myWeekNum}
+    \ifnum\themyWeekNum=53
+         \setcounter{myWeekNum}{1}
+    \else\fi
+}
+
+\newganttchartelement{foobar}{
+progress label text=\relax ,
+progress = today,
+bar/.style = {
+	shape = rectangle,
+	inner sep = 0pt,
+	draw = MainBack1,
+	thick,
+	bottom color = MainBack1,
+	top color = MainBack2,
+	fill opacity = 0.8
+},
+bar incomplete/.style = {
+	/pgfgantt/bar,
+	draw = SubFront,
+	bottom color = SubBack1,
+	top color = SubBack2
+},
+bar label font = \slshape,
+group/.append style = {
+	inner sep = 0pt,
+	draw = MainBack1,
+	bottom color = MainBack1,
+	top color = MainBack2,
+	fill opacity = 0.8
+},
+group incomplete/.style = {
+	/pgfgantt/group,
+	draw = SubFront,
+	bottom color = SubBack1,
+	top color = SubBack2
+},
+group left shift = 0,
+group right shift = 0,
+group peaks tip position = 0,
+group peaks height = 0.05,
+group peaks width = 0.5,
+milestone/.style = {
+	diamond,
+	inner sep = 0pt,
+	draw = MainBack1,
+	thick,
+	bottom color = MainBack1,
+	top color = MainBack2,
+	fill opacity = 0.8
+},
+milestone incomplete/.style = {
+	/pgfgantt/milestone,
+	draw = SubFront,
+	bottom color = SubBack1,
+	top color = SubBack2
+},
+milestone left shift = 0,
+milestone right shift = 0,
+time slot format = little-endian,
+x unit = 0.2cm,
+y unit chart = 0.8cm,
+y unit title = 0.9cm,
+vgrid = {*6{color = SubBack1, dotted, thin},*1{color = MainBack1, dashed, very thin}},
+hgrid style/.style = {color = MainBack1, dotted, thick},
+today = 28.10.2016,
+today offset=0.5,
+today label = Heute,
+today label node/.append style = {anchor = north west},
+today label font = \color{MainBack1},
+today rule/.style = {draw = blue!70!red!70!black, thick},
+calendar week text = {KW~\myWeek},
+title/.style={fill=MainBack1, draw=MainBack1},
+title label font=\color{MainFront}\bfseries,
+title left shift=.1,
+title right shift=-.1,
+title top shift=.05,
+title height=.75,
+progress label text = {\pgfmathprintnumber[precision=0]{#1}\% abgeschlossen},
+link/.style={-stealth, shorten > = 1pt, MainBack1, thick},
+link mid = 0.4,
+link bulge = 1.2,
+}
+\def\pgfcalendarmonthname#1{%
+\ifcase #1 Januar\or Februar\or März\or April\or Mai\or Juni\or Juli\or August\or September\or Oktober\or November\or Dezember\fi%
+}
+\def\pgfcalendarweekdayletter#1{%
+\ifcase #1 M\or D\or M\or D\or F\or S\or S\fi%  
+}
+\setcounter{myWeekNum}{37}
+\begin{ganttchart}{12.9.2016}{18.12.2016}
+	\gantttitle{Gantt-Diagram}{98}\\
+	\gantttitlecalendar{month = name, week} \\
+	\ganttgroup[progress=today]{Studium}{12.9.2016}{18.12.2016} \\
+	\ganttbar[progress=none,name=Jap]{Japan}{14.11.2016}{27.11.2016} \\[grid]
+	\ganttlinkedbar[link type=f-f,link label={MUAHAHA}]{Foobar 3}{16.10.2016}{29.11.2016}\\
+	\ganttmilestone[progress=none,name=Foo]{Milestone Test}{28.10.2016}
+	\ganttlink[link mid = 0.2]{Jap}{Foo}
+\end{ganttchart}
+
+\end{landscape}
+\end{document}

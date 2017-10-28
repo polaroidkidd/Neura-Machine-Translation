@@ -1,0 +1,128 @@
+%%	build-queue:
+%%	
+%%	¦¦¦ very first run. No .ist files yet
+%%	¦¦	index, citation/bibliography or glossary changed
+%%	¦	every change apart from the above mentioned. Double run for labels and toc.
+%%	
+%%	¦¦¦xelatex
+%%	¦¦makeglossaries
+%%	¦¦makeindex
+%%	¦¦bibtex
+%%	¦xelatex
+%%	¦xelatex
+%%	
+
+\RequirePackage[l2tabu,orthodox]{nag}
+\documentclass[10pt,a4paper,titlepage,twoside,english]{zhawreprt}
+
+\include{packages}
+\if false
+\include{glossaryentries}
+\fi
+
+\include{zhawSetup}
+
+\begin{document}
+
+\maketitle
+
+\chapter*{Zusammenfassung}\label{sec:Abstract}
+\notes{\item Zusammenfassung}
+
+\chapter*{Vorwort}\label{sec:Vorwort}
+\notes{\item Stellt den persönlichen Bezug zur Arbeit dar und spricht Dank aus.}
+
+\makedeclarationoforiginality
+
+\tableofcontents
+
+\chapter{Einleitung}\label{chp:Introduction}
+\section{Ausgangslage}\label{sec:InitialPosition}
+\notes{
+\item Nennt bestehende Arbeiten/Literatur zum Thema -> Literaturrecherche
+\item Stand der Technik: Bisherige Lösungen des Problems und deren Grenzen
+\item (Nennt kurz den Industriepartner und/oder weitere Kooperationspartner und dessen/deren Interesse am Thema Fragestellung)
+}
+\section{Aufgabenstellung}\label{sec:Task}
+\notes{
+\item Formuliert das Ziel der Arbeit
+\item Verweist auf die offizielle Aufgabenstellung des/der Dozierenden im Anhang
+\item (Pflichtenheft, Spezifikation)
+\item (Spezifiziert die Anforderungen an das Resultat der Arbeit)
+\item (Übersicht über die Arbeit: stellt die folgenden Teile der Arbeit kurz vor)
+\item (Angaben zum Zielpublikum: nennt das für die Arbeit vorausgesetzte Wissen)
+\item (Terminologie: Definiert die in der Arbeit verwendeten Begriffe)
+}
+
+\chapter{Theoretische Grundlagen}\label{chp:TheoreticalPrinciples}
+Test this one here too, please
+\setlistingCSharp
+\begin{lstlisting}[linebackgroundcolor={\inlist{lstnumber}{3,4}}]
+int getRandomNumber()
+{
+	return 4; // chosen by fair dice roll.
+			  // guaranteed to be random.
+}
+\end{lstlisting}
+
+\chapter{Vorgehen}\label{chp:Method}
+\notes{
+\item (Beschreibt die Grundüberlegungen der realisierten Lösung (Konstruktion/Entwurf) und die Realisierung als Simulation, als Prototyp oder als Software-Komponente)
+\item (Definiert Messgrössen, beschreibt Mess- oder Versuchsaufbau, beschreibt und dokumentiert Durchführung der Messungen/Versuche)
+\item (Experimente)
+\item (Lösungsweg)
+\item (Modell)
+\item (Tests und Validierung)
+\item (Theoretische Herleitung der Lösung)
+}
+
+\chapter{Resultate}\label{chp:Results}
+\notes{\item (Zusammenfassung der Resultate)}
+
+\chapter{Diskussion und Ausblick}\label{chp:DiscussionAndProspects}
+Wie in \cite[Kapitel~2, Seite~215]{DahmenReusken2008} nachzulesen, gibt es sogenannte Gleichungen\index{Gleichung}.\gls{hrz}\gls{elitism}\gls{ohm}
+\notes{
+\item Bespricht die erzielten Ergebnisse bezüglich ihrer Erwartbarkeit, Aussagekraft und Relevanz
+\item Interpretation und Validierung der Resultate
+\item Rückblick auf Aufgabenstellung, erreicht bzw. nicht erreicht
+\item Legt dar, wie an die Resultate (konkret vom Industriepartner oder weiteren Forschungsarbeiten; allgemein) angeschlossen werden kann; legt dar, welche Chancen die Resultate bieten
+}
+
+\chapter{Verzeichnisse}\label{chp:Index}
+\bibliography{reference}\label{sec:Bibliography}
+\newpage
+\printglossary\label{sec:Glossar}
+\newpage
+\listoffigures\label{sec:ListOfFigures}
+\newpage
+\listoftables\label{sec:ListOfTables}
+\newpage
+\lstlistoflistings\label{sec:ListOfListings}
+\newpage
+\printglossary[type=symbols]\label{sec:SymbolGlossary}
+\newpage
+\printglossary[title=Abkürzungsverzeichnis,type=\acronymtype]\label{sec:AcronymGlossary}
+\newpage
+\printindex\label{sec:Index}
+
+\appendix
+\chapter{Anhang}\label{chp:Appendix}
+\section{Projektmanagement}\label{sec:Projectmanagement}
+\notes{
+\item Offizielle Aufgabenstellung, Projektauftrag
+\item (Zeitplan) 
+\item (Besprechungsprotokolle oder Journals)
+}
+\section{Weiteres}\label{sec:Others}
+\notes{
+\item CD mit dem vollständigen Bericht als pdf-File inklusive Film- und Fotomaterial
+\item (Schaltpläne und Ablaufschemata)
+\item (Spezifikationen u. Datenblätter der verwendeten Messgeräte und/oder Komponenten)
+\item (Berechnungen, Messwerte, Simulationsresultate)
+\item (Stoffdaten)
+\item (Fehlerrechnungen mit Messunsicherheiten)
+\item (Grafische Darstellungen, Fotos)
+\item (Datenträger mit weiteren Daten(z. B. Software-Komponenten) inkl. Verzeichnis der auf diesem Datenträger abgelegten Dateien)
+\item (Softwarecode)
+}
+\end{document}

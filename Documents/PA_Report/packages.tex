@@ -1,0 +1,253 @@
+	\setdefaultlanguage{german}
+\RequirePackage{lscape}
+\usepackage{pgfgantt}
+\usepackage{xcolor}
+	\definecolor{lgray}{RGB}{250,250,250}
+	\definecolor{lgreen}{RGB}{63,127,95}
+	\definecolor{lred}{RGB}{127,0,85}
+	\definecolor{lblue}{RGB}{42,0,255}
+\usepackage{listings}
+	\lstdefinestyle{basestyle}{
+		basicstyle=\small\ttfamily,
+		breakatwhitespace = true,
+		tabsize = 4,
+		frame = double,
+		numbers = left,
+		numbersep = 10pt,
+		numberstyle = {\tiny\emptyaccsupp},
+%		firstnumber = auto,
+		numberblanklines = true,
+		captionpos = b,
+		columns = fullflexible,
+		extendedchars = true,
+		float = ht,
+		showtabs = false,
+		showspaces=false,
+		showstringspaces=false,
+		breaklines=true,
+%		prebreak=\Righttorque
+		backgroundcolor=\color{lgray},
+		keywordstyle=\color{lred}\bfseries,
+		commentstyle=\color{lgreen}\ttfamily,
+%		morekeywords={printstr, printhexln},
+		stringstyle=\color{lblue},
+		xleftmargin = \fboxsep,
+		xrightmargin = -6pt,
+		showstringspaces=true,
+	}
+	\newcommand{\setlistingCSharp}{
+		\lstset{
+		style = basestyle,
+		language = [Sharp]C,
+		%otherkeywords = {*,<,>,=,;,\{,\}},
+		%deletekeywords = {...},
+	}}
+	\newcommand{\setlistingCpp}{
+		\lstset{
+		style = basestyle,
+		language = C++,
+		%otherkeywords = {*,<,>,=,;,\{,\}},
+		%deletekeywords = {...},
+	}}
+	\newcommand{\setlistingJava}{
+		\lstset{
+		style = basestyle,
+		language = Java,
+		%otherkeywords = {*,<,>,=,;,\{,\}},
+		%deletekeywords = {...},
+	}}
+	\newcommand{\setlistingLaTeX}{
+		\lstset{
+		style = basestyle,
+		language = TeX,
+		%otherkeywords = {*,<,>,=,;,\{,\}},
+		%deletekeywords = {...},
+	}}
+	\newcommand{\setlistingMatlab}{
+		\lstset{
+		style = basestyle,
+		language = Matlab,
+		otherkeywords = {methods,enumeration,properties,classdef,Sealed,Abstract},
+		%deletekeywords = {...},
+	}}
+\usepackage{xstring}
+	\newcommand{\inlist}[2]{
+		\IfSubStr{,#2,}{,\arabic{#1},}{\color{lgray!95!blue}}{\color{lgray}}
+	}
+\usepackage{lstlinebgrd}
+	\makeatletter
+	\renewcommand{\lst@linebgrd}{%
+	\ifx\lst@linebgrdcolor\empty\else
+		\rlap{%
+			\lst@basicstyle
+			\color{lgray}
+			\lst@linebgrdcolor{%
+				\kern-\dimexpr\lst@linebgrdsep\relax%
+				\lst@linebgrdcmd{\lst@linebgrdwidth}{\lst@linebgrdheight}{\lst@linebgrddepth }%
+			}%
+		}%
+	\fi}
+	\makeatother
+\usepackage[space=true]{accsupp}
+	\newcommand\emptyaccsupp[1]{\BeginAccSupp{ActualText={}}#1\EndAccSupp{}}
+\usepackage{rotating}
+\usepackage{mathptmx}
+\usepackage{amssymb}
+\usepackage{textcomp}
+\usepackage[squaren]{SIunits}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[toc,page]{appendix}
+\usepackage{fontspec}
+	\setmainfont{Arial} % sets the roman font
+	\setsansfont{Arial} % sets the sans-sérif font
+	\setmonofont{Arial} % sets the monospace font
+\usepackage{microtype}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{pgf,tikz}
+	\usetikzlibrary{shapes}
+	\usetikzlibrary{shapes.geometric}
+	\usetikzlibrary{shapes.arrows}
+	\usetikzlibrary{positioning}
+	\usetikzlibrary{fit}
+	\usetikzlibrary{calc}
+	\usetikzlibrary{patterns}
+\usepackage{pgfplots}
+	\pgfplotsset{compat=1.13}
+\usepackage{array}
+\usepackage{natbib}
+	\bibliographystyle{agsm}
+\usepackage{usecases}
+\usepackage{footnote}
+	\makesavenoteenv{description}
+\usepackage{makeidx}
+	\makeindex
+\usepackage[nottoc]{tocbibind}
+\makeatletter
+	\if@inltxdoc\else
+	  \renewenvironment{theindex}%
+	    {\if@twocolumn
+	       \@restonecolfalse
+	     \else
+	       \@restonecoltrue
+	     \fi
+	     \if@bibchapter
+	        \if@donumindex
+	          \refstepcounter{section}
+	          \twocolumn[\vspace*{2\topskip}%
+	                     \@makechapterhead{\indexname}]%
+	          \addcontentsline{toc}{section}{\protect\numberline{\thesection}\indexname}
+	          \sectionmark{\indexname}
+	        \else
+	          \if@dotocind
+	            \twocolumn[\vspace*{2\topskip}%
+	                       \@makeschapterhead{\indexname}]%
+	            \prw@mkboth{\indexname}
+	            \addcontentsline{toc}{section}{\protect\numberline{\thesection}\indexname}
+	          \else
+	            \twocolumn[\vspace*{2\topskip}%
+	                       \@makeschapterhead{\indexname}]%
+	            \prw@mkboth{\indexname}
+	          \fi
+	        \fi
+	     \else
+	        \if@donumindex
+	          \twocolumn[\vspace*{-1.5\topskip}%
+	                     \@nameuse{\@tocextra}{\indexname}]%
+	          \csname \@tocextra mark\endcsname{\indexname}
+	        \else
+	          \if@dotocind
+	            \twocolumn[\vspace*{-1.5\topskip}%
+	                       \toc@headstar{\@tocextra}{\indexname}]%
+	            \prw@mkboth{\indexname}
+	            \addcontentsline{toc}{\@tocextra}{\indexname}
+	          \else
+	            \twocolumn[\vspace*{-1.5\topskip}%
+	                       \toc@headstar{\@tocextra}{\indexname}]%
+	            \prw@mkboth{\indexname}
+	          \fi
+	        \fi
+	     \fi
+	   \thispagestyle{plain}\parindent\z@
+	   \parskip\z@ \@plus .3\p@\relax
+	   \let\item\@idxitem}
+	   {\if@restonecol\onecolumn\else\clearpage\fi}
+	\fi
+\makeatother
+\usepackage{etoolbox}
+\makeatletter
+	\renewcommand\listoftables{%
+	    \section{Tabellenverzeichnis}%
+	    \@mkboth{\MakeUppercase\listtablename}%
+	        {\MakeUppercase\listtablename}%
+	    \@starttoc{lot}%
+	}
+	\renewcommand\listoffigures{%
+	    \section{Abbildungsverzeichnis}%
+	    \@mkboth{\MakeUppercase\listfigurename}%
+	        {\MakeUppercase\listfigurename}%
+	    \@starttoc{lof}%
+	}
+	\renewcommand\lstlistoflistings{%
+	    \section{Listingverzeichnis}%
+	    \@mkboth{\MakeUppercase\listfigurename}%
+	        {\MakeUppercase\listfigurename}%
+	    \@starttoc{lol}%
+	}
+	\renewenvironment{thebibliography}[1]
+	     {\section{\bibname}% <-- this line was changed from \chapter* to \section*
+	      \@mkboth{\MakeUppercase\bibname}{\MakeUppercase\bibname}%
+	      \list{\@biblabel{\@arabic\c@enumiv}}%
+	           {\settowidth\labelwidth{\@biblabel{#1}}%
+	            \leftmargin\labelwidth
+	            \advance\leftmargin\labelsep
+	            \@openbib@code
+	            \usecounter{enumiv}%
+	            \let\p@enumiv\@empty
+	            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+	      \sloppy
+	      \clubpenalty4000
+	      \@clubpenalty \clubpenalty
+	      \widowpenalty4000%
+	      \sfcode`\.\@m}
+	     {\def\@noitemerr
+	       {\@latex@warning{Empty `thebibliography' environment}}%
+	      \endlist}
+\makeatother
+	
+	\renewcommand\appendixname{Appendix}
+\makeatletter
+	\renewenvironment{theindex}{
+		\renameindex
+		\let\ps@plainorig\ps@plain
+		\let\ps@plain\ps@scrheadings
+		\if@twocolumn
+			\@restonecolfalse
+		\else
+			\@restonecoltrue
+		\fi
+		\columnseprule \z@
+		\columnsep 35\p@
+		\twocolumn[\section{\indexname}]%
+		\@mkboth{\MakeUppercase\indexname}{\MakeUppercase\indexname}%
+		\thispagestyle{plain}\parindent\z@
+		\parskip\z@ \@plus .3\p@\relax
+	\let\item\@idxitem}
+	{\if@restonecol\onecolumn\else\clearpage\fi}
+\makeatother
+
+\usepackage{varioref}
+\usepackage[colorlinks=true, linkcolor=black, citecolor=black, plainpages=false, unicode, pdfencoding=auto ,backref=page]{hyperref}
+\usepackage{cleveref}
+\usepackage[automake,acronym,numberedsection]{glossaries-extra}
+	\renewcommand*{\glspostdescription}{}
+	\newglossary[slg]{symbols}{sym}{sbl}{Symbolverzeichnis}
+	\makeglossaries
+	\loadglsentries{glossaryentries.tex}
+	\pdfstringdefDisableCommands{\let\textenglish\@firstofone\let\textgerman\@firstofone}
+	\makeatletter
+	\renewcommand*{\@@glossarysec}{section}
+	\makeatother
