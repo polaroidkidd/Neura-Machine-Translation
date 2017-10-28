@@ -1,5 +1,5 @@
-from models import WordBasedSeq2Seq1000Units20EpochsGLOVE
 from models import WordBasedSeq2Seq1000Units20EpochsFastText
+from models import WordBasedSeq2Seq1000Units20EpochsGLOVE
 from models import model_2_token_also_at_encoder_unk
 
 models = {'WordBasedSeq2Seq1000Units20EpochsGLOVE': '0',
@@ -41,6 +41,7 @@ def interactive_model_selection():
             exit(0)
 
         model = determine_model(choosed_model_code)
+        print("choosed model", model.identifier)
         if model == -1:
             print("\nThis model doesn't exists. Following models are allowed:")
     return model

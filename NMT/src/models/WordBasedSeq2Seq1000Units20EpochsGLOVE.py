@@ -49,7 +49,7 @@ class Seq2Seq2(BaseModel):
         self.END_TOKEN = "_EOS"
         self.UNK_TOKEN = "_UNK"
 
-        self.preprocessing = True
+        self.preprocessing = False
 
     def __create_vocab(self):
         en_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
@@ -143,6 +143,8 @@ class Seq2Seq2(BaseModel):
             # self.val_target_texts = np.load(self.BASIC_PERSISTENT_DIR + '/val_target_texts_1.npy')
             self.en_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/en_word_index.npy')
             self.de_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/de_word_index.npy')
+            self.en_word_index = self.en_word_index.item()
+            self.de_word_index = self.de_word_index.item()
             self.en_embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/en_embedding_matrix.npy')
 
             self.val_target_texts_no_preprocessing = []
@@ -271,7 +273,7 @@ class Seq2Seq2(BaseModel):
 
         while True:
             current_idx_of_target_file = 0
-            target_texts = np.load(file + str(current_idx_of_target_file) + 'npy')
+            target_texts = np.load(file + str(current_idx_of_target_file) + '.npy')
             from_idx = 0
             t_from_idx = 0
             for i in range(int(np.math.floor(input_texts.shape[0] / batch_size))):
@@ -282,7 +284,7 @@ class Seq2Seq2(BaseModel):
                 if t_to_idx >= target_texts.shape[0]:
                     t_from_idx = 0
                     current_idx_of_target_file += 1
-                    target_texts = np.load(file + str(current_idx_of_target_file) + 'npy')
+                    target_texts = np.load(file + str(current_idx_of_target_file) + '.npy')
                 from_idx = from_idx + batch_size
                 yield batch_X, batch_Y
 
