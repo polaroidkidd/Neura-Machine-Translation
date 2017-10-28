@@ -37,8 +37,9 @@ class CustomCallback(keras.callbacks.Callback):
 
             # TODO: may write some predictions to file
 
-            bleu_score = Bleu("WordBasedSeq2Seq1000Units20EpochsGLOVE", "Bleu_corpus").evaluate_hypothesis_corpus(
-                self.predicted_sentences, self.val_target_data, epoch=epoch)
+            bleu_score = Bleu("WordBasedSeq2Seq1000Units20EpochsGLOVE", "Bleu_corpus",
+                              epoch / self.real_epochs).evaluate_hypothesis_corpus(
+                self.predicted_sentences, self.val_target_data)
 
     def convert_prediction_to_sentence(self, predictions):
         print(predictions.shape)
