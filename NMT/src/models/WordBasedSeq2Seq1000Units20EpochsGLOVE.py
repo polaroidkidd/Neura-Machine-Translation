@@ -113,13 +113,25 @@ class Seq2Seq2(BaseModel):
 
             self.train_input_texts, self.train_target_texts = self.__split_data(self.TRAIN_DATA_FILE)
             self.num_train_samples = len(self.train_input_texts)
-            self.val_input_texts, self.val_target_texts = self.__split_data(self.VAL_DATA_FILE)
+            self.val_input_texts, self.val_target_texts = self.__split_data(self.VAL_DATA_FILE,
+                                                                            save_unpreprocessed_targets=True)
             self.__create_vocab()
 
-            np.save(self.BASIC_PERSISTENT_DIR + '/train_input_texts.npy', self.train_input_texts)
+            for j in range(int(np.floor(len(self.val_target_texts) / 1024))):
+                new_val_target_texts = np.zeros((1024, self.val_target_texts.shape[1], self.params['MAX_WORDS_DE'] + 3),
+                                                dtype='int16')
+                for i in range(j * 1024, (j + 1) * 1024):
+                    token_counter = 0
+                    for token in self.val_target_texts[i]:
+                        new_val_target_texts[i % 1024, token_counter, :] = to_categorical(token,
+                                                                                          num_classes=self.params[
+                                                                                                          'MAX_WORDS_DE'] + 3)
+                        token_counter += 1
+                np.save(self.BASIC_PERSISTENT_DIR + '/val_target_texts_' + str(j), new_val_target_texts)
+
             np.save(self.BASIC_PERSISTENT_DIR + '/train_target_texts.npy', self.train_target_texts)
+            np.save(self.BASIC_PERSISTENT_DIR + '/train_input_texts.npy', self.train_input_texts)
             np.save(self.BASIC_PERSISTENT_DIR + '/val_input_texts.npy', self.val_input_texts)
-            np.save(self.BASIC_PERSISTENT_DIR + '/val_target_texts.npy', self.val_target_texts)
             np.save(self.BASIC_PERSISTENT_DIR + '/en_word_index.npy', self.en_word_index)
             np.save(self.BASIC_PERSISTENT_DIR + '/de_word_index.npy', self.de_word_index)
             np.save(self.BASIC_PERSISTENT_DIR + '/en_embedding_matrix.npy', self.en_embedding_matrix)
@@ -128,10 +140,16 @@ class Seq2Seq2(BaseModel):
             self.train_input_texts = np.load(self.BASIC_PERSISTENT_DIR + '/train_input_texts.npy')
             self.train_target_texts = np.load(self.BASIC_PERSISTENT_DIR + '/train_target_texts.npy')
             self.val_input_texts = np.load(self.BASIC_PERSISTENT_DIR + '/val_input_texts.npy')
-            self.val_target_texts = np.load(self.BASIC_PERSISTENT_DIR + '/val_target_texts.npy')
+            # self.val_target_texts = np.load(self.BASIC_PERSISTENT_DIR + '/val_target_texts_1.npy')
             self.en_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/en_word_index.npy')
             self.de_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/de_word_index.npy')
             self.en_embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/en_embedding_matrix.npy')
+
+            self.val_target_texts_no_preprocessing = []
+            lines = open(self.VAL_DATA_FILE, encoding='UTF-8').read().split('\n')
+            for line in lines:
+                _, target_text = line.split('\t')
+                self.val_target_texts_no_preprocessing.append(target_text)
 
         self.num_train_samples = len(self.train_input_texts)
 
@@ -159,9 +177,9 @@ class Seq2Seq2(BaseModel):
 
         print('compiled')
 
-        steps_per_epoch = 1
-        mod_epochs = np.math.floor(
-            self.num_train_samples / self.params['batch_size'] / steps_per_epoch * self.params['epochs'])
+        steps_per_epoch = 2
+        mod_epochs = int(np.math.floor(
+            self.num_train_samples / self.params['batch_size'] / steps_per_epoch * self.params['epochs']))
         tbCallBack = callbacks.TensorBoard(log_dir=self.GRAPH_DIR, histogram_freq=0, write_grads=True, write_graph=True,
                                            write_images=True)
         modelCallback = callbacks.ModelCheckpoint(
@@ -169,19 +187,19 @@ class Seq2Seq2(BaseModel):
             monitor='loss', verbose=1, save_best_only=False,
             save_weights_only=True, mode='auto',
             period=mod_epochs / self.params['epochs'])
-        callback_steps = np.floor(len(self.val_input_texts) / (self.params['batch_size'] * 2))
-        validation_steps = np.floor(len(self.val_input_texts) / (self.params['batch_size'] * 2))
+        validation_steps = int(np.floor(len(self.val_input_texts) / (self.params['batch_size'] * 5)))
 
-        customCallback = CustomCallback(self.__serve_batch(self.val_input_texts, self.val_target_texts, "val_callback"),
-                                        callback_steps)
-        M.fit_generator(self.__serve_batch(self.train_input_texts, self.train_target_texts, "train"), steps_per_epoch,
+        customCallback = CustomCallback(self.de_word_index, self.START_TOKEN, self.END_TOKEN, self.val_input_texts,
+                                        self.val_target_texts_no_preprocessing, self.params['epochs'])
+        M.fit_generator(self.__serve_batch_old(self.train_input_texts, self.train_target_texts, "train"),
+                        steps_per_epoch,
                         epochs=mod_epochs, verbose=2, callbacks=[tbCallBack, modelCallback, customCallback],
-                        validation_data=self.__serve_batch(self.val_input_texts, self.val_target_texts, "val"),
-                        validation_steps=1,
-                        max_queue_size=1)
+                        validation_data=self.__serve_batch(self.val_input_texts, "val"),
+                        validation_steps=validation_steps,
+                        max_queue_size=2)
         M.save(self.model_file)
 
-    def __split_data(self, file):
+    def __split_data(self, file, save_unpreprocessed_targets=False):
         """
         Reads the data from the given file.
         The two languages in the file have to be splitted by a tab
@@ -194,9 +212,9 @@ class Seq2Seq2(BaseModel):
         for line in lines:
             input_text, target_text = line.split('\t')
             input_texts.append(input_text)
-            target_text = target_text
             target_texts.append(target_text)
-
+        if save_unpreprocessed_targets is True:
+            self.val_target_texts_no_preprocessing = target_texts.copy()
         assert len(input_texts) == len(target_texts)
         return input_texts, target_texts
 
@@ -214,10 +232,10 @@ class Seq2Seq2(BaseModel):
         print('Loaded', len(data), "lines of data.")
         return data
 
-    def __serve_batch(self, input_texts, target_texts, mode):
+    def __serve_batch_old(self, input_texts, target_texts, mode):
         batch_size = self.params['batch_size']
-        if mode == 'val' or mode == 'val_callback':
-            batch_size *= 2
+        # if mode == 'val' or mode == 'val_callback':
+        #    batch_size *= 5
         print(input_texts.shape, target_texts.shape, mode)
         counter = 0
         batch_X = np.zeros((batch_size, self.params['MAX_SEQ_LEN']), dtype='int32')
@@ -239,6 +257,34 @@ class Seq2Seq2(BaseModel):
                     print("counter == batch_size", i, mode)
                     counter = 0
                     yield batch_X, batch_Y
+
+    def __serve_batch(self, input_texts, mode):
+        batch_size = self.params['batch_size']
+        # if mode == 'val' or mode == 'val_callback':
+        #    batch_size *= 5
+
+
+        if mode == 'val' or mode == 'val_callback':
+            file = self.BASIC_PERSISTENT_DIR + '/val_target_texts_'
+        elif mode == 'train':
+            file = self.BASIC_PERSISTENT_DIR + '/train_target_texts_'
+
+        while True:
+            current_idx_of_target_file = 0
+            target_texts = np.load(file + str(current_idx_of_target_file) + 'npy')
+            from_idx = 0
+            t_from_idx = 0
+            for i in range(int(np.math.floor(input_texts.shape[0] / batch_size))):
+                to_idx = from_idx + batch_size
+                t_to_idx = t_from_idx + batch_size
+                batch_X = input_texts[from_idx:to_idx]
+                batch_Y = target_texts[t_from_idx:t_to_idx]
+                if t_to_idx >= target_texts.shape[0]:
+                    t_from_idx = 0
+                    current_idx_of_target_file += 1
+                    target_texts = np.load(file + str(current_idx_of_target_file) + 'npy')
+                from_idx = from_idx + batch_size
+                yield batch_X, batch_Y
 
     def __setup_model(self):
         try:

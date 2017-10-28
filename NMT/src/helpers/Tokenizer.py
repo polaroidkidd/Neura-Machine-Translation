@@ -1,7 +1,8 @@
-from nltk import TreebankWordTokenizer
 import re
 from collections import OrderedDict
-import numpy as np
+
+from nltk import TreebankWordTokenizer
+
 
 class Tokenizer():
     def __init__(self, unk_token, start_token, end_token, num_words=None):
@@ -53,13 +54,13 @@ class Tokenizer():
         for word, count in list(self.word_docs.items()):
             index_docs[self.word_index[word]] = count
 
-    def texts_to_sequences(self, texts):
+    def texts_to_sequences(self, texts, search_related_word=False):
         res = []
-        for vect in self.texts_to_sequences_generator(texts):
+        for vect in self.__texts_to_sequences_generator(texts, search_related_word):
             res.append(vect)
         return res
 
-    def texts_to_sequences_generator(self, texts):
+    def __texts_to_sequences_generator(self, texts, search_related_word):
         """Transforms each text in texts in a sequence of integers.
 
         Only top "num_words" most frequent words will be taken into account.
@@ -80,8 +81,19 @@ class Tokenizer():
                 i = self.word_index.get(w)
                 if i is not None:
                     if num_words and i >= num_words:
-                        # Replace out of vocab words with unk_token
-                        vect.append(self.word_index.get(self.UNK_TOKEN))
+                        if search_related_word is True:
+                            self.__find_related_known_word(w)
+                        else:
+                            continue
+                            # TODO: what is with out of vocab token? (fasttext and glove)
                     else:
                         vect.append(i)
+                else:
+                    if search_related_word is True:
+                        related_word = self.__find_related_known_word(2)
+                        i = self.word_index.get(related_word)
+                        if i is not None:
+                            vect.append(i)
+                            continue
+                    vect.append(self.word_index.get(self.UNK_TOKEN))
             yield vect

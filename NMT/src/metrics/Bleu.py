@@ -30,7 +30,9 @@ class Bleu(BaseMetric):
             'ref': []
             }
 
-        self.params['RESULT_DIR'] = '../../../Evaluations/' + self.params['model']
+        self.params['RESULT_DIR'] = '../../Persistence/Evaluations/' + self.params['model']
+        if not os.path.exists("../../Persistence/Evaluations"):
+            os.mkdir("../../Persistence/Evaluations")
         if not os.path.exists(self.params['RESULT_DIR']):
             os.mkdir(self.params['RESULT_DIR'])
         self.params['FILE_NAME'] = model + '_' + self.params['timestamp'] + '_BLEU.txt'
