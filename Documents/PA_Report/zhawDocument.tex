@@ -41,13 +41,59 @@
 \tableofcontents
 
 \chapter{Introduction}\label{chp:Introduction}
-\section{InitialPosition}\label{sec:InitialPosition}
+\begin{itemize}
+\item machines becoming better at processing human language (accuracy)
+\item conversation with machines are possible to a limited degree
+\item information retrieval through voice recognition still a challenge due to
+\begin{itemize}
+\item attention to correct words
+\item database structures
+\item multiple ways to ask for identical information
+\end{itemize}
+\item multiple solutions proposed
+\begin{itemize}
+\item KBQA: Learning Question Answering over QA Corpora and Knowledge Bases
+\item Eric, Manning - 2017 - Key-Value Retrieval Networks for Task-Oriented Dialogue - With Highlights
+\end{itemize}
+\item Asking your Assistant (Google, Siri or S-Voice) weather you have an appointment tomorrow and ask follow-up questions about this appointment is currently not possible (due to above challenges but could be if these papers prove implementable
+\end{itemize}
+
+
+
+\section{Initial Position}\label{sec:InitialPosition}
+\begin{itemize}
+\item No Response from KBQA for Code
+\item Refusal to share code from Manning
+\item Ultimate new goal: Implement Manning's solution without his code
+\end{itemize}
 \notes{
 \item Nennt bestehende Arbeiten/Literatur zum Thema -> Literaturrecherche
 \item Stand der Technik: Bisherige Lösungen des Problems und deren Grenzen
 \item (Nennt kurz den Industriepartner und/oder weitere Kooperationspartner und dessen/deren Interesse am Thema Fragestellung)
 }
 \section{Task}\label{sec:Task}
+\begin{itemize}
+\item Small Steps
+\begin{itemize}
+\item implement seq2seq network for translation
+\begin{itemize}
+\item implement char-based
+\item implement word-based
+\item try multiple different implementations (reversed-input, multiple LSTMs) and compare against each other
+\item get decent results on both and move on
+\end{itemize}
+\item implement seq2seq with attention
+\begin{itemize}
+\item attempt various attention mechanism
+\end{itemize}
+\end{itemize}
+\item One Large Step
+\begin{itemize}
+\item map best working models and tools to KBQA and get better results than Stanford
+\item Rub better results in Eric's face.
+\item Profit.
+\end{itemize}
+\end{itemize}
 \notes{
 \item Formuliert das Ziel der Arbeit
 \item Verweist auf die offizielle Aufgabenstellung des/der Dozierenden im Anhang
@@ -107,7 +153,7 @@ Wie in \cite[Kapitel~2, Seite~215]{DahmenReusken2008} nachzulesen, gibt es sogen
 \newpage
 \printglossary[title=Acronym Glossary,type=\acronymtype]\label{sec:AcronymGlossary}
 \newpage
-\printindex\label{sec:Index}
+\printindex[title=Index]\label{sec:Index}
 
 \appendix
 \chapter{Appendix}\label{chp:Appendix}

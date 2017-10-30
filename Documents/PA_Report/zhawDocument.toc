@@ -1,7 +1,7 @@
 \select@language {german}
 \select@language {german}
 \contentsline {chapter}{\numberline {1}Introduction}{6}{chapter.1}
-\contentsline {section}{\numberline {1.1}InitialPosition}{6}{section.1.1}
+\contentsline {section}{\numberline {1.1}Initial Position}{6}{section.1.1}
 \contentsline {section}{\numberline {1.2}Task}{6}{section.1.2}
 \contentsline {chapter}{\numberline {2}Theoretical Principles}{7}{chapter.2}
 \contentsline {chapter}{\numberline {3}Method}{8}{chapter.3}
@@ -14,6 +14,6 @@
 \contentsline {section}{\numberline {6.4}Listingverzeichnis}{15}{section.6.4}
 \contentsline {section}{\numberline {6.5}Symbol Glossary}{16}{section.6.5}
 \contentsline {section}{\numberline {6.6}Acronym Glossary}{17}{section.6.6}
-\contentsline {chapter}{\numberline {A}Appendix}{18}{appendix.A}
-\contentsline {section}{\numberline {A.1}Projektmanagement}{18}{section.A.1}
-\contentsline {section}{\numberline {A.2}Final Words}{18}{section.A.2}
+\contentsline {chapter}{\numberline {A}Appendix}{19}{appendix.A}
+\contentsline {section}{\numberline {A.1}Projektmanagement}{19}{section.A.1}
+\contentsline {section}{\numberline {A.2}Final Words}{19}{section.A.2}
