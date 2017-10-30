@@ -8,6 +8,8 @@ from metrics.BaseMetric import BaseMetric
 
 
 class Bleu(BaseMetric):
+
+
     def __init__(self, model: str, metric: str, epoch: int, timestamp: bool = False):
         """
         This is a wrapper class for nltk's bleu score evaluation designed to work on individual statements
@@ -18,6 +20,7 @@ class Bleu(BaseMetric):
         :param metric: The metric used to evaluate the hypothesis
 
         """
+
         BaseMetric.__init__(self)
         self.params['model'] = model
         self.params['metric'] = metric
