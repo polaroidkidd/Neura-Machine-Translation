@@ -31,9 +31,9 @@ class Bleu(BaseMetric):
             'ref': []
             }
 
-        self.params['RESULT_DIR'] = '../../Persistence/Evaluations/' + self.params['model']
-        if not os.path.exists("../../Persistence/Evaluations"):
-            os.mkdir("../../Persistence/Evaluations")
+        self.params['RESULT_DIR'] = '../../Evaluations/' + self.params['model']
+        if not os.path.exists("../../Evaluations"):
+            os.mkdir("../../Evaluations")
         if not os.path.exists(self.params['RESULT_DIR']):
             os.mkdir(self.params['RESULT_DIR'])
         self.params['FILE_NAME'] = model + '_' + self.params['timestamp'] + '_BLEU.txt'
@@ -46,7 +46,6 @@ class Bleu(BaseMetric):
         is available this method accepts it as a string and converts it to a single-item list
         :param hypothesis: The predicted string(s)
         """
-
         self.params['hypothesis_reference']['hyp'] = hypothesis.strip('\n').split(' ')
         if '\t' not in references:
             self.params['hypothesis_reference']['ref'] = [references.strip('\n').split(' ')]
@@ -56,7 +55,7 @@ class Bleu(BaseMetric):
                 self.params['hypothesis_reference']['ref'].append(i)
 
         if os.path.exists(self.params['FILE_PATH']):
-            with open(self.params['FILE_PATH'], 'a') as file:
+            with open(self.params['FILE_PATH'], 'a', encoding='UTF-8') as file:
                 self.__write_single_or_batch_single(file,
                                                     bleu_score.sentence_bleu(
                                                             references=self.params['hypothesis_reference']['ref'],
@@ -66,7 +65,7 @@ class Bleu(BaseMetric):
                                                     self.params['hypothesis_reference']['ref'],
                                                     self.params['hypothesis_reference']['hyp'])
         else:
-            with open(self.params['FILE_PATH'], 'w') as file:
+            with open(self.params['FILE_PATH'], 'w', encoding='UTF-8') as file:
                 self.__write_single_or_batch_single(file,
                                                     bleu_score.sentence_bleu(
                                                             references=self.params['hypothesis_reference']['ref'],
@@ -84,8 +83,8 @@ class Bleu(BaseMetric):
         :param hypothesis: A text file (including path)containing all the hypothesis, one per line
         :return: This method writes the respective BLEU scores into the file specified at class instantiation time.
         """
-        if not (os.path.exists(references) or os.path.exists(hypothesis)):
-            raise FileNotFoundError
+        if not os.path.exists(references) or not os.path.exists(hypothesis):
+            raise FileNotFoundError("file not found")
         else:
             with \
                     open(hypothesis, 'r', encoding='utf-8') as hyp_file, \
@@ -104,7 +103,7 @@ class Bleu(BaseMetric):
         """
         if type(hypothesis) == str and type(references) == str:
             if not (os.path.exists(references) or os.path.exists(hypothesis)):
-                raise FileNotFoundError
+                raise FileNotFoundError()
             else:
                 with \
                         open(hypothesis, 'r', encoding='utf-8') as hyp_file, \

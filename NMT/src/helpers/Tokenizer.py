@@ -5,7 +5,7 @@ from nltk import TreebankWordTokenizer
 
 
 class Tokenizer():
-    def __init__(self, unk_token, start_token, end_token, num_words=None):
+    def __init__(self, start_token, end_token, unk_token, num_words=None):
         self.treebank_word_tokenizer = TreebankWordTokenizer()
         improved_open_quote_regex = re.compile(u'([«“‘])', re.U)
         improved_close_quote_regex = re.compile(u'([»”’])', re.U)
