@@ -1,7 +1,24 @@
+import os
+import sys
+
+from helpers import model_repo
 from metrics.Bleu import Bleu
 
-hypothesis_file = "C:/Users/Nicolas/Desktop/deu_val_data_not_seen.pred"
-references_file = "C:/Users/Nicolas/Desktop/deu_val_data_not_seen.de"
+if len(sys.argv) > 1:
+    model = model_repo.argument_model_selection(sys.argv[1])
+else:
+    model = model_repo.interactive_model_selection()
 
-bleu_evaluator = Bleu("model_2_token_also_at_encoder_unk", 'bleu', timestamp=True)
-bleu_evaluator.evaluate_hypothesis_batch_single(hypothesis_file, references_file)
+references_file = input("reference_file:\n")
+if references_file == "":
+    references_file = "C:/Users/Nicolas/Desktop/DE_EN_(tatoeba)_validation_german_only.txt"
+
+base_hypothesis_path = "C:/Users/Nicolas/Desktop/"
+hypothesis_file = base_hypothesis_path + model.identifier + "_validation_predictions" + '.txt'
+
+if not os.path.exists(hypothesis_file):
+    with open(hypothesis_file, 'w'):
+        pass
+
+bleu_evaluator = Bleu(model.identifier, 'bleu', timestamp=True, epoch=1)
+bleu_evaluator.evaluate_hypothesis_corpus(hypothesis_file, references_file)
