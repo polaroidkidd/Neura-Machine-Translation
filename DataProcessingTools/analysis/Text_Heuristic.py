@@ -20,4 +20,9 @@ for word in blob:
 
 filtered_blob = list(filter(lambda w: not w in stop_words, better_blob))
 
-p.FreqDist(filtered_blob).plot(100)
+
+heu = p.FreqDist(filtered_blob).most_common(100)
+
+for i in range(len(heu)):
+    print(heu[i])
+
