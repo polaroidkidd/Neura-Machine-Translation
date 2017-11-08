@@ -13,7 +13,7 @@ class Original_Charbased():
         self.epochs = 1  # Number of epochs to train for.
         self.latent_dim = 256  # Latent dimensionality of the encoding space.
         self.num_samples = 150000  # Number of samples to train on.
-        self.BASIC_PERSISTENT_DIR
+        self.BASIC_PERSISTENCE_DIR
         self.data_path = '../../../DataSets/Training/deu.txt'
 
     def start_training(self):
@@ -92,7 +92,8 @@ class Original_Charbased():
         #
         # Run training
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
-        #
+        model.summary()
+
         tbCallBack = callbacks.TensorBoard(log_dir='./data/Graph', histogram_freq=0, write_graph=True,
                                            write_images=True)
         model.fit([encoder_input_data, decoder_input_data], decoder_target_data, batch_size=self.batch_size,

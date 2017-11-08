@@ -28,13 +28,13 @@ class Seq2Seq2(BaseModel):
         self.params['MAX_SEQ_LEN'] = 1800
         self.UNKNOWN_CHAR = '\r'
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../persistent/persistentModelseq2seqbugfree'
-        self.GRAPH_DIR = os.path.join(self.BASIC_PERSISTENT_DIR, 'Graph')
-        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
+        self.BASIC_PERSISTENCE_DIR = '../../persistent/persistentModelseq2seqbugfree'
+        self.GRAPH_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR, 'Graph')
+        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
+        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
         self.LATEST_MODEL_CHKPT = os.path.join(self.MODEL_CHECKPOINT_DIR,
                                                'chkp2prepro_64_100_15_256_1000000_20000_1000_1800_70_70_0.8_char___tfmodelprepro.35999-54.06.hdf5')
-        self.token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "input_token_idx_preprocessed.npy")
+        self.token_idx_file = os.path.join(self.BASIC_PERSISTENCE_DIR, "input_token_idx_preprocessed.npy")
         self.train_en_file = os.path.join(self.BASE_DATA_DIR, 'Training/train.en')
         self.train_de_file = os.path.join(self.BASE_DATA_DIR, 'Training/train.de')
         self.encoder_model_file = os.path.join(self.MODEL_DIR, 'encoder_model.h5')

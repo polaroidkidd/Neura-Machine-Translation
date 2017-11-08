@@ -5,7 +5,7 @@ from nltk import TreebankWordTokenizer
 
 
 class Tokenizer():
-    def __init__(self, start_token, end_token, unk_token, num_words=None):
+    def __init__(self, start_token: str, end_token: str, unk_token: str, num_words: int = None, max_seq_len: int = 100):
         self.treebank_word_tokenizer = TreebankWordTokenizer()
         improved_open_quote_regex = re.compile(u'([«“‘])', re.U)
         improved_close_quote_regex = re.compile(u'([»”’])', re.U)
@@ -22,8 +22,9 @@ class Tokenizer():
         self.START_TOKEN = start_token
         self.END_TOKEN = end_token
         self.UNK_TOKEN = unk_token
+        self.MAX_SEQ_LEN = max_seq_len
 
-    def fit_on_texts(self, texts):
+    def fit_on_texts(self, texts: list):
         self.document_count = 0
         for text in texts:
             self.document_count += 1
@@ -54,13 +55,15 @@ class Tokenizer():
         for word, count in list(self.word_docs.items()):
             index_docs[self.word_index[word]] = count
 
-    def texts_to_sequences(self, texts, search_related_word=False):
+    def texts_to_sequences(self, texts: list, search_related_word: bool = False, print_unk_warning: bool = False,
+                           lower_flag: bool = False):
         res = []
-        for vect in self.__texts_to_sequences_generator(texts, search_related_word):
+        for vect in self.__texts_to_sequences_generator(texts, search_related_word, print_unk_warning, lower_flag):
             res.append(vect)
         return res
 
-    def __texts_to_sequences_generator(self, texts, search_related_word):
+    def __texts_to_sequences_generator(self, texts: list, search_related_word: bool, print_unk_warning: bool,
+                                       lower_flag: bool):
         """Transforms each text in texts in a sequence of integers.
 
         Only top "num_words" most frequent words will be taken into account.
@@ -78,22 +81,35 @@ class Tokenizer():
             seq = [self.START_TOKEN] + seq + [self.END_TOKEN]
             vect = []
             for w in seq:
+                if lower_flag is True:
+                    w = w.lower()
                 i = self.word_index.get(w)
                 if i is not None:
                     if num_words and i >= num_words:
                         if search_related_word is True:
-                            self.__find_related_known_word(w)
+                            i = self.__find_idx_of_related_known_word(w)
+                            if i is None:
+                                if print_unk_warning is True:
+                                    print("\nATTENTION:", w, "is unknown.\n")
+                                vect.append(self.word_index.get(self.UNK_TOKEN))
+                                continue
+                            else:
+                                vect.append(i)
                         else:
+                            if print_unk_warning is True:
+                                print("\nATTENTION:", w, "is unknown.\n")
+                            vect.append(self.word_index.get(self.UNK_TOKEN))
                             continue
                             # TODO: what is with out of vocab token? (fasttext and glove)
                     else:
                         vect.append(i)
                 else:
                     if search_related_word is True:
-                        related_word = self.__find_related_known_word(2)
-                        i = self.word_index.get(related_word)
+                        i = self.__find_idx_of_related_known_word(2)
                         if i is not None:
                             vect.append(i)
                             continue
+                    if print_unk_warning is True:
+                        print("\nATTENTION:", w, "is unknown.\n")
                     vect.append(self.word_index.get(self.UNK_TOKEN))
             yield vect

@@ -40,6 +40,7 @@ def predict_interactive_from_file(model):
     split_flag = input("split source file with tab?\n")
 
     source_sentences = open(source_file, encoding='UTF-8').read().split('\n')
+    print(len(source_sentences))
     if split_flag in ['y', 'yes']:
         temp_source_sentences = source_sentences.copy()
         source_sentences = []

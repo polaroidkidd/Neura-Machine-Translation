@@ -30,16 +30,14 @@ class Seq2Seq2(BaseModel):
         self.params['P_DENSE_DROPOUT'] = 0.2
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../Persistence/' + self.identifier
-        if not os.path.exists("../../Persistence"):
-            os.makedirs("../../Persistence")
-        if not os.path.exists(self.BASIC_PERSISTENT_DIR):
-            os.makedirs(self.BASIC_PERSISTENT_DIR)
-        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        self.GRAPH_DIR = os.path.join(self.BASIC_PERSISTENT_DIR, 'Graph')
-        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        # self.input_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "input_token_index.npy")
-        # self.target_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "target_token_index.npy")
+        self.BASIC_PERSISTENCE_DIR = '../../Persistence/' + self.identifier
+        if not os.path.exists(self.BASIC_PERSISTENCE_DIR):
+            os.makedirs(self.BASIC_PERSISTENCE_DIR)
+        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
+        self.GRAPH_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR, 'Graph')
+        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
+        # self.input_token_idx_file = os.path.join(self.BASIC_PERSISTENCE_DIR, "input_token_index.npy")
+        # self.target_token_idx_file = os.path.join(self.BASIC_PERSISTENCE_DIR, "target_token_index.npy")
         self.data_path = os.path.join(self.BASE_DATA_DIR, 'Training/deu.txt')
         self.model_file = os.path.join(self.MODEL_DIR, 'model.h5')
         self.PRETRAINED_GLOVE_FILE = os.path.join(self.BASE_DATA_DIR, 'glove.6B.100d.txt')
@@ -78,15 +76,15 @@ class Seq2Seq2(BaseModel):
         self.START_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
         self.END_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
         self.UNK_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
-        np.save(self.BASIC_PERSISTENT_DIR + '/start_token_vector.npy', self.START_TOKEN_VECTOR)
-        np.save(self.BASIC_PERSISTENT_DIR + '/end_token_vector.npy', self.END_TOKEN_VECTOR)
-        np.save(self.BASIC_PERSISTENT_DIR + '/unk_token_vector.npy', self.UNK_TOKEN_VECTOR)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/start_token_vector.npy', self.START_TOKEN_VECTOR)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/end_token_vector.npy', self.END_TOKEN_VECTOR)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/unk_token_vector.npy', self.UNK_TOKEN_VECTOR)
 
         self._split_count_data()
 
         M = Sequential()
         M.add(Embedding(self.params['MAX_WORDS'] + 3, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
-                        mask_zero=True))
+                        mask_zero=True, trainable=False))
 
         M.add(LSTM(self.params['latent_dim'], return_sequences=True))
 
@@ -104,6 +102,7 @@ class Seq2Seq2(BaseModel):
         print('compiling')
 
         M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        M.summary()
 
         print('compiled')
 
@@ -227,8 +226,8 @@ class Seq2Seq2(BaseModel):
             if embedding_vector is None:
                 embedding_vector = self.UNK_TOKEN_VECTOR
             self.embedding_matrix[i] = embedding_vector
-        np.save(self.BASIC_PERSISTENT_DIR + '/word_index.npy', self.word_index)
-        np.save(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy', self.embedding_matrix)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/word_index.npy', self.word_index)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/embedding_matrix.npy', self.embedding_matrix)
 
     def load(file):
         """
@@ -348,11 +347,11 @@ class Seq2Seq2(BaseModel):
         except AttributeError:
             pass
 
-        self.embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy')
+        self.embedding_matrix = np.load(self.BASIC_PERSISTENCE_DIR + '/embedding_matrix.npy')
 
         self.M = Sequential()
         self.M.add(Embedding(self.params['MAX_WORDS'] + 3, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
-                        mask_zero=True))
+                             mask_zero=True, trainable=False))
 
         self.M.add(LSTM(self.params['latent_dim'], return_sequences=True, name='encoder'))
 
@@ -368,13 +367,14 @@ class Seq2Seq2(BaseModel):
                                     activation='softmax')))
 
         self.M.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        self.M.summary()
 
         self.M.load_weights(self.LATEST_MODELCHKPT)
 
     def predict_one_sentence(self, sentence):
         self.__setup_model()
         tokenizer = Tokenizer()
-        self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
+        self.word_index = np.load(self.BASIC_PERSISTENCE_DIR + '/word_index.npy')
         self.word_index = self.word_index.item()
         tokenizer.word_index = self.word_index
         self.num_words = self.params['MAX_WORDS'] + 3
@@ -420,7 +420,7 @@ class Seq2Seq2(BaseModel):
         self.__setup_model()
 
         tokenizer = Tokenizer()
-        self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
+        self.word_index = np.load(self.BASIC_PERSISTENCE_DIR + '/word_index.npy')
         self.word_index = self.word_index.item()
         tokenizer.word_index = self.word_index
         self.num_words = self.params['MAX_WORDS'] + 3
@@ -480,7 +480,7 @@ class Seq2Seq2(BaseModel):
         self.__setup_model()
 
         tokenizer = Tokenizer()
-        self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
+        self.word_index = np.load(self.BASIC_PERSISTENCE_DIR + '/word_index.npy')
         self.word_index = self.word_index.item()
         tokenizer.word_index = self.word_index
         self.num_words = self.params['MAX_WORDS'] + 3

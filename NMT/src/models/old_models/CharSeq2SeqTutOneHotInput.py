@@ -26,10 +26,10 @@ class Seq2Seq2(BaseModel):
         self.params['max_decoder_seq_length'] = 138
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../persistent/chr_teacher_force_manythings'
-        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        self.input_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "input_token_index.npy")
-        self.target_token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "target_token_index.npy")
+        self.BASIC_PERSISTENCE_DIR = '../../persistent/chr_teacher_force_manythings'
+        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
+        self.input_token_idx_file = os.path.join(self.BASIC_PERSISTENCE_DIR, "input_token_index.npy")
+        self.target_token_idx_file = os.path.join(self.BASIC_PERSISTENCE_DIR, "target_token_index.npy")
         self.data_path = self.BASE_DATA_DIR + 'Training/deu.txt'
         self.encoder_model_file = os.path.join(self.MODEL_DIR, 'encoder_model.h5')
         self.model_file = os.path.join(self.MODEL_DIR, 's2s2.h5')

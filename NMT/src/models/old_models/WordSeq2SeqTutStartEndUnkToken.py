@@ -28,23 +28,21 @@ class Seq2Seq2(BaseModel):
         self.params['MAX_WORDS'] = 20000
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../Persistence/WordSeq2SeqTutStartEndUnkToken'
-        if not os.path.exists("../../Persistence"):
-            os.makedirs("../../Persistence")
-        if not os.path.exists(self.BASIC_PERSISTENT_DIR):
-            os.makedirs(self.BASIC_PERSISTENT_DIR)
-        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        self.GRAPH_DIR = os.path.join(self.BASIC_PERSISTENT_DIR, 'Graph')
-        self.token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "token_index.npy")
+        self.BASIC_PERSISTENCE_DIR = '../../Persistence/WordSeq2SeqTutStartEndUnkToken'
+        if not os.path.exists(self.BASIC_PERSISTENCE_DIR):
+            os.makedirs(self.BASIC_PERSISTENCE_DIR)
+        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
+        self.GRAPH_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR, 'Graph')
+        self.token_idx_file = os.path.join(self.BASIC_PERSISTENCE_DIR, "token_index.npy")
         self.data_path = os.path.join(self.BASE_DATA_DIR, 'Training/deu.txt')
         self.encoder_model_file = os.path.join(self.MODEL_DIR, 'encoder_model.h5')
         self.model_file = os.path.join(self.MODEL_DIR, 'model.h5')
         self.weights_file = os.path.join(self.MODEL_DIR, 'weights.h5')
         self.decoder_model_file = os.path.join(self.MODEL_DIR, 'decoder_model.h5')
         self.PRETRAINED_GLOVE_FILE = os.path.join(self.BASE_DATA_DIR, 'glove.6B.100d.txt')
-        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        self.LATEST_MODEL_CHKPT = os.path.join(self.BASIC_PERSISTENT_DIR, 'model.1171-3544.78.hdf5')
-        self.WORD_IDX_FILE = os.path.join(self.BASIC_PERSISTENT_DIR, "word_idx")
+        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
+        self.LATEST_MODEL_CHKPT = os.path.join(self.BASIC_PERSISTENCE_DIR, 'model.1171-3544.78.hdf5')
+        self.WORD_IDX_FILE = os.path.join(self.BASIC_PERSISTENCE_DIR, "word_idx")
 
         self.START_TOKEN = "_GO"
         self.END_TOKEN = "_EOS"
@@ -54,16 +52,16 @@ class Seq2Seq2(BaseModel):
         self.START_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
         self.END_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
         self.UNK_TOKEN_VECTOR = np.random.rand(self.params['EMBEDDING_DIM'])
-        np.save(self.BASIC_PERSISTENT_DIR + '/start_token_vector.npy', self.START_TOKEN_VECTOR)
-        np.save(self.BASIC_PERSISTENT_DIR + '/end_token_vector.npy', self.END_TOKEN_VECTOR)
-        np.save(self.BASIC_PERSISTENT_DIR + '/unk_token_vector.npy', self.UNK_TOKEN_VECTOR)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/start_token_vector.npy', self.START_TOKEN_VECTOR)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/end_token_vector.npy', self.END_TOKEN_VECTOR)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/unk_token_vector.npy', self.UNK_TOKEN_VECTOR)
 
         self._split_count_data()
         next(self._serve_batch())
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None,))
         encoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
-                                      mask_zero=True)
+                                      mask_zero=True, trainable=False)
         encoder_embedded = encoder_embedding(encoder_inputs)
         encoder = LSTM(self.params['latent_dim'], return_state=True)
         encoder_outputs, state_h, state_c = encoder(encoder_embedded)
@@ -73,7 +71,7 @@ class Seq2Seq2(BaseModel):
         # Set up the decoder, using `encoder_states` as initial state.
         decoder_inputs = Input(shape=(None,))
         decoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
-                                      mask_zero=True)
+                                      mask_zero=True, trainable=False)
         decoder_embedded = decoder_embedding(decoder_inputs)
         # We set up our decoder to return full output sequences,
         # and to return internal states as well. We don't use the
@@ -89,6 +87,7 @@ class Seq2Seq2(BaseModel):
 
         # Run training
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+        model.summary()
         steps = 4
         mod_epochs = np.math.floor(self.num_samples / self.params['batch_size'] / steps * self.params['epochs'])
         tbCallBack = callbacks.TensorBoard(log_dir=self.GRAPH_DIR, histogram_freq=0, write_graph=True,
@@ -256,11 +255,11 @@ class Seq2Seq2(BaseModel):
             if embedding_vector is None:
                 embedding_vector = self.UNK_TOKEN_VECTOR
             self.embedding_matrix[i] = embedding_vector
-        np.save(self.BASIC_PERSISTENT_DIR + '/word_index.npy', self.word_index)
-        np.save(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy', self.embedding_matrix)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/word_index.npy', self.word_index)
+        np.save(self.BASIC_PERSISTENCE_DIR + '/embedding_matrix.npy', self.embedding_matrix)
 
     def predict_one_sentence(self, sentence):
-        self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
+        self.word_index = np.load(self.BASIC_PERSISTENCE_DIR + '/word_index.npy')
         self.word_index = self.word_index.item()
         self.num_words = self.params['MAX_WORDS'] + 3
         tokenizer = Tokenizer(num_words=self.params['MAX_WORDS'] + 3)
@@ -277,12 +276,12 @@ class Seq2Seq2(BaseModel):
         sentence = tokenizer.texts_to_sequences([sentence])
         sentence = pad_sequences(sentence, maxlen=self.params['max_seq_length'], padding='post')
 
-        self.embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy')
+        self.embedding_matrix = np.load(self.BASIC_PERSISTENCE_DIR + '/embedding_matrix.npy')
 
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None,))
         encoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
-                                      mask_zero=True)
+                                      mask_zero=True, trainable=False)
         encoder_embedded = encoder_embedding(encoder_inputs)
         encoder = LSTM(self.params['latent_dim'], return_state=True)
         encoder_outputs, state_h, state_c = encoder(encoder_embedded)
@@ -292,7 +291,7 @@ class Seq2Seq2(BaseModel):
         # Set up the decoder, using `encoder_states` as initial state.
         decoder_inputs = Input(shape=(None,))
         decoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
-                                      mask_zero=True)
+                                      mask_zero=True, trainable=False)
         decoder_embedded = decoder_embedding(decoder_inputs)
         # We set up our decoder to return full output sequences,
         # and to return internal states as well. We don't use the
@@ -308,6 +307,7 @@ class Seq2Seq2(BaseModel):
 
         # Run training
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+        model.summary()
 
         model.load_weights(self.LATEST_MODEL_CHKPT)
 
@@ -371,7 +371,7 @@ class Seq2Seq2(BaseModel):
         raise NotImplementedError()
 
     def calculate_hiddenstate_after_encoder(self, sentence):
-        self.word_index = np.load(self.BASIC_PERSISTENT_DIR + '/word_index.npy')
+        self.word_index = np.load(self.BASIC_PERSISTENCE_DIR + '/word_index.npy')
         self.word_index = self.word_index.item()
         self.num_words = self.params['MAX_WORDS'] + 3
         tokenizer = Tokenizer(num_words=self.params['MAX_WORDS'] + 3)
@@ -389,12 +389,12 @@ class Seq2Seq2(BaseModel):
         sentence = tokenizer.texts_to_sequences([sentence])
         sentence = pad_sequences(sentence, maxlen=self.params['max_seq_length'], padding='post')
 
-        self.embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/embedding_matrix.npy')
+        self.embedding_matrix = np.load(self.BASIC_PERSISTENCE_DIR + '/embedding_matrix.npy')
 
         # Define an input sequence and process it.
         encoder_inputs = Input(shape=(None,))
         encoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
-                                      mask_zero=True)
+                                      mask_zero=True, trainable=False)
         encoder_embedded = encoder_embedding(encoder_inputs)
         encoder = LSTM(self.params['latent_dim'], return_state=True)
         encoder_outputs, state_h, state_c = encoder(encoder_embedded)
@@ -404,7 +404,7 @@ class Seq2Seq2(BaseModel):
         # Set up the decoder, using `encoder_states` as initial state.
         decoder_inputs = Input(shape=(None,))
         decoder_embedding = Embedding(self.num_words, self.params['EMBEDDING_DIM'], weights=[self.embedding_matrix],
-                                      mask_zero=True)
+                                      mask_zero=True, trainable=False)
         decoder_embedded = decoder_embedding(decoder_inputs)
         # We set up our decoder to return full output sequences,
         # and to return internal states as well. We don't use the
@@ -420,6 +420,7 @@ class Seq2Seq2(BaseModel):
 
         # Run training
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+        model.summary()
 
         model.load_weights(self.LATEST_MODEL_CHKPT)
 

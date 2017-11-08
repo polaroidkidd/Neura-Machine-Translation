@@ -1,7 +1,9 @@
+from models import CharSeq2SeqTutOneHotInput
 from models import WordBasedSeq2Seq1000Units20EpochsFastText
 from models import WordBasedSeq2Seq1000Units20EpochsGLOVE
 from models import WordBasedSeq2Seq1000Units20EpochsGLOVEBig
 from models import WordBasedSeq2Seq1000Units20EpochsGLOVEBigReverse
+from models import WordBasedSeq2Seq1000Units20EpochsGLOVELargeDataSet
 from models import WordBasedSeq2Seq1000Units20EpochsGLOVEReverseInput
 from models import model_2_token_also_at_encoder_unk
 
@@ -10,7 +12,9 @@ models = {'WordBasedSeq2Seq1000Units20EpochsGLOVE': '0',
           'model_2_token_also_at_encoder_unk': '2',
           'WordBasedSeq2Seq1000Units20EpochsGLOVEReverseInput': '3',
           'WordBasedSeq2Seq1000Units20EpochsGLOVEBig': '4',
-          'WordBasedSeq2Seq1000Units20EpochsGLOVEBigReverse': '5'
+          'WordBasedSeq2Seq1000Units20EpochsGLOVEBigReverse': '5',
+          'CharSeq2SeqTutOneHotInput': '6',
+          'WordBasedSeq2Seq1000Units20EpochsGLOVELargeDataSet': '7'
           }
 
 
@@ -39,6 +43,14 @@ def determine_model(searched_model):
     elif searched_model == 'WordBasedSeq2Seq1000Units20EpochsGLOVEBigReverse' or searched_model == models[
         'WordBasedSeq2Seq1000Units20EpochsGLOVEBigReverse']:
         model = WordBasedSeq2Seq1000Units20EpochsGLOVEBigReverse.Seq2Seq2()
+
+    elif searched_model == 'CharSeq2SeqTutOneHotInput' or searched_model == models[
+        'CharSeq2SeqTutOneHotInput']:
+        model = CharSeq2SeqTutOneHotInput.Seq2Seq2()
+
+    elif searched_model == 'WordBasedSeq2Seq1000Units20EpochsGLOVELargeDataSet' or searched_model == models[
+        'WordBasedSeq2Seq1000Units20EpochsGLOVELargeDataSet']:
+        model = WordBasedSeq2Seq1000Units20EpochsGLOVELargeDataSet.Seq2Seq2()
 
     return model
 

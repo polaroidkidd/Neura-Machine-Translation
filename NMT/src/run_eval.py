@@ -13,8 +13,10 @@ references_file = input("reference_file:\n")
 if references_file == "":
     references_file = "C:/Users/Nicolas/Desktop/DE_EN_(tatoeba)_validation_german_only.txt"
 
-base_hypothesis_path = "C:/Users/Nicolas/Desktop/"
-hypothesis_file = base_hypothesis_path + model.identifier + "_validation_predictions" + '.txt'
+hypothesis_file = input("hypothesis file:\n")
+if len(hypothesis_file) < 2:
+    base_hypothesis_path = "C:/Users/Nicolas/Desktop/Predictions"
+    hypothesis_file = base_hypothesis_path + model.identifier + "_validation_predictions" + '.txt'
 
 if not os.path.exists(hypothesis_file):
     with open(hypothesis_file, 'w'):

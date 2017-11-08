@@ -10,7 +10,7 @@ from keras.models import Sequential
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 
-from helpers.CustomCallback import CustomCallback
+from helpers.BleuCallback import BleuCallback
 from helpers.EvalCallback import EvalCallback
 from helpers.Tokenizer import Tokenizer
 from models.BaseModel import BaseModel
@@ -21,38 +21,50 @@ class Seq2Seq2(BaseModel):
         BaseModel.__init__(self)
         self.identifier = 'WordBasedSeq2Seq1000Units20EpochsGLOVEBigReverse'
 
-        self.params['batch_size'] = 32
-        self.params['val_batch_size'] = 64
+        self.params['batch_size'] = 10
+        self.params['val_batch_size'] = 32
         self.params['epochs'] = 20
         self.params['latent_dim'] = 1000
         self.params['MAX_SEQ_LEN'] = 100
         self.params['EMBEDDING_DIM'] = 300
-        self.params['MAX_WORDS_DE'] = 32000
-        self.params['MAX_WORDS_EN'] = 16000
+        self.params['MAX_WORDS_DE'] = 40000
+        self.params['MAX_WORDS_EN'] = 40000
         self.params['P_DENSE_DROPOUT'] = 0.2
+        self.params['VALIDATION_FREQ'] = 1
 
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../Persistence/' + self.identifier
-        if not os.path.exists("../../Persistence"):
-            os.makedirs("../../Persistence")
-        if not os.path.exists(self.BASIC_PERSISTENT_DIR):
-            os.makedirs(self.BASIC_PERSISTENT_DIR)
-        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        self.GRAPH_DIR = os.path.join(self.BASIC_PERSISTENT_DIR, 'Graph')
-        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
+        self.BASIC_PERSISTENCE_DIR = '../../Persistence/' + self.identifier
+        if not os.path.exists(self.BASIC_PERSISTENCE_DIR):
+            os.makedirs(self.BASIC_PERSISTENCE_DIR)
+        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
+        self.GRAPH_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR, 'Graph')
+        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
+        self.WEIGHT_FILES = []
 
+        dir = os.listdir(self.MODEL_CHECKPOINT_DIR)
+        for file in dir:
+            if file.endswith("hdf5"):
+                self.WEIGHT_FILES.append(os.path.join(self.MODEL_CHECKPOINT_DIR, file))
+        self.WEIGHT_FILES.sort(key=lambda x: int(x.split('model.')[1].split('-')[0]))
+        if len(self.WEIGHT_FILES) == 0:
+            print("no weight files found")
+        else:
+            self.LATEST_MODELCHKPT = self.WEIGHT_FILES[len(self.WEIGHT_FILES) - 1]
         self.TRAIN_DATA_FILE = os.path.join(self.BASE_DATA_DIR, 'Training/DE_EN_(tatoeba)_train.txt')
         self.VAL_DATA_FILE = os.path.join(self.BASE_DATA_DIR, 'Validation/DE_EN_(tatoeba)_validation.txt')
         self.model_file = os.path.join(self.MODEL_DIR, 'model.h5')
         self.PRETRAINED_GLOVE_FILE = os.path.join(self.BASE_DATA_DIR, 'glove.6B.300d.txt')
-        self.LATEST_MODELCHKPT = os.path.join(self.MODEL_CHECKPOINT_DIR, 'model.878-1.90.hdf5')
-
         self.START_TOKEN = "_GO"
         self.END_TOKEN = "_EOS"
         self.UNK_TOKEN = "_UNK"
 
         self.preprocessing = True
-        self.use_custom_callback = False
+        self.use_bleu_callback = False
+
+    def __insert_valid_token_at_last_position(self, texts):
+        for sent in texts:
+            if not (sent[self.params['MAX_SEQ_LEN'] - 1] == 0 or sent[self.params['MAX_SEQ_LEN'] - 1] == 2):
+                sent[self.params['MAX_SEQ_LEN'] - 1] = 2
 
     def __create_vocab(self):
         en_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
@@ -62,10 +74,13 @@ class Seq2Seq2(BaseModel):
         self.train_input_texts = pad_sequences(self.train_input_texts, maxlen=self.params['MAX_SEQ_LEN'],
                                                padding='post',
                                                truncating='post')
+        self.__insert_valid_token_at_last_position(self.train_input_texts)
+
         self.val_input_texts = en_tokenizer.texts_to_sequences(self.val_input_texts)
         self.val_input_texts = pad_sequences(self.val_input_texts, maxlen=self.params['MAX_SEQ_LEN'],
                                              padding='post',
                                              truncating='post')
+        self.__insert_valid_token_at_last_position(self.val_input_texts)
         self.en_word_index = en_tokenizer.word_index
 
         de_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
@@ -75,10 +90,12 @@ class Seq2Seq2(BaseModel):
         self.train_target_texts = pad_sequences(self.train_target_texts, maxlen=self.params['MAX_SEQ_LEN'],
                                                 padding='post',
                                                 truncating='post')
+        self.__insert_valid_token_at_last_position(self.train_target_texts)
         self.val_target_texts = de_tokenizer.texts_to_sequences(self.val_target_texts)
         self.val_target_texts = pad_sequences(self.val_target_texts, maxlen=self.params['MAX_SEQ_LEN'],
                                               padding='post',
                                               truncating='post')
+        self.__insert_valid_token_at_last_position(self.val_target_texts)
         self.de_word_index = de_tokenizer.word_index
 
         embeddings_index = {}
@@ -102,6 +119,8 @@ class Seq2Seq2(BaseModel):
                 embedding_vector = self.START_TOKEN_VECTOR
             elif word == self.END_TOKEN:
                 embedding_vector = self.END_TOKEN_VECTOR
+            elif word == self.UNK_TOKEN:
+                embedding_vector = self.UNK_TOKEN_VECTOR
             else:
                 embedding_vector = embeddings_index.get(word)
             if embedding_vector is None:
@@ -117,89 +136,61 @@ class Seq2Seq2(BaseModel):
             self.train_input_texts, self.train_target_texts = self.__split_data(self.TRAIN_DATA_FILE)
             self.num_train_samples = len(self.train_input_texts)
             self.val_input_texts, self.val_target_texts = self.__split_data(self.VAL_DATA_FILE,
-                                                                            save_unpreprocessed_targets=self.use_custom_callback)
+                                                                            save_unpreprocessed_targets=self.use_bleu_callback)
             self.__create_vocab()
-            if self.use_custom_callback is False:
-                np.save(self.BASIC_PERSISTENT_DIR + '/val_target_texts.npy', self.val_target_texts)
-            np.save(self.BASIC_PERSISTENT_DIR + '/train_target_texts.npy', self.train_target_texts)
-            np.save(self.BASIC_PERSISTENT_DIR + '/train_input_texts.npy', self.train_input_texts)
-            np.save(self.BASIC_PERSISTENT_DIR + '/val_input_texts.npy', self.val_input_texts)
-            np.save(self.BASIC_PERSISTENT_DIR + '/en_word_index.npy', self.en_word_index)
-            np.save(self.BASIC_PERSISTENT_DIR + '/de_word_index.npy', self.de_word_index)
-            np.save(self.BASIC_PERSISTENT_DIR + '/en_embedding_matrix.npy', self.en_embedding_matrix)
+            if self.use_bleu_callback is False:
+                np.save(self.BASIC_PERSISTENCE_DIR + '/val_target_texts.npy', self.val_target_texts)
+            np.save(self.BASIC_PERSISTENCE_DIR + '/train_target_texts.npy', self.train_target_texts)
+            np.save(self.BASIC_PERSISTENCE_DIR + '/train_input_texts.npy', self.train_input_texts)
+            np.save(self.BASIC_PERSISTENCE_DIR + '/val_input_texts.npy', self.val_input_texts)
+            np.save(self.BASIC_PERSISTENCE_DIR + '/en_word_index.npy', self.en_word_index)
+            np.save(self.BASIC_PERSISTENCE_DIR + '/de_word_index.npy', self.de_word_index)
+            np.save(self.BASIC_PERSISTENCE_DIR + '/en_embedding_matrix.npy', self.en_embedding_matrix)
 
         else:
-            self.train_input_texts = np.load(self.BASIC_PERSISTENT_DIR + '/train_input_texts.npy')
-            self.train_target_texts = np.load(self.BASIC_PERSISTENT_DIR + '/train_target_texts.npy')
-            self.val_input_texts = np.load(self.BASIC_PERSISTENT_DIR + '/val_input_texts.npy')
-            self.en_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/en_word_index.npy')
-            self.de_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/de_word_index.npy')
+            self.train_input_texts = np.load(self.BASIC_PERSISTENCE_DIR + '/train_input_texts.npy')
+            self.train_target_texts = np.load(self.BASIC_PERSISTENCE_DIR + '/train_target_texts.npy')
+            self.val_input_texts = np.load(self.BASIC_PERSISTENCE_DIR + '/val_input_texts.npy')
+            self.en_word_index = np.load(self.BASIC_PERSISTENCE_DIR + '/en_word_index.npy')
+            self.de_word_index = np.load(self.BASIC_PERSISTENCE_DIR + '/de_word_index.npy')
             self.en_word_index = self.en_word_index.item()
             self.de_word_index = self.de_word_index.item()
-            self.en_embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/en_embedding_matrix.npy')
+            self.en_embedding_matrix = np.load(self.BASIC_PERSISTENCE_DIR + '/en_embedding_matrix.npy')
 
-            if self.use_custom_callback:
+            if self.use_bleu_callback:
                 self.val_target_texts_no_preprocessing = []
                 lines = open(self.VAL_DATA_FILE, encoding='UTF-8').read().split('\n')
                 for line in lines:
                     _, target_text = line.split('\t')
                     self.val_target_texts_no_preprocessing.append(target_text)
             else:
-                self.val_target_texts = np.load(self.BASIC_PERSISTENT_DIR + '/val_target_texts.npy')
+                self.val_target_texts = np.load(self.BASIC_PERSISTENCE_DIR + '/val_target_texts.npy')
 
         self.num_train_samples = len(self.train_input_texts)
 
-        M = Sequential()
-        M.add(
-            Embedding(self.params['MAX_WORDS_EN'] + 3, self.params['EMBEDDING_DIM'], weights=[self.en_embedding_matrix],
-                      mask_zero=True))
+        self.__setup_model(mode='training')
 
-        M.add(LSTM(self.params['latent_dim'], return_sequences=True, name='encoder', go_backwards=True))
-
-        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
-
-        M.add(LSTM(self.params['latent_dim'] * int(1 / self.params['P_DENSE_DROPOUT']), return_sequences=True))
-        # M.add(LSTM(self.params['latent_dim'], return_sequences=True))
-
-        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
-
-        M.add(TimeDistributed(Dense(self.params['MAX_WORDS_DE'] + 3,
-                                    input_shape=(None, self.params['MAX_SEQ_LEN'], self.params['MAX_WORDS_DE'] + 3),
-                                    activation='softmax')))
-
-        print('compiling')
-
-        M.compile(optimizer='Adam', loss='categorical_crossentropy')
-
-        print('compiled')
-
-        steps_per_epoch = 1
-        mod_epochs = int(np.math.floor(
-            self.num_train_samples / self.params['batch_size'] / steps_per_epoch * self.params['epochs']))
         tbCallBack = callbacks.TensorBoard(log_dir=self.GRAPH_DIR, histogram_freq=0, write_grads=True, write_graph=True,
                                            write_images=True)
         modelCallback = callbacks.ModelCheckpoint(
             self.MODEL_CHECKPOINT_DIR + '/model.{epoch:03d}-{loss:.3f}.hdf5',
             monitor='loss', verbose=1, save_best_only=False,
             save_weights_only=True, mode='auto',
-            period=mod_epochs / self.params['epochs'])
-        validation_steps = int(np.floor(len(self.val_input_texts) / (self.params['val_batch_size'])) - 2)
+            period=1)
 
-        if self.use_custom_callback:
-            customCallback = CustomCallback(self.de_word_index, self.START_TOKEN, self.END_TOKEN, self.val_input_texts,
-                                            self.val_target_texts_no_preprocessing, self.params['epochs'])
-            used_callbacks = [tbCallBack, modelCallback, customCallback]
+        if self.use_bleu_callback:
+            bleuCallback = BleuCallback(self.de_word_index, self.START_TOKEN, self.END_TOKEN, self.val_input_texts,
+                                        self.val_target_texts_no_preprocessing, self.params['epochs'])
+            used_callbacks = [tbCallBack, modelCallback, bleuCallback]
         evalCallback = EvalCallback(self.__serve_batch(self.val_input_texts, self.val_target_texts, 'val'),
-                                    validation_steps, int(np.floor(mod_epochs / self.params['epochs'])),
-                                    self.identifier)
+                                    int(len(self.val_input_texts) / self.params['val_batch_size']), self.identifier,
+                                    frequency=self.params['VALIDATION_FREQ'])
         used_callbacks = [tbCallBack, modelCallback, evalCallback]
-        M.fit_generator(self.__serve_batch(self.train_input_texts, self.train_target_texts, 'train'),
-                        steps_per_epoch,
-                        epochs=mod_epochs, verbose=2, callbacks=used_callbacks,
-                        # validation_data=self.__serve_batch(self.val_input_texts, self.val_target_texts, 'val'),
-                        # validation_steps=validation_steps,
-                        max_queue_size=1)
-        M.save(self.model_file)
+        self.M.fit_generator(self.__serve_batch(self.train_input_texts, self.train_target_texts, 'train'),
+                             int(len(self.train_input_texts) / self.params['batch_size']),
+                             epochs=self.params['epochs'], verbose=2, callbacks=used_callbacks,
+                             max_queue_size=1)
+        self.M.save(self.model_file)
 
     def __split_data(self, file, save_unpreprocessed_targets=False):
         """
@@ -259,66 +250,82 @@ class Seq2Seq2(BaseModel):
                     counter = 0
                     yield batch_X, batch_Y
 
-    def __setup_model(self):
-        try:
-            test = self.en_embedding_matrix
-            test = self.M
-            return
-        except AttributeError:
-            pass
+    def __setup_model(self, mode=None):
+        if mode not in ['predict', 'training']:
+            exit("wrong mode for setup_model")
 
-        self.en_embedding_matrix = np.load(self.BASIC_PERSISTENT_DIR + '/en_embedding_matrix.npy')
+        if mode == 'predict':
+            try:
+                test = self.en_embedding_matrix
+                test = self.M
+                return
+            except AttributeError:
+                pass
+            self.en_embedding_matrix = np.load(self.BASIC_PERSISTENCE_DIR + '/en_embedding_matrix.npy')
 
-        M = Sequential()
-        M.add(
+        self.M = Sequential()
+        self.M.add(
             Embedding(self.params['MAX_WORDS_EN'] + 3, self.params['EMBEDDING_DIM'], weights=[self.en_embedding_matrix],
-                      mask_zero=True))
+                      mask_zero=True, trainable=False))
 
-        M.add(LSTM(self.params['latent_dim'], return_sequences=True, name='encoder'))
+        self.M.add(LSTM(self.params['latent_dim'], return_sequences=True, name='encoder', go_backwards=True))
 
-        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
+        self.M.add(Dropout(self.params['P_DENSE_DROPOUT']))
 
-        M.add(LSTM(self.params['latent_dim'] * int(1 / self.params['P_DENSE_DROPOUT']), return_sequences=True))
+        self.M.add(LSTM(self.params['latent_dim'] * int(1 / self.params['P_DENSE_DROPOUT']), return_sequences=True))
+        # M.add(LSTM(self.params['latent_dim'], return_sequences=True))
 
-        M.add(Dropout(self.params['P_DENSE_DROPOUT']))
+        self.M.add(Dropout(self.params['P_DENSE_DROPOUT']))
 
-        M.add(TimeDistributed(Dense(self.params['MAX_WORDS_DE'] + 3,
-                                    input_shape=(None, self.params['MAX_SEQ_LEN'], self.params['MAX_WORDS_DE'] + 3),
-                                    activation='softmax')))
+        self.M.add(TimeDistributed(Dense(self.params['MAX_WORDS_DE'] + 3,
+                                         input_shape=(
+                                             None, self.params['MAX_SEQ_LEN'], self.params['MAX_WORDS_DE'] + 3),
+                                         activation='softmax')))
 
         print('compiling')
 
-        M.compile(optimizer='Adam', loss='categorical_crossentropy')
+        self.M.compile(optimizer='Adam', loss='categorical_crossentropy')
+        self.M.summary()
 
-        self.M.load_weights(self.LATEST_MODELCHKPT)
+        print('compiled')
+
+        if mode == 'predict':
+            self.M.load_weights(self.LATEST_MODELCHKPT)
+
+    def __setup_helpers(self):
+        try:
+            self.en_word_index
+            return
+        except Exception as e:
+            pass
+        self.en_word_index = np.load(self.BASIC_PERSISTENCE_DIR + '/en_word_index.npy')
+        self.de_word_index = np.load(self.BASIC_PERSISTENCE_DIR + '/de_word_index.npy')
+        self.de_word_index = self.de_word_index.item()
+        self.en_word_index = self.en_word_index.item()
+
+        self.en_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
+                                      num_words=self.params['MAX_WORDS_EN'])
+        self.en_tokenizer.word_index = self.en_word_index
+        self.en_tokenizer.num_words = self.params['MAX_WORDS_EN'] + 3
+
+        self.de_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
+                                      num_words=self.params['MAX_WORDS_DE'])
+        self.de_tokenizer.word_index = self.de_word_index
+        self.de_tokenizer.num_words = self.params['MAX_WORDS_DE'] + 3
 
     def predict_one_sentence(self, sentence):
-        self.__setup_model()
+        self.__setup_model(mode='predict')
+        self.__setup_helpers()
 
-        self.en_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/en_word_index.npy')
-        self.de_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/de_word_index.npy')
-
-        en_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
-                                 num_words=self.params['MAX_WORDS_EN'])
-        en_tokenizer.word_index = self.en_word_index
-        en_tokenizer.num_words = self.params['MAX_WORDS_EN'] + 3
-
-        de_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
-                                 num_words=self.params['MAX_WORDS_DE'])
-        de_tokenizer.word_index = self.de_word_index
-        de_tokenizer.num_words = self.params['MAX_WORDS_DE'] + 3
-
-        print(sentence)
-        sentence = en_tokenizer.texts_to_sequences([sentence])
-        print(sentence)
+        sentence = self.en_tokenizer.texts_to_sequences([sentence], print_unk_warning=True)
         sentence = pad_sequences(sentence, maxlen=self.params['MAX_SEQ_LEN'],
                                  padding='post',
                                  truncating='post')
+        self.__insert_valid_token_at_last_position(sentence)
         sentence = sentence.reshape(sentence.shape[0], sentence.shape[1])
-        print(sentence)
 
         prediction = self.M.predict(sentence)
-
+        print(prediction.shape)
         predicted_sentence = ""
         reverse_word_index = dict((i, word) for word, i in self.de_word_index.items())
         for sentence in prediction:
@@ -337,35 +344,35 @@ class Seq2Seq2(BaseModel):
 
         return predicted_sentence
 
-    def predict_batch(self, sentences):
-        self.__setup_model()
+    def predict_batch(self, sentences, all_weights=False):
+        self.__setup_model(mode='predict')
+        self.__setup_helpers()
 
-        self.en_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/en_word_index.npy')
-        self.de_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/de_word_index.npy')
-
-        en_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
-                                 num_words=self.params['MAX_WORDS_EN'])
-        en_tokenizer.word_index = self.en_word_index
-        en_tokenizer.num_words = self.params['MAX_WORDS_EN'] + 3
-
-        de_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
-                                 num_words=self.params['MAX_WORDS_DE'])
-        de_tokenizer.word_index = self.de_word_index
-        de_tokenizer.num_words = self.params['MAX_WORDS_DE'] + 3
-
-        print(sentences)
-        sentences = en_tokenizer.texts_to_sequences(sentences)
-        print(sentences)
+        sentences = self.en_tokenizer.texts_to_sequences(sentences, print_unk_warning=True)
         sentences = pad_sequences(sentences, maxlen=self.params['MAX_SEQ_LEN'],
                                   padding='post',
                                   truncating='post')
+        self.__insert_valid_token_at_last_position(sentences)
         sentences = sentences.reshape(sentences.shape[0], sentences.shape[1])
 
-        batch_size = sentences.shape[0]
-        if batch_size > 10:
-            batch_size = 10
+        predictions_for_weights = {}
+        if all_weights is True:
+            for weight_file in self.WEIGHT_FILES:
+                self.M.load_weights(weight_file)
+                predictions_for_weights[weight_file.split('model.')[1]] = self.__predict_batch_for_specific_weight(
+                    sentences)
+        else:
+            predictions_for_weights[
+                self.LATEST_MODELCHKPT.split('model.')[1]] = self.__predict_batch_for_specific_weight()
 
+        return predictions_for_weights
+
+    def __predict_batch_for_specific_weight(self, sentences):
+        batch_size = sentences.shape[0]
+        if batch_size > 20:
+            batch_size = 20
         reverse_word_index = dict((i, word) for word, i in self.de_word_index.items())
+
         predicted_sentences = []
         from_idx = 0
         to_idx = batch_size
@@ -391,43 +398,55 @@ class Seq2Seq2(BaseModel):
                 predicted_sentences.append(predicted_sent)
             from_idx += batch_size
             to_idx += batch_size
-            if to_idx > sentences.shape[0]:
-                # todo accept not multiple of batchsize
+
+            if from_idx > sentences.shape[0]:
+                break
+            elif from_idx == sentences.shape[0]:
+                to_idx = from_idx + 1
+            elif to_idx > sentences.shape[0] and from_idx < sentences.shape[0]:
+                to_idx = sentences.shape[0] + 1
+            elif to_idx > sentences.shape[0]:
                 break
         return predicted_sentences
 
-    def calculate_hiddenstate_after_encoder(self, sentence):
-        self.__setup_model()
+    def calculate_hiddenstate_after_encoder(self, sentences):
+        self.__setup_model(mode='predict')
+        self.__setup_helpers()
 
-        self.en_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/en_word_index.npy')
-        self.de_word_index = np.load(self.BASIC_PERSISTENT_DIR + '/de_word_index.npy')
+        sentences = self.en_tokenizer.texts_to_sequences(sentences, print_unk_warning=True)
+        sentences = pad_sequences(sentences, maxlen=self.params['MAX_SEQ_LEN'],
+                                  padding='post',
+                                  truncating='post')
+        self.__insert_valid_token_at_last_position(sentences)
+        sentences = sentences.reshape(sentences.shape[0], sentences.shape[1])
+        encoder = Model(inputs=self.M.input, outputs=self.M.get_layer('encoder').output)
 
-        en_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
-                                 num_words=self.params['MAX_WORDS_EN'])
-        en_tokenizer.word_index = self.en_word_index
-        en_tokenizer.num_words = self.params['MAX_WORDS_EN'] + 3
+        batch_size = sentences.shape[0]
+        if batch_size > 20:
+            batch_size = 20
 
-        de_tokenizer = Tokenizer(self.START_TOKEN, self.END_TOKEN, self.UNK_TOKEN,
-                                 num_words=self.params['MAX_WORDS_DE'])
-        de_tokenizer.word_index = self.de_word_index
-        de_tokenizer.num_words = self.params['MAX_WORDS_DE'] + 3
+        predicted_sentences = []
+        from_idx = 0
+        to_idx = batch_size
 
-        print(sentence)
-        sentence = en_tokenizer.texts_to_sequences([sentence])
-        print(sentence)
-        sentence = pad_sequences(sentence, maxlen=self.params['MAX_SEQ_LEN'],
-                                 padding='post',
-                                 truncating='post')
-        sentence = sentence.reshape(sentence.shape[0], sentence.shape[1])
-        print(sentence)
+        hiddenstates = []
+        while True:
+            print("from_idx, to_idx, hm_sentences", from_idx, to_idx, sentences.shape[0])
+            current_batch = sentences[from_idx:to_idx]
+            hiddenstates.append(encoder.predict(current_batch, batch_size=batch_size))
 
-        encoder_name = 'encoder'
+            from_idx += batch_size
+            to_idx += batch_size
 
-        encoder = Model(inputs=self.M.input, outputs=self.M.get_layer(encoder_name).output)
-
-        prediction = encoder.predict(sentence, batch_size=1)
-        print(prediction.shape)
-        return prediction
+            if from_idx > sentences.shape[0]:
+                break
+            elif from_idx == sentences.shape[0]:
+                to_idx = from_idx + 1
+            elif to_idx > sentences.shape[0] and from_idx < sentences.shape[0]:
+                to_idx = sentences.shape[0] + 1
+            elif to_idx > sentences.shape[0]:
+                break
+        return hiddenstates
 
     def calculate_every_hiddenstate_after_encoder(self, sentence):
         raise NotImplementedError()

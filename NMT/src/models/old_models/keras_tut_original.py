@@ -18,12 +18,12 @@ class KerasTutSeq2Seq(BaseModel):
 
         self.UNKNOWN_CHAR = '\r'
         self.BASE_DATA_DIR = "../../DataSets"
-        self.BASIC_PERSISTENT_DIR = '../../persistent/model_keras_tut_original'
-        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
-        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENT_DIR)
+        self.BASIC_PERSISTENCE_DIR = '../../persistent/model_keras_tut_original'
+        self.MODEL_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
+        self.MODEL_CHECKPOINT_DIR = os.path.join(self.BASIC_PERSISTENCE_DIR)
         self.LATEST_MODEL_CHKPT = os.path.join(self.MODEL_CHECKPOINT_DIR,
                                                'chkp22_64_100_15_256_1000000_20000_1000_1800_150_150_0.8_char___tfmodel2.6999-47.37.hdf5')
-        self.token_idx_file = os.path.join(self.BASIC_PERSISTENT_DIR, "token_index.npy")
+        self.token_idx_file = os.path.join(self.BASIC_PERSISTENCE_DIR, "token_index.npy")
         self.train_data_file = os.path.join(self.BASE_DATA_DIR, 'Training/deu.txt')
         self.encoder_model_file = os.path.join(self.MODEL_DIR, 'encoder_model.h5')
         self.model_file = os.path.join(self.MODEL_DIR, 's2s2.h5')
