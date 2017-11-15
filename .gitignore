@@ -204,3 +204,8 @@ NMT/src/playground.py
 /Persistence/WordBasedSeq2Seq1000Units20EpochsGLOVEReverseInputBig/
 /Persistence/WordBasedSeq2Seq1000Units20EpochsGLOVEBig/
 /Persistence/WordBasedSeq2Seq1000Units20EpochsGLOVEReverseInput/
+/Persistence/WordBasedSeq2Seq1000Units20EpochsGLOVEBigReverse/
+/Persistence/CharSeq2SeqTutOneHotInput/
+/Persistence/WordBasedSeq2Seq1000Units20EpochsGLOVELargeDataSet/
+/Persistence/LR/
+/wmt16_de_en/
