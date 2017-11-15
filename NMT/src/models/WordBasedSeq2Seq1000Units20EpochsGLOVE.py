@@ -189,7 +189,7 @@ class Seq2Seq2(BaseModel):
         self.M.fit_generator(self.__serve_batch(self.train_input_texts, self.train_target_texts, 'train'),
                              int(len(self.train_input_texts) / self.params['batch_size']),
                              epochs=self.params['epochs'], verbose=2, callbacks=used_callbacks,
-                             max_queue_size=1)
+                             max_queue_size=1, suffle=True)
         self.M.save(self.model_file)
 
     def __split_data(self, file, save_unpreprocessed_targets=False):
@@ -269,13 +269,13 @@ class Seq2Seq2(BaseModel):
                       mask_zero=True, trainable=False))
 
         self.M.add(LSTM(self.params['latent_dim'], return_sequences=True, name='encoder'))
-
-        self.M.add(Dropout(self.params['P_DENSE_DROPOUT']))
+        if mode == 'training':
+            self.M.add(Dropout(self.params['P_DENSE_DROPOUT']))
 
         # M.add(LSTM(self.params['latent_dim'] * int(1 / self.params['P_DENSE_DROPOUT']), return_sequences=True))
         self.M.add(LSTM(self.params['latent_dim'], return_sequences=True))
-
-        self.M.add(Dropout(self.params['P_DENSE_DROPOUT']))
+        if mode == 'training':
+            self.M.add(Dropout(self.params['P_DENSE_DROPOUT']))
 
         self.M.add(TimeDistributed(Dense(self.params['MAX_WORDS_DE'] + 3,
                                          input_shape=(

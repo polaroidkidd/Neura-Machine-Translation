@@ -7,7 +7,12 @@ from metrics.Bleu import Bleu
 if len(sys.argv) > 1:
     model = model_repo.argument_model_selection(sys.argv[1])
 else:
-    model = model_repo.interactive_model_selection()
+    mode = input("model selection (1) or name (2)")
+    if mode == 1:
+        model = model_repo.interactive_model_selection()
+        model_name = model.identifier
+    else:
+        model_name = input("name of the model")
 
 references_file = input("reference_file:\n")
 if references_file == "":
@@ -22,5 +27,5 @@ if not os.path.exists(hypothesis_file):
     with open(hypothesis_file, 'w'):
         pass
 
-bleu_evaluator = Bleu(model.identifier, 'bleu', timestamp=True, epoch=1)
+bleu_evaluator = Bleu(model_name, 'bleu', timestamp=True, epoch=1)
 bleu_evaluator.evaluate_hypothesis_corpus(hypothesis_file, references_file)

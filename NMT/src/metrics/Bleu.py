@@ -106,8 +106,8 @@ class Bleu(BaseMetric):
                 raise FileNotFoundError()
             else:
                 with \
-                        open(hypothesis, 'r', encoding='utf-8') as hyp_file, \
-                        open(references, 'r', encoding='utf-8') as ref_file:
+                        open(hypothesis, 'r', encoding='ISO-8859-1') as hyp_file, \
+                        open(references, 'r', encoding='ISO-8859-1') as ref_file:
                     for hyp, ref in zip(hyp_file, ref_file):
                         self.parse_data(hyp, ref)
         else:
