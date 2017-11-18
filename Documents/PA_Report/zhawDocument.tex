@@ -1,3 +1,4 @@
+
 %%	build-queue:
 %%	
 %%	¦¦¦ very first run. No .ist files yet
@@ -13,9 +14,10 @@
 %%	
 
 \RequirePackage[l2tabu,orthodox]{nag}
-\documentclass[10pt,a4paper,titlepage,twoside,english, final]{zhawreprt}
+\documentclass[10pt,a4paper,titlepage,twoside,english]{zhawreprt}
 
 \usepackage[T1]{fontenc}
+\usepackage{hyperref}
 
 
 \include{packages}
@@ -40,11 +42,54 @@
 
 \tableofcontents
 
+
 \chapter{Introduction}\label{chp:Introduction}
+The rapid pace at which the human species has overcome barriers of communication in the past 100 years is astounding. From the introduction of traditional carrier mail [\citenum{Union2016}]  to the invention of the internet [citation needed] one of  our only common subjectively goals is the improvement of communication. [citation needed] 
+\\
+\\
+However, it is only through the internet that we have the possibility to engage people from all over the globe at the touch of a finger. This ability brings into focus one of the last remaining barriers of communication we have to overcome. In 2009 we spoke 6909 unique languages [\citenum{Anderson2010}]. Therefore, finding a way to efficiently translate between any of these languages is key.
+\\
+\\
+The rapid advancements in machine learning has put computer scientists in a position to develop machine translators. The currently developed translators can be classified into one of five major groups.[Citation Needed]
+\notes{
+
 \begin{itemize}
+\item https://en.wikipedia.org/wiki/Machine_translation#Neural_MT}
+\end{itemize}
+\begin{enumerate}
+
+\item Rule-Based
+\item Statistical
+\item Example-Based
+\item Hybrid Machine Translation
+\item Neural Machine Translation
+
+\end{enumerate}
+There are three major challenges in automating translation lies in the nature of all spoken languages. 
+\begin{enumerate}
+\item Ambiguity - Words may contain multiple meanings and depending on the context, only a subset apply
+\item Non-Standard Terminology - This refers to the use of language constructs which do not adhere to the official language documentation. A popular example of this is are the abbreviations and emojies used in tweets.
+\item Named Entities - To a machine, a name appears like any other word. It's a set of characters. However, they are typically not translatable and thus the machine needs to be in a position to accurately identify named entities. 
+\end{enumerate}
+They are ambiguous, contain non-standard constructs and include named entities.  
+
+
+\begin{itemize}
+\item humans are the most communicative mammal on this planet (source needed)
+\item our species has relentlessly pursued the improvement of communication methods. First carrier mail, then the telegram followed by the radio, telephone, tv and most recently, the internet.
+\item The last innovation enabled us truly to connect with [insert percentage of people on the planet who have access to internet] of earth's population.
+\item One major challenge remains. Language barriers.
+\item Rise of machine learning has begun to help us overcome this barrier. [Examples of Microsoft (Skype), Google (translate/nmt) and Deepl]
 \item machines becoming better at processing human language (accuracy)
-\item conversation with machines are possible to a limited degree
-\item information retrieval through voice recognition still a challenge due to
+\item translations are still not always 100\% correct due to factors such as
+\begin{itemize}
+\item double meaning
+\item context
+\item sentiment (sarcasm vs. criticism)
+\end{itemize}
+\item this project is aimed at building our own neural machine translation agent, rebuilding current nmts and verifying their published performance as well as measure our nmt against the published performance and our measured performance
+\end{itemize}
+\notes{
 \begin{itemize}
 \item attention to correct words
 \item database structures
@@ -55,8 +100,8 @@
 \item KBQA: Learning Question Answering over QA Corpora and Knowledge Bases
 \item Eric, Manning - 2017 - Key-Value Retrieval Networks for Task-Oriented Dialogue - With Highlights
 \end{itemize}
-\item Asking your Assistant (Google, Siri or S-Voice) weather you have an appointment tomorrow and ask follow-up questions about this appointment is currently not possible (due to above challenges but could be if these papers prove implementable
-\end{itemize}
+\item Asking your Assistant (Google, Siri or S-Voice) weather you have an appointment tomorrow and ask follow-up questions about this appointment is currently not possible (due to above challenges but could be if these papers prove implementable}
+
 
 
 
@@ -178,13 +223,16 @@ int getRandomNumber()
 \notes{\item (Zusammenfassung der Resultate)}
 
 \chapter{Discussion and Prospects}\label{chp:DiscussionAndProspects}
-Wie in \cite[Kapitel~2, Seite~215]{DahmenReusken2008} nachzulesen, gibt es sogenannte Gleichungen\index{Gleichung}.\gls{hrz}\gls{elitism}\gls{ohm}
+Wie in XXX nachzulesen, gibt es sogenannte Gleichungen\index{Gleichung}.\gls{hrz}\gls{elitism}\gls{ohm}
 \notes{
 \item Bespricht die erzielten Ergebnisse bezüglich ihrer Erwartbarkeit, Aussagekraft und Relevanz
 \item Interpretation und Validierung der Resultate
 \item Rückblick auf Aufgabenstellung, erreicht bzw. nicht erreicht
 \item Legt dar, wie an die Resultate (konkret vom Industriepartner oder weiteren Forschungsarbeiten; allgemein) angeschlossen werden kann; legt dar, welche Chancen die Resultate bieten
 }
+
+
+
 
 \chapter{Index}\label{chp:Index}
 \bibliography{reference}\label{sec:Bibliography}
@@ -208,7 +256,7 @@ Wie in \cite[Kapitel~2, Seite~215]{DahmenReusken2008} nachzulesen, gibt es sogen
 \section{Projektmanagement}\label{sec:Projectmanagement}
 \notes{
 \item Offizielle Aufgabenstellung, Projektauftrag
-\item (Zeitplan) 
+\item (Zeitplan)
 \item (Besprechungsprotokolle oder Journals)
 }
 \section{Final Words}\label{sec:Others}
