@@ -13,10 +13,7 @@
 %%	
 
 \RequirePackage[l2tabu,orthodox]{nag}
-\documentclass[10pt,a4paper,titlepage,twoside,english, final]{zhawreprt}
-
-\usepackage[T1]{fontenc}
-
+\documentclass[10pt,a4paper,titlepage,twoside,english]{zhawreprt}
 
 \include{packages}
 \if false
@@ -29,6 +26,16 @@
 
 \maketitle
 
+\chapter*{Zusammenfassung}\label{sec:Abstract}
+\notes{\item Zusammenfassung}
+
+\chapter*{Vorwort}\label{sec:Vorwort}
+\notes{\item Stellt den persönlichen Bezug zur Arbeit dar und spricht Dank aus.}
+
+\makedeclarationoforiginality
+
+\tableofcontents
+
 \chapter*{Abstract}\label{sec:Abstract}
 \notes{\item Summary}
 \text{This is just some normal text that goes here}
@@ -36,72 +43,106 @@
 \chapter*{Preface}\label{sec:Preface}
 \notes{\item Stellt den persönlichen Bezug zur Arbeit dar und spricht Dank aus.}
 \text{thank-yous go here}
-\makedeclarationoforiginality
 
-\tableofcontents
+
+
+
 
 \chapter{Introduction}\label{chp:Introduction}
-\begin{itemize}
-\item machines becoming better at processing human language (accuracy)
-\item conversation with machines are possible to a limited degree
-\item information retrieval through voice recognition still a challenge due to
-\begin{itemize}
-\item attention to correct words
-\item database structures
-\item multiple ways to ask for identical information
-\end{itemize}
-\item multiple solutions proposed
-\begin{itemize}
-\item KBQA: Learning Question Answering over QA Corpora and Knowledge Bases
-\item Eric, Manning - 2017 - Key-Value Retrieval Networks for Task-Oriented Dialogue - With Highlights
-\end{itemize}
-\item Asking your Assistant (Google, Siri or S-Voice) weather you have an appointment tomorrow and ask follow-up questions about this appointment is currently not possible (due to above challenges but could be if these papers prove implementable
-\end{itemize}
+The rapid pace at which the human species has overcome barriers of communication in the past 100 years is astounding. From the introduction of traditional carrier mail [\citenum{Union2016}]  to the invention of the internet [citation needed] one of  our only common subjectively goals is the improvement of communication. [citation needed] 
+\\
+\\
+However, it is only through the internet that we have the possibility to engage people from all over the globe at the touch of a finger. This ability brings into focus one of the last remaining barriers of communication we have to overcome. In 2009 we spoke 6909 unique languages [\citenum{Anderson2010}]. Therefore, finding a way to efficiently translate between any of these languages is key.
+\\
+\\
+The rapid advancements in machine learning has put computer scientists in a position to develop machine translators. The currently developed translators can be classified into one of five major groups.[Citation Needed]
 
+\begin{enumerate}
+	
+	\item Rule-Based
+	\item Statistical
+	\item Example-Based
+	\item Hybrid Machine Translation
+	\item Neural Machine Translation
+	
+\end{enumerate}
+There are three major challenges in automating translation lies in the nature of all spoken languages. 
+\begin{enumerate}
+	\item Ambiguity - Words may contain multiple meanings and depending on the context, only a subset apply
+	\item Non-Standard Terminology - This refers to the use of language constructs which do not adhere to the official language documentation. A popular example of this is are the abbreviations and emojies used in tweets.
+	\item Named Entities - To a machine, a name appears like any other word. It's a set of characters. However, they are typically not translatable and thus the machine needs to be in a position to accurately identify named entities. 
+\end{enumerate}
+They are ambiguous, contain non-standard constructs and include named entities.  
+
+
+\begin{itemize}
+	\item humans are the most communicative mammal on this planet (source needed)
+	\item our species has relentlessly pursued the improvement of communication methods. First carrier mail, then the telegram followed by the radio, telephone, tv and most recently, the internet.
+	\item The last innovation enabled us truly to connect with [insert percentage of people on the planet who have access to internet] of earth's population.
+	\item One major challenge remains. Language barriers.
+	\item Rise of machine learning has begun to help us overcome this barrier. [Examples of Microsoft (Skype), Google (translate/nmt) and Deepl]
+	\item machines becoming better at processing human language (accuracy)
+	\item translations are still not always 100\% correct due to factors such as
+	\begin{itemize}
+		\item double meaning
+		\item context
+		\item sentiment (sarcasm vs. criticism)
+	\end{itemize}
+	\item this project is aimed at building our own neural machine translation agent, rebuilding current nmts and verifying their published performance as well as measure our nmt against the published performance and our measured performance
+\end{itemize}
+\notes{
+	\item attention to correct words
+	\item database structures
+	\item multiple ways to ask for identical information
+	\item multiple solutions proposed
+	\item KBQA: Learning Question Answering over QA Corpora and Knowledge Bases
+	\item Eric, Manning - 2017 - Key-Value Retrieval Networks for Task-Oriented Dialogue - With Highlights	
+	\item Asking your Assistant (Google, Siri or S-Voice) weather you have an appointment tomorrow and ask follow-up questions about this appointment is currently not possible (due to above challenges but could be if these papers prove implementable	
+}
 
 
 \section{Initial Position}\label{sec:InitialPosition}
 \begin{itemize}
-\item No Response from KBQA for Code
-\item Refusal to share code from Manning
-\item Ultimate new goal: Implement Manning's solution without his code
+	\item No Response from KBQA for Code
+	\item Refusal to share code from Manning
+	\item Ultimate new goal: Implement Manning's solution without his code
 \end{itemize}
 \notes{
-\item Nennt bestehende Arbeiten/Literatur zum Thema -> Literaturrecherche
-\item Stand der Technik: Bisherige Lösungen des Problems und deren Grenzen
-\item (Nennt kurz den Industriepartner und/oder weitere Kooperationspartner und dessen/deren Interesse am Thema Fragestellung)
+	\item Nennt bestehende Arbeiten/Literatur zum Thema -> Literaturrecherche
+	\item Stand der Technik: Bisherige Lösungen des Problems und deren Grenzen
+	\item (Nennt kurz den Industriepartner und/oder weitere Kooperationspartner und dessen/deren Interesse am Thema Fragestellung)
 }
 \section{Task}\label{sec:Task}
 \begin{itemize}
-\item Small Steps
-\begin{itemize}
-\item implement seq2seq network for translation
-\begin{itemize}
-\item implement char-based
-\item implement word-based
-\item try multiple different implementations (reversed-input, multiple LSTMs) and compare against each other
-\item get decent results on both and move on
-\end{itemize}
-\item implement seq2seq with attention
-\begin{itemize}
-\item attempt various attention mechanism
-\end{itemize}
-\end{itemize}
-\item One Large Step
-\begin{itemize}
-\item map best working models and tools to KBQA and get better results than Stanford
-\item Rub better results in Eric's face.
-\item Profit.
-\end{itemize}
+	\item Small Steps
+	\begin{itemize}
+		\item implement seq2seq network for translation
+		\begin{itemize}
+			\item implement char-based
+			\item implement word-based
+			\item try multiple different implementations (reversed-input, multiple LSTMs) and compare against each other
+			\item get decent results on both and move on
+		\end{itemize}
+		\item implement seq2seq with attention
+		\begin{itemize}
+			\item attempt various attention mechanism
+		\end{itemize}
+	\end{itemize}
+	\item One Large Step
+	\begin{itemize}
+		\item map best working models and tools to KBQA and get better results than Stanford
+		\item Rub better results in Eric's face.
+		\item Profit.
+	\end{itemize}
 \end{itemize}
 \notes{
-\item Formuliert das Ziel der Arbeit
-\item Verweist auf die offizielle Aufgabenstellung des/der Dozierenden im Anhang
-\item (Pflichtenheft, Spezifikation)
-\item (Spezifiziert die Anforderungen an das Resultat der Arbeit)
-\item (Übersicht über die Arbeit: stellt die folgenden Teile der Arbeit kurz vor)
-\item (Angaben zum Zielpublikum: nennt das für die Arbeit vorausgesetzte Wissen)
-\item (Terminologie: Definiert die in der Arbeit verwendeten Begriffe)
+	\item Formuliert das Ziel der Arbeit
+	\item Verweist auf die offizielle Aufgabenstellung des/der Dozierenden im Anhang
+	\item (Pflichtenheft, Spezifikation)
+	\item (Spezifiziert die Anforderungen an das Resultat der Arbeit)
+	\item (Übersicht über die Arbeit: stellt die folgenden Teile der Arbeit kurz vor)
+	\item (Angaben zum Zielpublikum: nennt das für die Arbeit vorausgesetzte Wissen)
+	\item (Terminologie: Definiert die in der Arbeit verwendeten Begriffe)
 }
 
 \chapter{Theoretical Principles}\label{chp:TheoreticalPrinciples}
@@ -110,81 +151,84 @@ Test this one here too, please
 \begin{lstlisting}[linebackgroundcolor={\inlist{lstnumber}{3,4}}]
 int getRandomNumber()
 {
-	return 4; // chosen by fair dice roll.
-			  // guaranteed to be random.
+return 4; // chosen by fair dice roll.
+// guaranteed to be random.
 }
 \end{lstlisting}
 \section{Definitions}\label{sec:Definitions}
 \begin{itemize}
-\item Hypothesis
-\item Reference
+	\item Hypothesis
+	\item Reference
 \end{itemize}
 \section{Recurrent Neural Networks}\label{sec:Recurrent Neural Networks}
 \begin{itemize}
-\item Standard Neural Networks
-\item Recurrent Neural Networks
-\begin{itemize}
-\item Problems
-\item Solutions
-\end{itemize}
+	\item Standard Neural Networks
+	\item Recurrent Neural Networks
+	\begin{itemize}
+		\item Problems
+		\item Solutions
+	\end{itemize}
 \end{itemize}
 \section{Seq2Seq}\label{sec:Seq2Seq}
 \begin{itemize}
-\item encoder
-\item decoder
+	\item encoder
+	\item decoder
 \end{itemize}
 \section{Attention}\label{sec:Attention Mechanisms}
 \begin{itemize}
-\item Mechanisms
+	\item Mechanisms
 \end{itemize}
 \section{Performance Evaluation}\label{sec:Performance Evaluation}
 \begin{itemize}
-\item Translation
-\begin{itemize}
-\item Bleu
-\item others
-\end{itemize}
-\item KB-Retrieval
-\begin{itemize}
-\item Bleu
-\item sent2vec
-\end{itemize}
+	\item Translation
+	\begin{itemize}
+		\item Bleu
+		\item others
+	\end{itemize}
+	\item KB-Retrieval
+	\begin{itemize}
+		\item Bleu
+		\item sent2vec
+	\end{itemize}
 \end{itemize}
 
 \chapter{Experiments}\label{chp:Experiments}
 \begin{itemize}
-\item Folgende waren schlechter als in deren Literatur beschrieben
-\begin{itemize}
-\item Keras Tutorial Char-Based
-\item MagicMagic Keras Char = Keras Word
-\item Our attempt at Word Based
-\end{itemize}
-\item Hidden State(?)
-\item Used Keras Tutorial from TF-Talk
-\item Google NMT
-\item Find out why ours didn´t perform as well as the above two
+	\item Folgende waren schlechter als in deren Literatur beschrieben
+	\begin{itemize}
+		\item Keras Tutorial Char-Based
+		\item MagicMagic Keras Char = Keras Word
+		\item Our attempt at Word Based
+	\end{itemize}
+	\item Hidden State(?)
+	\item Used Keras Tutorial from TF-Talk
+	\item Google NMT
+	\item Find out why ours didn´t perform as well as the above two
 \end{itemize}
 \notes{
-\item (Beschreibt die Grundüberlegungen der realisierten Lösung (Konstruktion/Entwurf) und die Realisierung als Simulation, als Prototyp oder als Software-Komponente)
-\item (Definiert Messgrössen, beschreibt Mess- oder Versuchsaufbau, beschreibt und dokumentiert Durchführung der Messungen/Versuche)
-\item (Experimente)
-\item (Lösungsweg)
-\item (Modell)
-\item (Tests und Validierung)
-\item (Theoretische Herleitung der Lösung)
+	\item (Beschreibt die Grundüberlegungen der realisierten Lösung (Konstruktion/Entwurf) und die Realisierung als Simulation, als Prototyp oder als Software-Komponente)
+	\item (Definiert Messgrössen, beschreibt Mess- oder Versuchsaufbau, beschreibt und dokumentiert Durchführung der Messungen/Versuche)
+	\item (Experimente)
+	\item (Lösungsweg)
+	\item (Modell)
+	\item (Tests und Validierung)
+	\item (Theoretische Herleitung der Lösung)
 }
 
 \chapter{Results}\label{chp:Results}
 \notes{\item (Zusammenfassung der Resultate)}
 
 \chapter{Discussion and Prospects}\label{chp:DiscussionAndProspects}
-Wie in \cite[Kapitel~2, Seite~215]{DahmenReusken2008} nachzulesen, gibt es sogenannte Gleichungen\index{Gleichung}.\gls{hrz}\gls{elitism}\gls{ohm}
+Wie in XXX nachzulesen, gibt es sogenannte Gleichungen\index{Gleichung}.\gls{hrz}\gls{elitism}\gls{ohm}
 \notes{
-\item Bespricht die erzielten Ergebnisse bezüglich ihrer Erwartbarkeit, Aussagekraft und Relevanz
-\item Interpretation und Validierung der Resultate
-\item Rückblick auf Aufgabenstellung, erreicht bzw. nicht erreicht
-\item Legt dar, wie an die Resultate (konkret vom Industriepartner oder weiteren Forschungsarbeiten; allgemein) angeschlossen werden kann; legt dar, welche Chancen die Resultate bieten
+	\item Bespricht die erzielten Ergebnisse bezüglich ihrer Erwartbarkeit, Aussagekraft und Relevanz
+	\item Interpretation und Validierung der Resultate
+	\item Rückblick auf Aufgabenstellung, erreicht bzw. nicht erreicht
+	\item Legt dar, wie an die Resultate (konkret vom Industriepartner oder weiteren Forschungsarbeiten; allgemein) angeschlossen werden kann; legt dar, welche Chancen die Resultate bieten
 }
+
+
+
 
 \chapter{Index}\label{chp:Index}
 \bibliography{reference}\label{sec:Bibliography}
@@ -195,7 +239,7 @@ Wie in \cite[Kapitel~2, Seite~215]{DahmenReusken2008} nachzulesen, gibt es sogen
 \newpage
 \listoftables\label{sec:ListOfTables}
 \newpage
-\lstlistoflistings\label{sec:ListOfListings}
+%\lstlistoflistings\label{sec:ListOfListings}
 \newpage
 \printglossary[title=Symbol Glossary, type=symbols]\label{sec:SymbolGlossary}
 \newpage
@@ -207,20 +251,20 @@ Wie in \cite[Kapitel~2, Seite~215]{DahmenReusken2008} nachzulesen, gibt es sogen
 \chapter{Appendix}\label{chp:Appendix}
 \section{Projektmanagement}\label{sec:Projectmanagement}
 \notes{
-\item Offizielle Aufgabenstellung, Projektauftrag
-\item (Zeitplan) 
-\item (Besprechungsprotokolle oder Journals)
+	\item Offizielle Aufgabenstellung, Projektauftrag
+	\item (Zeitplan)
+	\item (Besprechungsprotokolle oder Journals)
 }
 \section{Final Words}\label{sec:Others}
 \notes{
-\item CD mit dem vollständigen Bericht als pdf-File inklusive Film- und Fotomaterial
-\item (Schaltpläne und Ablaufschemata)
-\item (Spezifikationen u. Datenblätter der verwendeten Messgeräte und/oder Komponenten)
-\item (Berechnungen, Messwerte, Simulationsresultate)
-\item (Stoffdaten)
-\item (Fehlerrechnungen mit Messunsicherheiten)
-\item (Grafische Darstellungen, Fotos)
-\item (Datenträger mit weiteren Daten(z. B. Software-Komponenten) inkl. Verzeichnis der auf diesem Datenträger abgelegten Dateien)
-\item (Softwarecode)
+	\item CD mit dem vollständigen Bericht als pdf-File inklusive Film- und Fotomaterial
+	\item (Schaltpläne und Ablaufschemata)
+	\item (Spezifikationen u. Datenblätter der verwendeten Messgeräte und/oder Komponenten)
+	\item (Berechnungen, Messwerte, Simulationsresultate)
+	\item (Stoffdaten)
+	\item (Fehlerrechnungen mit Messunsicherheiten)
+	\item (Grafische Darstellungen, Fotos)
+	\item (Datenträger mit weiteren Daten(z. B. Software-Komponenten) inkl. Verzeichnis der auf diesem Datenträger abgelegten Dateien)
+	\item (Softwarecode)
 }
 \end{document}
