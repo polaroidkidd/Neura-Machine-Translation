@@ -67,7 +67,7 @@
 \def\theprojecttype{PA}\newcommand{\projecttype}[1]{
 \ifnum\pdf@strcmp{\unexpanded{#1}}{PA}=0 %
 \def\theprojecttype{PA}
-\if@german\def\zhaw@Project{Projektarbeit}\def\zhaw@project{Projektarbeit}\else\def\zhaw@Project{Project Work}\def\zhaw@project{Project Work}\fi
+\if@german\def\zhaw@Project{Projektarbeit}\def\zhaw@project{Projektarbeit}\else\def\zhaw@Project{Project Work}\def\zhaw@project{project work}\fi
 \else\ifnum\pdf@strcmp{\unexpanded{#1}}{BA}=0 %
 \if@german\def\zhaw@Project{Bachelorarbeit}\def\zhaw@project{Bachelorarbeit}\else\def\zhaw@Project{Bachelor's Thesis}\def\zhaw@project{Bachelor's thesis}\fi
 \else
@@ -182,7 +182,7 @@
 		\ifx\zhaw@authors\empty\else
 		\begin{minipage}[b][1.5cm][t]{0.27\textwidth}
 		\hrule\vskip 0.5cm
-			\textbf{Authers}
+			\textbf{Autoren}
 		\end{minipage}\hfill
 		\begin{minipage}[b][1.5cm][t]{0.7\textwidth}
 		\hrule\vskip 0.5cm
@@ -192,7 +192,7 @@
 		\ifx\zhaw@mainreferee\empty\else
 		\begin{minipage}[b][1.5cm][t]{0.27\textwidth}
 		\hrule\vskip 0.5cm
-			\textbf{Main Referee}
+			\textbf{Hauptbetreuung}
 		\end{minipage}\hfill
 		\begin{minipage}[b][1.5cm][t]{0.7\textwidth}
 		\hrule\vskip 0.5cm
@@ -202,7 +202,7 @@
 		\ifx\zhaw@referee\empty\else
 		\begin{minipage}[b][1.5cm][t]{0.27\textwidth}
 		\hrule\vskip 0.5cm
-			\textbf{Assisting Referees}
+			\textbf{Nebenbetreuung}
 		\end{minipage}\hfill
 		\begin{minipage}[b][1.5cm][t]{0.7\textwidth}
 		\hrule\vskip 0.5cm
@@ -231,7 +231,7 @@
 		\fi
 		\begin{minipage}[b][1.5cm][t]{0.27\textwidth}
 		\hrule\vskip 0.5cm
-			\textbf{Date}
+			\textbf{Datum}
 		\end{minipage}\hfill
 		\begin{minipage}[b][1.5cm][t]{0.7\textwidth}
 		\hrule\vskip 0.5cm
