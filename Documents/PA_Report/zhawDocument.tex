@@ -154,20 +154,17 @@ This paper is structured as follows: Chapter two explains the fundamental concep
 }
 
 \chapter{Theoretical Principles}\label{chp:TheoreticalPrinciples}
-Test this one here too, please
-\setlistingCSharp
-\begin{lstlisting}[linebackgroundcolor={\inlist{lstnumber}{3,4}}]
-int getRandomNumber()
-{
-return 4; // chosen by fair dice roll.
-// guaranteed to be random.
-}
-\end{lstlisting}
+The first part of this chapter is dedicated to explaining fundamental terminology and theoretical concepts in machine learning, followed by concepts specific to NMT. 
+
+It is important to note that the following definitions and explanations are restricted to information specific to NMT. As such concepts related to unsupervised learning are excluded from this report. 
+
 \section{Definitions}\label{sec:Definitions}
-\begin{itemize}
-	\item Hypothesis
-	\item Reference
-\end{itemize}
+% TODO Vertical Align definitions
+
+\textbf{Reference} \quad\quad\ A \textit{reference} refers to a the correct translation against which the translation produced by the NMT can be measured. It is either an entire paragraph, sentence or word. Traditionally a \textit{reference} refers to one complete sentence. \newline
+\newline
+\textbf{Hypothesis} \quad\quad In the context of machine translation a \textit{hypothesis} refers to the output produced by the NMT, given an input sentence.
+
 \section{Recurrent Neural Networks}\label{sec:Recurrent Neural Networks}
 \begin{itemize}
 	\item Standard Neural Networks
