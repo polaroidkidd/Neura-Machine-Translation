@@ -49,13 +49,19 @@
 
 
 \chapter{Introduction}\label{chp:Introduction}
-The rapid pace at which the human species has overcome barriers of communication in the past 100 years is astounding. From the introduction of traditional carrier mail [\citenum{Union2016}]  to the invention of the internet [citation needed] one of  our only common subjectively goals is the improvement of communication. [citation needed] 
+The rapid pace at which the human race has overcome barriers of communication in the past 100 years is astounding. Starting at the introduction of traditional carrier mail [\citenum{Union2016}]  to the invention of the internet [citation needed], subjectively, one of  our only common goals is the improvement of communication. [citation needed] 
 \\
 \\
-However, it is only through the internet that we have the possibility to engage people from all over the globe at the touch of a finger. This ability brings into focus one of the last remaining barriers of communication we have to overcome. In 2009 we spoke 6909 unique languages [\citenum{Anderson2010}]. Therefore, finding a way to efficiently translate between any of these languages is key.
+However, the internet is unique in it's ability to connect us neigh instantaneously with people from all over the globe at the touch of a button. This brings into focus one of the last remaining barriers of communication we have to overcome. Languages.
 \\
 \\
-The rapid advancements in machine learning has put computer scientists in a position to develop machine translators. The currently developed translators can be classified into one of five major groups.[Citation Needed]
+In 2009 we spoke 6909 unique languages [\citenum{Anderson2010}]. Therefore, finding a way to efficiently translate between any of these languages is key to further enable interaction. The three main challenges which present themselves are as follows:
+\begin{enumerate}
+	\item Ambiguity - Words may contain multiple meanings and depending on their context, only a subset apply.
+	\item Non-Standard Terminology - This refers to the use of language constructs which do not adhere to the official language documentation. A popular example of this is are the abbreviations and emojies used in tweets.
+	\item Named Entities - To a machine, a name appears like any other word. It's a set of characters. However, they are typically not translatable and thus the machine needs to be in a position to accurately identify named entities. 
+\end{enumerate}
+The rapid advancements in machine learning as well as increase in computational power has enabled computer scientists develop machine translators. Past machine assisted translation software as well as current iterations can be associated with one of the the following five groups.[Citation Needed].
 
 \begin{enumerate}
 	
@@ -66,16 +72,22 @@ The rapid advancements in machine learning has put computer scientists in a posi
 	\item Neural Machine Translation
 	
 \end{enumerate}
-There are three major challenges in automating translation lies in the nature of all spoken languages. 
+Although different implementations of the Neural Machine Translation (hence forth NMT) approach varies widly in terms of accuracy, speed and reliability, it has, in general, shown the most promise of succeeding.
+
+This has lead to an increase in attention from the scientific community resulting in a large number of slight variations, each claiming to produce better results.
+
+This report focuses on two main aspects:
 \begin{enumerate}
-	\item Ambiguity - Words may contain multiple meanings and depending on the context, only a subset apply
-	\item Non-Standard Terminology - This refers to the use of language constructs which do not adhere to the official language documentation. A popular example of this is are the abbreviations and emojies used in tweets.
-	\item Named Entities - To a machine, a name appears like any other word. It's a set of characters. However, they are typically not translatable and thus the machine needs to be in a position to accurately identify named entities. 
-\end{enumerate}
-They are ambiguous, contain non-standard constructs and include named entities.  
-
-
-\begin{itemize}
+	\item Build a functioning NMT and evaluate it with the field's common methods
+	\item Rebuild and reproduce the results of a number of recently published papers in order to 
+	\begin{enumerate}
+		\item Compare our model against the current state of the art.
+		\item Reproduce, verify and compare the results of other models with our own.
+		\item Determine and why our model succeeded or fell short of expectations when compared to others.
+	\end{enumerate}
+\end{enumerate} 
+This paper is structured as follows: Chapter two explains the fundamental concepts of machine learning, homing in on terminology and theory commonly applied in NMT and common evaluation methods. Chapter three is dedicated to show casing our selected approach while chapter four briefly summarizes the selected approaches. Chapter five and six details the selected data and methodology. The experiments, results and the comparison is described in chapter seven while chapter eight and nine summarizes our learnings and possible next steps.
+\notes{
 	\item humans are the most communicative mammal on this planet (source needed)
 	\item our species has relentlessly pursued the improvement of communication methods. First carrier mail, then the telegram followed by the radio, telephone, tv and most recently, the internet.
 	\item The last innovation enabled us truly to connect with [insert percentage of people on the planet who have access to internet] of earth's population.
@@ -83,14 +95,10 @@ They are ambiguous, contain non-standard constructs and include named entities.
 	\item Rise of machine learning has begun to help us overcome this barrier. [Examples of Microsoft (Skype), Google (translate/nmt) and Deepl]
 	\item machines becoming better at processing human language (accuracy)
 	\item translations are still not always 100\% correct due to factors such as
-	\begin{itemize}
-		\item double meaning
-		\item context
-		\item sentiment (sarcasm vs. criticism)
-	\end{itemize}
+	\item double meaning
+	\item context
+	\item sentiment (sarcasm vs. criticism)
 	\item this project is aimed at building our own neural machine translation agent, rebuilding current nmts and verifying their published performance as well as measure our nmt against the published performance and our measured performance
-\end{itemize}
-\notes{
 	\item attention to correct words
 	\item database structures
 	\item multiple ways to ask for identical information
@@ -146,20 +154,17 @@ They are ambiguous, contain non-standard constructs and include named entities.
 }
 
 \chapter{Theoretical Principles}\label{chp:TheoreticalPrinciples}
-Test this one here too, please
-\setlistingCSharp
-\begin{lstlisting}[linebackgroundcolor={\inlist{lstnumber}{3,4}}]
-int getRandomNumber()
-{
-return 4; // chosen by fair dice roll.
-// guaranteed to be random.
-}
-\end{lstlisting}
+The first part of this chapter is dedicated to explaining fundamental terminology and theoretical concepts in machine learning, followed by concepts specific to NMT. 
+
+It is important to note that the following definitions and explanations are restricted to information specific to NMT. As such concepts related to unsupervised learning are excluded from this report. 
+
 \section{Definitions}\label{sec:Definitions}
-\begin{itemize}
-	\item Hypothesis
-	\item Reference
-\end{itemize}
+% TODO Vertical Align definitions
+
+\textbf{Reference} \quad\quad\ A \textit{reference} refers to a the correct translation against which the translation produced by the NMT can be measured. It is either an entire paragraph, sentence or word. Traditionally a \textit{reference} refers to one complete sentence. \newline
+\newline
+\textbf{Hypothesis} \quad\quad In the context of machine translation a \textit{hypothesis} refers to the output produced by the NMT, given an input sentence.
+
 \section{Recurrent Neural Networks}\label{sec:Recurrent Neural Networks}
 \begin{itemize}
 	\item Standard Neural Networks
